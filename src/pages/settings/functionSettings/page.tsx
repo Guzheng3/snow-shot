@@ -43,11 +43,6 @@ import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { defaultAppSettingsData } from "@/constants/appSettings";
 import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat";
 import {
-	SOURCE_LANGUAGE_ENV_VARIABLE,
-	TARGET_LANGUAGE_ENV_VARIABLE,
-	TRANSLATION_DOMAIN_ENV_VARIABLE,
-} from "@/constants/components/translation";
-import {
 	PLUGIN_ID_AI_CHAT,
 	PLUGIN_ID_FFMPEG,
 	PLUGIN_ID_RAPID_OCR,
@@ -1559,63 +1554,6 @@ export const FunctionSettingsPage = () => {
 								</Col>
 							</Row>
 
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<Alert
-										message={
-											<Typography>
-												<Row>
-													<Col span={24}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.variables" />
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.sourceLanguage" />
-														<code>{SOURCE_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.targetLanguage" />
-														<code>{TARGET_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.translationDomain" />
-														<code>{TRANSLATION_DOMAIN_ENV_VARIABLE}</code>
-													</Col>
-												</Row>
-											</Typography>
-										}
-										type="info"
-										style={{ marginBottom: token.margin }}
-									/>
-									<ProFormTextArea
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.tip" />
-												}
-											/>
-										}
-										layout="horizontal"
-										name="translationSystemPrompt"
-										rules={[
-											{
-												required: true,
-												message: intl.formatMessage({
-													id: "settings.functionSettings.translationSettings.chatPrompt.required",
-												}),
-											},
-										]}
-										fieldProps={{
-											autoSize: {
-												minRows: 1,
-												maxRows: 1,
-											},
-										}}
-									/>
-								</Col>
-							</Row>
 						</ProForm>
 					</Spin>
 				</>

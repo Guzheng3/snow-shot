@@ -835,17 +835,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.cacheTargetLanguage
 							: (prevSettings?.cacheTargetLanguage ??
 								defaultAppSettingsData[group].cacheTargetLanguage),
-					cacheTranslationDomain:
-						typeof newSettings?.cacheTranslationDomain === "string"
-							? newSettings.cacheTranslationDomain
-							: (prevSettings?.cacheTranslationDomain ??
-								defaultAppSettingsData[group].cacheTranslationDomain),
-					cacheTranslationType:
-						typeof newSettings?.cacheTranslationType === "number" ||
-						typeof newSettings?.cacheTranslationType === "string"
-							? newSettings.cacheTranslationType
-							: (prevSettings?.cacheTranslationType ??
-								defaultAppSettingsData[group].cacheTranslationType),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslation) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -854,11 +843,6 @@ const AppSettingsContextProviderCore: React.FC<{
 					| undefined;
 
 				settings = {
-					translationSystemPrompt:
-						typeof newSettings?.translationSystemPrompt === "string"
-							? newSettings.translationSystemPrompt
-							: (prevSettings?.translationSystemPrompt ??
-								defaultAppSettingsData[group].translationSystemPrompt),
 					optimizeAiTranslationLayout:
 						typeof newSettings?.optimizeAiTranslationLayout === "boolean"
 							? newSettings.optimizeAiTranslationLayout
@@ -888,17 +872,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.targetLanguage
 							: (prevSettings?.targetLanguage ??
 								defaultAppSettingsData[group].targetLanguage),
-					translationDomain:
-						typeof newSettings?.translationDomain === "string"
-							? newSettings.translationDomain
-							: (prevSettings?.translationDomain ??
-								defaultAppSettingsData[group].translationDomain),
-					translationType:
-						typeof newSettings?.translationType === "number" ||
-						typeof newSettings?.translationType === "string"
-							? newSettings.translationType
-							: (prevSettings?.translationType ??
-								defaultAppSettingsData[group].translationType),
 				};
 			} else if (group === AppSettingsGroup.FunctionScreenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];

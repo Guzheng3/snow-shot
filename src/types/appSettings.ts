@@ -9,7 +9,6 @@ import type {
 	CommonKeyEventValue,
 } from "./core/commonKeyEvent";
 import { DrawState } from "./draw";
-import type { TranslationDomain, TranslationType } from "./servies/translation";
 import type { ImageFormat } from "./utils/file";
 
 export enum HistoryValidDuration {
@@ -389,18 +388,13 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */
 		optimizeAiTranslationLayout: boolean;
-		translationSystemPrompt: string;
 		translationApiConfigList: TranslationApiConfig[];
 		sourceLanguage: string;
 		targetLanguage: string;
-		translationDomain: TranslationDomain;
-		translationType: TranslationType | string;
 	};
 	[AppSettingsGroup.FunctionTranslationCache]: {
 		cacheSourceLanguage: string;
 		cacheTargetLanguage: string;
-		cacheTranslationDomain: TranslationDomain;
-		cacheTranslationType: TranslationType | string;
 	};
 	[AppSettingsGroup.FunctionScreenshot]: {
 		/** 选取窗口子元素 */
