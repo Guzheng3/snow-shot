@@ -76,10 +76,6 @@ export const HomePage = () => {
 						return isReadyStatus?.(PLUGIN_ID_FFMPEG);
 					}
 
-					if (group === AppFunctionGroup.Chat) {
-												return false;
-											}
-
 					return true;
 				})
 				.map((group) => {
@@ -102,21 +98,6 @@ export const HomePage = () => {
 											}
 											appSettingsGroup={AppSettingsGroup.AppFunction}
 											filter={resetFliter(AppFunctionGroup.Screenshot)}
-										/>
-									}
-								>
-								</GroupTitle>
-							);
-							break;
-						case AppFunctionGroup.Chat:
-							groupTitle = (
-								<GroupTitle
-									id="chatFunction"
-									extra={
-										<ResetSettingsButton
-											title={<FormattedMessage id="home.chatFunction" />}
-											appSettingsGroup={AppSettingsGroup.AppFunction}
-											filter={resetFliter(AppFunctionGroup.Chat)}
 										/>
 									}
 								>
@@ -158,7 +139,6 @@ export const HomePage = () => {
 					let speicalKeys: string[] | undefined;
 					switch (group) {
 						case AppFunctionGroup.Screenshot:
-						case AppFunctionGroup.Chat:
 						case AppFunctionGroup.Other:
 							speicalKeys = ["PrintScreen"];
 							break;

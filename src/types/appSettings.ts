@@ -58,15 +58,6 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-export type ChatApiConfig = {
-	api_uri: string;
-	api_key: string;
-	api_model: string;
-	model_name: string;
-	support_thinking: boolean;
-	support_vision: boolean | undefined;
-};
-
 export enum TranslationApiType {
 	DeepL = "translation_api_deepl",
 }
@@ -91,12 +82,10 @@ export enum AppSettingsGroup {
 	AppFunction = "appFunction",
 	Render = "render",
 	SystemCommon = "systemCommon",
-	SystemChat = "systemChat",
 	SystemNetwork = "systemNetwork",
 	SystemScreenshot = "systemScreenshot_20250627",
 	SystemCore = "systemCore",
 	SystemScrollScreenshot = "systemScrollScreenshot_20250628",
-	FunctionChat = "functionChat",
 	FunctionOcr = "functionOcr",
 	FunctionTranslation = "functionTranslation",
 	FunctionTranslationCache = "functionTranslationCache",
@@ -309,8 +298,6 @@ export type AppSettingsData = {
 	};
 	[AppSettingsGroup.Cache]: {
 		menuCollapsed: boolean;
-		chatModel: string;
-		chatModelEnableThinking: boolean;
 		colorPickerColorFormatIndex: number;
 		prevImageFormat: ImageFormat;
 		prevSelectRect: ElementRect;
@@ -358,32 +345,14 @@ export type AppSettingsData = {
 	};
 	[AppSettingsGroup.SystemCommon]: {
 		autoStart: boolean;
-		autoCheckVersion: boolean;
 		runLog: boolean;
-	};
-	[AppSettingsGroup.SystemChat]: {
-		maxTokens: number;
-		temperature: number;
-		thinkingBudgetTokens: number;
 	};
 	[AppSettingsGroup.SystemNetwork]: {
 		enableProxy: boolean;
 	};
-	[AppSettingsGroup.FunctionChat]: {
-		autoCreateNewSession: boolean;
-		/** 关闭窗口时自动创建新会话 */
-		autoCreateNewSessionOnCloseWindow: boolean;
-		chatApiConfigList: ChatApiConfig[];
-	};
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** 将图片转为 HTML 的视觉理解模型 */
-		htmlVisionModel: string;
-		/** 图片转为 HTML 的 System 提示词 */
-		htmlVisionModelSystemPrompt: string;
-		/** 图片转为 Markdown 的 System 提示词 */
-		markdownVisionModelSystemPrompt: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */

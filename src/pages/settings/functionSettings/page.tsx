@@ -7,7 +7,6 @@ import ProForm, {
 	ProFormSelect,
 	ProFormSwitch,
 	ProFormText,
-	ProFormTextArea,
 } from "@ant-design/pro-form";
 import {
 	Alert,
@@ -18,7 +17,6 @@ import {
 	Form,
 	Row,
 	Select,
-	type SelectProps,
 	Spin,
 	Switch,
 	Typography,
@@ -40,10 +38,8 @@ import { DirectoryInput } from "@/components/directoryInput";
 import { GroupTitle, SubGroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { defaultAppSettingsData } from "@/constants/appSettings";
 import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat";
 import {
-	PLUGIN_ID_AI_CHAT,
 	PLUGIN_ID_FFMPEG,
 	PLUGIN_ID_RAPID_OCR,
 	PLUGIN_ID_TRANSLATE,
@@ -52,7 +48,6 @@ import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
-import { useVisionModelList } from "@/pages/fixedContent/components/ocrResult";
 import {
 	type AppSettingsData,
 	AppSettingsFixedContentInitialPosition,
@@ -75,7 +70,6 @@ import {
 	getImageSaveDirectory,
 	getVideoRecordSaveDirectory,
 } from "@/utils/file";
-import { TestChat } from "./components/testChat";
 import { TranslationConfig } from "./components/translationConfig";
 
 export const FunctionSettingsPage = () => {
@@ -83,8 +77,6 @@ export const FunctionSettingsPage = () => {
 	const { token } = theme.useToken();
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
-	const [functionForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionChat]>();
 	const [functionDrawForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
@@ -121,14 +113,6 @@ export const FunctionSettingsPage = () => {
 					translationForm.setFieldsValue(
 						settings[AppSettingsGroup.FunctionTranslation],
 					);
-				}
-
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.FunctionChat] !==
-						settings[AppSettingsGroup.FunctionChat]
-				) {
-					functionForm.setFieldsValue(settings[AppSettingsGroup.FunctionChat]);
 				}
 
 				if (
@@ -238,7 +222,6 @@ export const FunctionSettingsPage = () => {
 			},
 			[
 				translationForm,
-				functionForm,
 				functionDrawForm,
 				screenshotForm,
 				outputForm,
@@ -629,59 +612,6 @@ export const FunctionSettingsPage = () => {
 			},
 		];
 	}, [intl]);
-
-	const { getVisionModelList } = useVisionModelList();
-	const [htmlVisionModelOptions, setHtmlVisionModelOptions] = useState<
-		SelectProps["options"]
-	>([]);
-	useEffect(() => {
-		getVisionModelList().then((visionModelList) => {
-			const officialVisionModelList = visionModelList.filter(
-				(model) => model.isOfficial,
-			);
-			const customVisionModelList = visionModelList.filter(
-				(model) => !model.isOfficial,
-			);
-
-			const htmlVisionModelOptions = [
-				{
-					label: (
-						<IconLabel
-							label={intl.formatMessage({
-								id: "settings.functionSettings.ocrSettings.htmlVisionModel.default",
-							})}
-							tooltipTitle={intl.formatMessage({
-								id: "settings.functionSettings.ocrSettings.htmlVisionModel.default.tip",
-							})}
-						/>
-					),
-					value:
-						defaultAppSettingsData[AppSettingsGroup.FunctionOcr]
-							.htmlVisionModel,
-				},
-				customVisionModelList.length > 0
-					? {
-							label: <FormattedMessage id="tools.chat.custom" />,
-							options: customVisionModelList.map((model) => ({
-								label: model.config.model_name,
-								value: model.config.model_name,
-							})),
-						}
-					: undefined,
-				officialVisionModelList.length > 0
-					? {
-							label: <FormattedMessage id="tools.chat.official" />,
-							options: officialVisionModelList.map((model) => ({
-								label: model.config.model_name,
-								value: model.config.model_name,
-							})),
-						}
-					: undefined,
-			].filter(Boolean) as SelectProps["options"];
-
-			setHtmlVisionModelOptions(htmlVisionModelOptions);
-		});
-	}, [getVisionModelList, intl]);
 
 	const doubleClickActionOptions = useMemo(() => {
 		return [
@@ -1309,65 +1239,6 @@ export const FunctionSettingsPage = () => {
 										options={ocrModelOptions}
 									/>
 								</Col>
-
-								{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-									<>
-										<Col span={12}>
-											<ProFormSelect
-												name="htmlVisionModel"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModel" />
-														}
-														tooltipTitle={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModel.tip" />
-														}
-													/>
-												}
-												layout="vertical"
-												options={htmlVisionModelOptions}
-												allowClear={false}
-											/>
-										</Col>
-										<Col span={24}>
-											<ProFormTextArea
-												name="htmlVisionModelSystemPrompt"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModelSystemPrompt" />
-														}
-													/>
-												}
-												fieldProps={{
-													autoSize: {
-														minRows: 1,
-														maxRows: 1,
-													},
-												}}
-											/>
-										</Col>
-										<Col span={24}>
-											<ProFormTextArea
-												name="markdownVisionModelSystemPrompt"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.markdownVisionModelSystemPrompt" />
-														}
-													/>
-												}
-												fieldProps={{
-													autoSize: {
-														minRows: 1,
-														maxRows: 1,
-													},
-												}}
-											/>
-										</Col>
-									</>
-								)}
 							</Row>
 						</ProForm>
 					</Spin>
@@ -1554,262 +1425,6 @@ export const FunctionSettingsPage = () => {
 								</Col>
 							</Row>
 
-						</ProForm>
-					</Spin>
-				</>
-			)}
-
-			{(isReadyStatus?.(PLUGIN_ID_TRANSLATE) ||
-				isReadyStatus?.(PLUGIN_ID_AI_CHAT)) && (
-				<>
-					<Divider />
-
-					<GroupTitle
-						id="chatSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.chatSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionChat}
-							/>
-						}
-					>
-						<FormattedMessage id="settings.functionSettings.chatSettings" />
-					</GroupTitle>
-
-					<Spin spinning={appSettingsLoading}>
-						<ProForm
-							form={functionForm}
-							onValuesChange={(_, values) => {
-								updateAppSettings(
-									AppSettingsGroup.FunctionChat,
-									values,
-									true,
-									true,
-									true,
-									true,
-									false,
-								);
-							}}
-							submitter={false}
-						>
-							{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-								<Row gutter={token.marginLG}>
-									<Col span={12}>
-										<ProForm.Item
-											label={
-												<IconLabel
-													label={
-														<FormattedMessage id="settings.functionSettings.chatSettings.autoCreateNewSession" />
-													}
-												/>
-											}
-											layout="horizontal"
-											name="autoCreateNewSession"
-											valuePropName="checked"
-										>
-											<Switch />
-										</ProForm.Item>
-									</Col>
-
-									<Col span={12}>
-										<ProForm.Item
-											label={
-												<IconLabel
-													label={
-														<FormattedMessage id="settings.functionSettings.chatSettings.autoCreateNewSessionOnCloseWindow" />
-													}
-												/>
-											}
-											layout="horizontal"
-											name="autoCreateNewSessionOnCloseWindow"
-											valuePropName="checked"
-										>
-											<Switch />
-										</ProForm.Item>
-									</Col>
-								</Row>
-							)}
-
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<ProFormList
-										name="chatApiConfigList"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.tip" />
-												}
-											/>
-										}
-										creatorButtonProps={{
-											creatorButtonText: intl.formatMessage({
-												id: "settings.functionSettings.chatSettings.apiConfig.add",
-											}),
-										}}
-										actionRender={(...params) => {
-											const [field, , defaultActionDom] = params;
-											return [
-												defaultActionDom,
-												<TestChat
-													key="test-chat"
-													config={
-														functionForm.getFieldValue("chatApiConfigList")[
-															field.name
-														]
-													}
-												/>,
-											];
-										}}
-										className="api-config-list"
-										min={0}
-										itemRender={({ listDom, action }) => (
-											<Flex align="end" justify="space-between">
-												{listDom}
-												<div>{action}</div>
-											</Flex>
-										)}
-										creatorRecord={() => ({
-											api_uri: "",
-											api_key: "",
-											api_model: "",
-											model_name: "",
-										})}
-									>
-										<Row gutter={token.marginLG} style={{ width: "100%" }}>
-											<Col span={12}>
-												<ProFormText
-													name="model_name"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.modelName" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.modelName.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.modelName.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-										<Row gutter={token.marginLG}>
-											<Col span={12}>
-												<ProFormText
-													name="api_uri"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiUri" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiUri.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiUri.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText.Password
-													name="api_key"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiKey" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiKey.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiKey.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText
-													name="api_model"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiModel" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiModel.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiModel.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-										<Row gutter={token.marginLG}>
-											<Col span={12}>
-												<ProFormSwitch
-													name="support_thinking"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportThinking" />
-															}
-														/>
-													}
-												/>
-											</Col>
-											{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-												<Col span={12}>
-													<ProFormSwitch
-														name="support_vision"
-														label={
-															<IconLabel
-																label={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision" />
-																}
-																tooltipTitle={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision.tip" />
-																}
-															/>
-														}
-													/>
-												</Col>
-											)}
-										</Row>
-									</ProFormList>
-								</Col>
-							</Row>
 						</ProForm>
 					</Spin>
 				</>

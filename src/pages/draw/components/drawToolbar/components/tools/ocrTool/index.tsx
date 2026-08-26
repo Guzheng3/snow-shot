@@ -2,15 +2,8 @@ import { Button } from "antd";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
-import {
-	OcrTranslateIcon,
-	VisionMarkdownIcon,
-	VisionModelHtmlIcon,
-} from "@/components/icons";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
+import { OcrTranslateIcon } from "@/components/icons";
+import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
@@ -30,31 +23,19 @@ export const isOcrTool = (drawState: DrawState) => {
 const OcrTool: React.FC<{
 	onSwitchOcrResult: (ocrResultType: OcrResultType) => void;
 	onTranslate: () => void;
-	onConvertImageToHtml: () => void;
-	onConvertImageToMarkdown: () => void;
 	currentOcrResult:
 		| (AppOcrResult & { ocrResultType: OcrResultType })
 		| undefined;
 	ocrResult: AppOcrResult | undefined;
 	translatedOcrResult: AppOcrResult | undefined;
 	translateLoading: boolean;
-	visionModelHtmlResult: AppOcrResult | undefined;
-	visionModelHtmlLoading: boolean;
-	visionModelMarkdownResult: AppOcrResult | undefined;
-	visionModelMarkdownLoading: boolean;
 }> = ({
 	onSwitchOcrResult,
 	onTranslate,
-	onConvertImageToHtml,
-	onConvertImageToMarkdown,
 	currentOcrResult,
 	ocrResult,
 	translatedOcrResult,
 	translateLoading,
-	visionModelHtmlResult,
-	visionModelHtmlLoading,
-	visionModelMarkdownResult,
-	visionModelMarkdownLoading,
 }) => {
 	const intl = useIntl();
 
@@ -107,62 +88,6 @@ const OcrTool: React.FC<{
 								icon={<OcrTranslateIcon />}
 								title={intl.formatMessage({ id: "draw.ocrDetect.translate" })}
 								key="translate"
-							/>,
-						]
-					: []),
-				...(isReadyStatus?.(PLUGIN_ID_AI_CHAT)
-					? [
-							<Button
-								loading={visionModelHtmlLoading}
-								onClick={() => {
-									if (visionModelHtmlResult) {
-										onSwitchOcrResult(
-											currentOcrResult?.ocrResultType ===
-												OcrResultType.VisionModelHtml
-												? OcrResultType.Ocr
-												: OcrResultType.VisionModelHtml,
-										);
-									} else {
-										onConvertImageToHtml();
-									}
-								}}
-								type={
-									currentOcrResult?.ocrResultType ===
-									OcrResultType.VisionModelHtml
-										? "primary"
-										: "text"
-								}
-								icon={<VisionModelHtmlIcon />}
-								title={intl.formatMessage({
-									id: "draw.ocrDetect.visionModelHtml",
-								})}
-								key="visionModelHtml"
-							/>,
-							<Button
-								loading={visionModelMarkdownLoading}
-								onClick={() => {
-									if (visionModelMarkdownResult) {
-										onSwitchOcrResult(
-											currentOcrResult?.ocrResultType ===
-												OcrResultType.VisionModelMarkdown
-												? OcrResultType.Ocr
-												: OcrResultType.VisionModelMarkdown,
-										);
-									} else {
-										onConvertImageToMarkdown();
-									}
-								}}
-								type={
-									currentOcrResult?.ocrResultType ===
-									OcrResultType.VisionModelMarkdown
-										? "primary"
-										: "text"
-								}
-								icon={<VisionMarkdownIcon />}
-								title={intl.formatMessage({
-									id: "draw.ocrDetect.visionModelMarkdown",
-								})}
-								key="visionModelMarkdown"
 							/>,
 						]
 					: []),

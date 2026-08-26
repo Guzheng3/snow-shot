@@ -110,64 +110,17 @@ export const settings = {
 	"settings.systemSettings.commonSettings.adminPermission.tip":
 		"当应用具有管理员权限时，全局快捷键能在更多的应用响应；如果开启了“开机自动启动”，当应用自动启动时将使用管理员权限启动",
 	"settings.systemSettings.commonSettings.useAdminAutoStart.enable": "重新启动",
-	"settings.systemSettings.commonSettings.autoCheckVersion": "自动检查更新",
 	"settings.systemSettings.commonSettings.runLog": "运行日志",
 	"settings.systemSettings.commonSettings.runLog.tip":
 		"将日志输出到日志文件中，用于问题反馈",
-		"settings.hotKeySettings.chat": "AI 对话",
 	"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
-	"settings.chatSettings": "AI 对话",
-	"settings.chatSettings.maxTokens": "最大 Token 数",
-	"settings.chatSettings.maxTokens.tip":
-		"限制一次请求中模型生成 completion 的最大 token 数",
-	"settings.chatSettings.temperature": "Temperature",
-	"settings.chatSettings.temperature.tip":
-		"更高的值，如 0.8，会使输出更随机，而更低的值，如 0.2，会使其更加集中和确定",
 	"settings.systemSettings.networkSettings": "网络",
 	"settings.systemSettings.networkSettings.proxy": "系统代理",
-	"settings.chatSettings.thinkingBudgetTokens": "思考预算 Token 数",
-	"settings.chatSettings.thinkingBudgetTokens.tip":
-		'对于如 Claude 模型的推理模式，思考预算决定其内部推理过程的最大 Token 数。注意，思考预算 Token 数不能小于"最大 Token 数"，所以如果该值有效，"最大 Token 数"可能由服务器决定',
 	"settings.functionSettings.drawSettings": "绘制",
 	"settings.functionSettings.drawSettings.disableQuickSelectElementToolList":
 		"禁用选择相同类型的元素",
 	"settings.functionSettings.drawSettings.disableQuickSelectElementToolList.tip":
 		"在绘制时激活了当前设置中选定的工具时，将不可以通过鼠标左键选择相同类型的元素",
-									"settings.functionSettings.chatSettings": "AI 对话",
-	"settings.functionSettings.chatSettings.autoCreateNewSession":
-		"快捷键启动时自动创建新会话",
-	"settings.functionSettings.chatSettings.autoCreateNewSessionOnCloseWindow":
-		"关闭窗口时自动创建新会话",
-	"settings.functionSettings.chatSettings.apiConfig": "API 配置",
-	"settings.functionSettings.chatSettings.apiConfig.tip":
-		"仅支持兼容 OpenAI SDK 的 API 配置，新增配置后将自动支持 AI 翻译",
-	"settings.functionSettings.chatSettings.apiConfig.add": "添加 API 配置",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey": "API Key",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey.tip":
-		"注意该配置在本地明文保存（也不会上传到云端）",
-	"settings.functionSettings.chatSettings.apiConfig.apiKey.required":
-		"请输入 API Key",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri": "API 地址",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri.required":
-		"请输入 API 地址",
-	"settings.functionSettings.chatSettings.apiConfig.apiUri.tip":
-		"格式如：https://api.openai.com/v1",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel": "API 模型",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel.tip":
-		"API 模型，如：gpt-3.5-turbo",
-	"settings.functionSettings.chatSettings.apiConfig.apiModel.required":
-		"请输入 API 模型",
-	"settings.functionSettings.chatSettings.apiConfig.modelName": "模型名称",
-	"settings.functionSettings.chatSettings.apiConfig.modelName.tip":
-		"模型名称用于 Snow Shot 的展示",
-	"settings.functionSettings.chatSettings.apiConfig.modelName.required":
-		"请输入模型名称",
-	"settings.functionSettings.chatSettings.apiConfig.supportThinking":
-		"支持推理",
-	"settings.functionSettings.chatSettings.apiConfig.supportVision":
-		"支持视觉理解",
-	"settings.functionSettings.chatSettings.apiConfig.supportVision.tip":
-		"启用后，该模型将可用于视觉理解，将图片转化为 HTML 等格式的内容",
 	"settings.functionSettings.screenshotSettings": "截图",
 	"settings.functionSettings.screenshotSettings.findChildrenElements":
 		"查找窗口子元素",
@@ -444,7 +397,7 @@ export const settings = {
 	"settings.systemSettings.dataFilePath.open": "打开目录",
 	"settings.systemSettings.dataFile.clearAll": "清除所有数据",
 	"settings.systemSettings.dataFile.clearAll.tip":
-		"清除所有所有持久存储的数据，包括配置、AI 对话历史等",
+		"清除所有所有持久存储的数据，包括配置等",
 	"settings.systemSettings.dataFile.clearAll.confirm":
 		"确定清除所有数据吗？完成清除后将自动重启软件（重启后会自动生成默认配置的数据）",
 	"settings.systemSettings.dataFilePath.open.failed":
@@ -453,9 +406,6 @@ export const settings = {
 	"settings.systemSettings.appLogFilePath.open": "打开目录",
 	"settings.systemSettings.appLogFilePath.open.failed":
 		"打开日志目录失败，请手动复制目录打开",
-	"settings.functionSettings.chatSettings.testChat": "测试 API 配置",
-	"settings.functionSettings.chatSettings.testPrompt":
-		'测试提示词: "Say "Hello, world!""',
 	"settings.systemSettings.screenshotSettings": "截图",
 	"settings.systemSettings.screenshotSettings.tryGetElementByFocus":
 		"选取窗口元素增强",

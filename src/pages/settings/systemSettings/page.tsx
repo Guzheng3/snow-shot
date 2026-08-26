@@ -284,21 +284,6 @@ export const SystemSettingsPage = () => {
 								label={
 									<IconLabel
 										label={
-											<FormattedMessage id="settings.systemSettings.commonSettings.autoCheckVersion" />
-										}
-									/>
-								}
-								name="autoCheckVersion"
-								valuePropName="checked"
-							>
-								<Switch />
-							</ProForm.Item>
-						</Col>
-						<Col span={12}>
-							<ProForm.Item
-								label={
-									<IconLabel
-										label={
 											<FormattedMessage id="settings.systemSettings.commonSettings.runLog" />
 										}
 									/>

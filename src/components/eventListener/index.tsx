@@ -283,20 +283,6 @@ const EventListenerCore: React.FC<{ children: React.ReactNode }> = ({
 				},
 			});
 			defaultListener.push({
-				event: "execute-chat",
-				callback: async () => {},
-			});
-			defaultListener.push({
-				event: "execute-chat-selected-text",
-				callback: async () => {},
-			});
-			defaultListener.push({
-				callback: async () => {},
-			});
-			defaultListener.push({
-				callback: async () => {},
-			});
-			defaultListener.push({
 				event: "main-window:send-error-message",
 				callback: async ({ payload }: { payload: string }) => {
 					showWindow();

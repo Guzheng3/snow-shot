@@ -18,18 +18,6 @@ export const defaultCommonKeyEventSettings: Record<
 		hotKey: getPlatformValue("Ctrl+C", "Meta+C"),
 		group: CommonKeyEventGroup.Translation,
 	},
-	[CommonKeyEventKey.ChatCopyAndHide]: {
-		hotKey: getPlatformValue("Ctrl+Q", "Meta+Q"),
-		group: CommonKeyEventGroup.Chat,
-	},
-	[CommonKeyEventKey.ChatCopy]: {
-		hotKey: getPlatformValue("Ctrl+C", "Meta+C"),
-		group: CommonKeyEventGroup.Chat,
-	},
-	[CommonKeyEventKey.ChatNewSession]: {
-		hotKey: getPlatformValue("Ctrl+N", "Meta+N"),
-		group: CommonKeyEventGroup.Chat,
-	},
 	[CommonKeyEventKey.FixedContentEnableDraw]: {
 		hotKey: getPlatformValue("Ctrl+E", "Meta+E"),
 		group: CommonKeyEventGroup.FixedContent,
@@ -81,11 +69,6 @@ export const defaultCommonKeyEventComponentConfig: Record<
 			CommonKeyEventGroup.Translation
 		) {
 			baseMessageId = "tools.translation";
-		} else if (
-			defaultCommonKeyEventSettings[key as CommonKeyEventKey].group ===
-			CommonKeyEventGroup.Chat
-		) {
-			baseMessageId = "tools.chat";
 		} else if (
 			defaultCommonKeyEventSettings[key as CommonKeyEventKey].group ===
 			CommonKeyEventGroup.FixedContent

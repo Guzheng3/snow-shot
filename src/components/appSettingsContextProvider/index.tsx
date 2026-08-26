@@ -331,16 +331,6 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.menuCollapsed === "boolean"
 							? newSettings.menuCollapsed
 							: (prevSettings?.menuCollapsed ?? false),
-					chatModel:
-						typeof newSettings?.chatModel === "string"
-							? newSettings.chatModel
-							: (prevSettings?.chatModel ??
-								defaultAppSettingsData[group].chatModel),
-					chatModelEnableThinking:
-						typeof newSettings?.chatModelEnableThinking === "boolean"
-							? newSettings.chatModelEnableThinking
-							: (prevSettings?.chatModelEnableThinking ??
-								defaultAppSettingsData[group].chatModelEnableThinking),
 					colorPickerColorFormatIndex:
 						typeof newSettings?.colorPickerColorFormatIndex === "number"
 							? newSettings.colorPickerColorFormatIndex
@@ -714,38 +704,10 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.autoStart
 							: (prevSettings?.autoStart ??
 								defaultAppSettingsData[group].autoStart),
-					autoCheckVersion:
-						typeof newSettings?.autoCheckVersion === "boolean"
-							? newSettings.autoCheckVersion
-							: (prevSettings?.autoCheckVersion ??
-								defaultAppSettingsData[group].autoCheckVersion),
 					runLog:
 						typeof newSettings?.runLog === "boolean"
 							? newSettings.runLog
 							: (prevSettings?.runLog ?? defaultAppSettingsData[group].runLog),
-				};
-			} else if (group === AppSettingsGroup.SystemChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					maxTokens:
-						typeof newSettings?.maxTokens === "number"
-							? Math.min(Math.max(newSettings.maxTokens, 512), 8192)
-							: (prevSettings?.maxTokens ??
-								defaultAppSettingsData[group].maxTokens),
-					temperature:
-						typeof newSettings?.temperature === "number"
-							? Math.min(Math.max(newSettings.temperature, 0), 2)
-							: (prevSettings?.temperature ??
-								defaultAppSettingsData[group].temperature),
-					thinkingBudgetTokens:
-						typeof newSettings?.thinkingBudgetTokens === "number"
-							? Math.min(Math.max(newSettings.thinkingBudgetTokens, 1024), 8192)
-							: (prevSettings?.thinkingBudgetTokens ??
-								defaultAppSettingsData[group].thinkingBudgetTokens),
 				};
 			} else if (group === AppSettingsGroup.SystemNetwork) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -772,51 +734,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.ocrModel
 							: (prevSettings?.ocrModel ??
 								defaultAppSettingsData[group].ocrModel),
-					htmlVisionModel:
-						typeof newSettings?.htmlVisionModel === "string"
-							? newSettings.htmlVisionModel
-							: (prevSettings?.htmlVisionModel ??
-								defaultAppSettingsData[group].htmlVisionModel),
-					htmlVisionModelSystemPrompt:
-						typeof newSettings?.htmlVisionModelSystemPrompt === "string"
-							? newSettings.htmlVisionModelSystemPrompt
-							: (prevSettings?.htmlVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].htmlVisionModelSystemPrompt),
-					markdownVisionModelSystemPrompt:
-						typeof newSettings?.markdownVisionModelSystemPrompt === "string"
-							? newSettings.markdownVisionModelSystemPrompt
-							: (prevSettings?.markdownVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].markdownVisionModelSystemPrompt),
-				};
-			} else if (group === AppSettingsGroup.FunctionChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					autoCreateNewSession:
-						typeof newSettings?.autoCreateNewSession === "boolean"
-							? newSettings.autoCreateNewSession
-							: (prevSettings?.autoCreateNewSession ??
-								defaultAppSettingsData[group].autoCreateNewSession),
-					chatApiConfigList: Array.isArray(newSettings?.chatApiConfigList)
-						? newSettings.chatApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_model: `${item.api_model ?? ""}`,
-								model_name: `${item.model_name ?? ""}`,
-								support_thinking: !!item.support_thinking,
-								support_vision: !!item.support_vision,
-							}))
-						: (prevSettings?.chatApiConfigList ??
-							defaultAppSettingsData[group].chatApiConfigList),
-					autoCreateNewSessionOnCloseWindow:
-						typeof newSettings?.autoCreateNewSessionOnCloseWindow === "boolean"
-							? newSettings.autoCreateNewSessionOnCloseWindow
-							: (prevSettings?.autoCreateNewSessionOnCloseWindow ??
-								defaultAppSettingsData[group]
-									.autoCreateNewSessionOnCloseWindow),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];
