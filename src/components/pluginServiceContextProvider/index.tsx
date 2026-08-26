@@ -41,10 +41,7 @@ export const PluginServiceContextProvider: React.FC<{
 				id: PLUGIN_ID_FFMPEG,
 				file_list: getPlatform() === "windows" ? ["ffmpeg.exe"] : ["ffmpeg"],
 			},
-			{
-						file_list: [],
-					},
-				];
+		];
 	}, []);
 
 	const [pluginConfig, setPluginConfig, pluginConfigRef] = useStateRef<
