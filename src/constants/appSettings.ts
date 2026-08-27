@@ -129,7 +129,6 @@ export const defaultAppSettingsData: AppSettingsData = {
 	},
 	[AppSettingsGroup.FunctionOcr]: {
 		ocrModel: OcrModel.RapidOcrV4,
-		ocrApiToken: "",
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {
 		findChildrenElements: true,

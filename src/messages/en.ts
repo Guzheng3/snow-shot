@@ -53,14 +53,7 @@ export const en = {
 		"Rapid OCR V4",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
 		"Rapid OCR V5",
-	"settings.systemSettings.screenshotSettings.ocrModel.ppOcrV6":
-		"PP-OCRv6 (Cloud)",
-	"settings.functionSettings.ocrSettings.ocrApiToken": "PP-OCRv6 API Token",
-	"settings.functionSettings.ocrSettings.ocrApiToken.tip":
-		'To use PP-OCRv6 cloud recognition, enable the "PaddleOCR Service Deployment" service on Baidu AI Studio and obtain an API Token',
-	"settings.functionSettings.ocrSettings.ocrApiToken.placeholder":
-		"Enter your Baidu AI Studio API Token",
-		"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
+	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
 			"home.screenshot": "Screenshot",

@@ -596,12 +596,6 @@ export const FunctionSettingsPage = () => {
 				}),
 				value: OcrModel.RapidOcrV5,
 			},
-			{
-				label: intl.formatMessage({
-					id: "settings.systemSettings.screenshotSettings.ocrModel.ppOcrV6",
-				}),
-				value: OcrModel.PpOcrV6,
-			},
 		];
 	}, [intl]);
 
@@ -1227,39 +1221,6 @@ export const FunctionSettingsPage = () => {
 								/>
 							</Col>
 						</Row>
-
-						<ProFormDependency<{ ocrModel: OcrModel }>
-							name={["ocrModel"]}
-						>
-							{({ ocrModel }) => {
-								if (ocrModel !== OcrModel.PpOcrV6) {
-									return null;
-								}
-
-								return (
-									<Row gutter={token.marginLG}>
-										<Col span={12}>
-											<ProFormText.Password
-												name="ocrApiToken"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.ocrApiToken" />
-														}
-														tooltipTitle={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.ocrApiToken.tip" />
-														}
-													/>
-												}
-												placeholder={intl.formatMessage({
-													id: "settings.functionSettings.ocrSettings.ocrApiToken.placeholder",
-												})}
-											/>
-										</Col>
-									</Row>
-								);
-							}}
-						</ProFormDependency>
 					</ProForm>
 				</Spin>
 			</>

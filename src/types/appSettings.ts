@@ -177,8 +177,6 @@ export enum ColorPickerShowMode {
 export enum OcrModel {
 	RapidOcrV4 = "RapidOcrV4",
 	RapidOcrV5 = "RapidOcrV5",
-	/** PP-OCRv6 云端识别（百度 AI Studio） */
-	PpOcrV6 = "PpOcrV6",
 }
 
 export enum KeyDisplayDirection {
@@ -344,8 +342,6 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** PP-OCRv6 云端识别的 API Token（百度 AI Studio） */
-		ocrApiToken: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */

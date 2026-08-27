@@ -424,11 +424,9 @@ export const OcrResult: React.FC<{
 				sharedBufferChannelId,
 				scaleFactor,
 				detectAngle,
-				getAppSettings()[AppSettingsGroup.FunctionOcr].ocrModel,
-				getAppSettings()[AppSettingsGroup.FunctionOcr].ocrApiToken,
 			);
 		},
-		[getAppSettings],
+		[],
 	);
 
 	const ocrDetectByCanvas = useCallback(
@@ -459,12 +457,10 @@ export const OcrResult: React.FC<{
 				await imageBlob.arrayBuffer(),
 				scaleFactor,
 				detectAngle,
-				getAppSettings()[AppSettingsGroup.FunctionOcr].ocrModel,
-				getAppSettings()[AppSettingsGroup.FunctionOcr].ocrApiToken,
 			);
 			return ocrResult;
 		},
-		[ocrDetectWithSharedBufferAction, getAppSettings],
+		[ocrDetectWithSharedBufferAction],
 	);
 
 	/** 请求 ID，避免 OCR 检测中切换工具后仍然触发 OCR 结果 */

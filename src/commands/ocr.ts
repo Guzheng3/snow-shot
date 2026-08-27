@@ -6,15 +6,11 @@ export const ocrDetect = async (
 	data: ArrayBuffer | Uint8Array,
 	scaleFactor: number,
 	detectAngle: boolean,
-	model: OcrModel,
-	apiToken: string,
 ): Promise<OcrDetectResult> => {
 	return await invoke<OcrDetectResult>("ocr_detect", data, {
 		headers: {
 			"x-scale-factor": scaleFactor.toFixed(3),
 			"x-detect-angle": detectAngle ? "true" : "false",
-			"x-ocr-model": model,
-			"x-ocr-api-token": apiToken,
 		},
 	});
 };
@@ -23,15 +19,11 @@ export const ocrDetectWithSharedBuffer = async (
 	channelId: string,
 	scaleFactor: number,
 	detectAngle: boolean,
-	model: OcrModel,
-	apiToken: string,
 ): Promise<OcrDetectResult> => {
 	return await invoke<OcrDetectResult>("ocr_detect_with_shared_buffer", {
 		channelId,
 		scaleFactor,
 		detectAngle,
-		model,
-		apiToken,
 	});
 };
 

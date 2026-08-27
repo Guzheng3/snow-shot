@@ -722,11 +722,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.ocrModel
 							: (prevSettings?.ocrModel ??
 								defaultAppSettingsData[group].ocrModel),
-					ocrApiToken:
-						typeof newSettings?.ocrApiToken === "string"
-							? newSettings.ocrApiToken
-							: (prevSettings?.ocrApiToken ??
-								defaultAppSettingsData[group].ocrApiToken),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];

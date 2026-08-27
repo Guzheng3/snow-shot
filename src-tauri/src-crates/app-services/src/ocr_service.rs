@@ -17,7 +17,6 @@ pub struct OcrService {
 pub enum OcrModel {
     RapidOcrV4,
     RapidOcrV5,
-    PpOcrV6,
     WeChatOcr,
 }
 
@@ -76,7 +75,7 @@ impl OcrService {
 
     pub async fn init_session(&mut self) -> Result<(), String> {
         if self.det_model.is_none() || self.cls_model.is_none() || self.rec_model.is_none() {
-            // 云端 OCR（PP-OCRv6）等模型没有本地 ONNX 模型，无需初始化会话
+            // 未加载本地 ONNX 模型（如 WeChat OCR）时无需初始化会话
             return Ok(());
         }
 
@@ -148,8 +147,8 @@ impl OcrService {
                 orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_infer.onnx"),
                 orc_plugin_path.join("ch_PP-OCRv5_rec_mobile_infer.onnx"),
             ),
-            OcrModel::PpOcrV6 | OcrModel::WeChatOcr => {
-                return Ok(()); // 云端 OCR（PP-OCRv6）与 WeChat OCR 不使用本地 ONNX 模型
+            OcrModel::WeChatOcr => {
+                return Ok(()); // WeChat OCR 不使用本地 ONNX 模型
             }
         };
 
