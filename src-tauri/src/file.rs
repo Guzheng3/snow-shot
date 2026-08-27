@@ -1,6 +1,6 @@
 use snow_shot_app_services::file_cache_service::FileCacheService;
 use std::{path::PathBuf, sync::Arc};
-use tauri::command;
+use tauri::{command, Manager};
 
 #[command]
 pub async fn save_file(request: tauri::ipc::Request<'_>) -> Result<(), String> {
