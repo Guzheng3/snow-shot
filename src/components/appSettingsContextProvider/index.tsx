@@ -46,6 +46,7 @@ import {
 	type HdrColorAlgorithm,
 	type HistoryValidDuration,
 	OcrDetectAfterAction,
+	OcrModel,
 	type TrayIconClickAction,
 	type TrayIconDefaultIcon,
 	type VideoMaxSize,
@@ -718,10 +719,12 @@ const AppSettingsContextProviderCore: React.FC<{
 
 				settings = {
 					ocrModel:
-						typeof newSettings?.ocrModel === "string"
-							? newSettings.ocrModel
-							: (prevSettings?.ocrModel ??
-								defaultAppSettingsData[group].ocrModel),
+						newSettings?.ocrModel === OcrModel.RapidOcrV6Medium
+							? OcrModel.RapidOcrV6Medium
+							: (prevSettings?.ocrModel ===
+								OcrModel.RapidOcrV6Medium
+								? OcrModel.RapidOcrV6Medium
+								: defaultAppSettingsData[group].ocrModel),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];

@@ -13,10 +13,6 @@ export const zhHant = {
 	"settings.controlNode.circle": "圓形",
 	"settings.controlNode.polyline": "多邊形",
 	"settings.systemSettings.screenshotSettings.ocrModel": "文字辨識模型",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV4":
-		"Rapid OCR V4",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
-		"Rapid OCR V5",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
 		"Rapid OCR V6 Medium",
 	"settings.screenshotSettings": "截圖設定",

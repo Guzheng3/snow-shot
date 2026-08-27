@@ -420,10 +420,6 @@ export const settings = {
 	"settings.systemSettings.screenshotSettings.tryGetElementByFocus.always":
 		"保持启用",
 	"settings.systemSettings.screenshotSettings.ocrModel": "文本识别模型",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV4":
-		"Rapid OCR V4",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
-		"Rapid OCR V5",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
 		"Rapid OCR V6 Medium",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
