@@ -12,6 +12,7 @@ regex = { workspace = true }
 log = { workspace = true }
 dashmap = { workspace = true }
 tokio = { workspace = true }
+reqwest = { workspace = true }
 
 snow-shot-app-utils = { workspace = true }
 snow-shot-app-shared = { workspace = true }

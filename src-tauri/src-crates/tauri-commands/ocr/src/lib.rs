@@ -60,7 +60,26 @@ pub async fn ocr_detect_core(
     image: image::DynamicImage,
     scale_factor: f32,
     detect_angle: bool,
+    model: OcrModel,
+    api_token: &str,
 ) -> Result<OcrDetectResult, String> {
+    // 云端 OCR（PP-OCRv6）：将图片编码为 PNG 后调用百度 AI Studio 云端识别
+    if model == OcrModel::PpOcrV6 {
+        let mut cursor = Cursor::new(Vec::new());
+        image
+            .write_to(&mut cursor, image::ImageFormat::Png)
+            .map_err(|e| format!("[ocr_detect_core] Failed to encode image to PNG: {}", e))?;
+
+        let text_blocks =
+            snow_shot_app_services::pp_ocr_service::detect(cursor.into_inner(), api_token)
+                .await?;
+
+        return Ok(OcrDetectResult {
+            text_blocks,
+            scale_factor,
+        });
+    }
+
     let mut ocr_service = ocr_service.lock().await;
     let mut scale_factor = scale_factor;
     let mut image = image;
@@ -152,7 +171,26 @@ pub async fn ocr_detect(
         None => return Err("[ocr_detect] Missing detect angle".to_string()),
     };
 
-    ocr_detect_core(ocr_service, image, scale_factor, detect_angle).await
+    // 解析 OCR 模型与 PP-OCRv6 云端 API Token（旧版本前端未传递时默认本地模型）
+    let model = match request.headers().get("x-ocr-model") {
+        Some(header) => match header.to_str() {
+            Ok("RapidOcrV4") => OcrModel::RapidOcrV4,
+            Ok("RapidOcrV5") => OcrModel::RapidOcrV5,
+            Ok("PpOcrV6") => OcrModel::PpOcrV6,
+            Ok("WeChatOcr") => OcrModel::WeChatOcr,
+            Ok(_) => return Err("[ocr_detect] Invalid ocr model".to_string()),
+            Err(_) => return Err("[ocr_detect] Invalid ocr model".to_string()),
+        },
+        None => OcrModel::RapidOcrV4,
+    };
+    let api_token = request
+        .headers()
+        .get("x-ocr-api-token")
+        .and_then(|header| header.to_str().ok())
+        .unwrap_or("")
+        .to_string();
+
+    ocr_detect_core(ocr_service, image, scale_factor, detect_angle, model, &api_token).await
 }
 
 #[cfg(target_os = "windows")]
@@ -162,10 +200,12 @@ pub async fn ocr_detect_with_shared_buffer(
     channel_id: String,
     scale_factor: f32,
     detect_angle: bool,
+    model: OcrModel,
+    api_token: String,
 ) -> Result<OcrDetectResult, String> {
     log::info!("[ocr_detect_with_shared_buffer] start detect");
 
-    let image_data = match shared_buffer_service.receive_data(channel_id) {
+    let mut image_data = match shared_buffer_service.receive_data(channel_id) {
         Ok(image_data) => image_data,
         Err(e) => {
             return Err(format!(
@@ -174,6 +214,10 @@ pub async fn ocr_detect_with_shared_buffer(
             ));
         }
     };
+
+    if image_data.len() < 8 {
+        return Err("[ocr_detect_with_shared_buffer] Invalid image data".to_string());
+    }
 
     let image_width = u32::from_le_bytes(
         image_data[image_data.len() - 8..image_data.len() - 4]
@@ -186,6 +230,9 @@ pub async fn ocr_detect_with_shared_buffer(
             .unwrap(),
     );
 
+    // 移除末尾 8 字节的宽高信息，仅保留纯 RGBA 像素数据
+    image_data.truncate(image_data.len() - 8);
+
     ocr_detect_core(
         ocr_service,
         image::DynamicImage::ImageRgba8(
@@ -196,6 +243,8 @@ pub async fn ocr_detect_with_shared_buffer(
         ),
         scale_factor,
         detect_angle,
+        model,
+        &api_token,
     )
     .await
 }

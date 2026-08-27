@@ -40,6 +40,8 @@ pub async fn ocr_detect_with_shared_buffer(
     channel_id: String,
     scale_factor: f32,
     detect_angle: bool,
+    model: OcrModel,
+    api_token: String,
 ) -> Result<OcrDetectResult, String> {
     snow_shot_tauri_commands_ocr::ocr_detect_with_shared_buffer(
         ocr_instance,
@@ -47,6 +49,8 @@ pub async fn ocr_detect_with_shared_buffer(
         channel_id,
         scale_factor,
         detect_angle,
+        model,
+        api_token,
     )
     .await
 }

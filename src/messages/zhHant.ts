@@ -12,6 +12,18 @@ export const zhHant = {
 	"settings.controlNode": "選取範圍控制樣式",
 	"settings.controlNode.circle": "圓形",
 	"settings.controlNode.polyline": "多邊形",
+	"settings.systemSettings.screenshotSettings.ocrModel": "文字辨識模型",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV4":
+		"Rapid OCR V4",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
+		"Rapid OCR V5",
+	"settings.systemSettings.screenshotSettings.ocrModel.ppOcrV6":
+		"PP-OCRv6（雲端）",
+	"settings.functionSettings.ocrSettings.ocrApiToken": "PP-OCRv6 API Token",
+	"settings.functionSettings.ocrSettings.ocrApiToken.tip":
+		"使用 PP-OCRv6 雲端辨識需要在百度 AI Studio 開通「PaddleOCR 服務化部署」服務並取得 API Token",
+	"settings.functionSettings.ocrSettings.ocrApiToken.placeholder":
+		"請輸入百度 AI Studio API Token",
 	"settings.screenshotSettings": "截圖設定",
 	"settings.findChildrenElements": "尋找視窗子元素",
 	"settings.performanceMode": "效能優先",

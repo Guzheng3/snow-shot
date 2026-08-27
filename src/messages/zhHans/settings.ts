@@ -424,6 +424,14 @@ export const settings = {
 		"Rapid OCR V4",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
 		"Rapid OCR V5",
+	"settings.systemSettings.screenshotSettings.ocrModel.ppOcrV6":
+		"PP-OCRv6（云端）",
+	"settings.functionSettings.ocrSettings.ocrApiToken":
+		"PP-OCRv6 API Token",
+	"settings.functionSettings.ocrSettings.ocrApiToken.tip":
+		"使用 PP-OCRv6 云端识别需要在百度 AI Studio 开通「PaddleOCR 服务化部署」服务并获取 API Token",
+	"settings.functionSettings.ocrSettings.ocrApiToken.placeholder":
+		"请输入百度 AI Studio API Token",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
 	"settings.systemSettings.screenshotSettings.ocrHotStart.tip":
 		"预加载文本识别模型，提高文本识别的识别速度，但会提高内存占用",
