@@ -45,7 +45,6 @@ import { TrayIconStatePublisher } from "@/components/trayIconLoader";
 import { defaultAppFunctionConfigs } from "@/constants/appFunction";
 import {
 	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
 } from "@/constants/pluginService";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -132,14 +131,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 					key === AppFunction.VideoRecordCopy
 				) {
 					return isReadyStatus?.(PLUGIN_ID_FFMPEG);
-				}
-
-				if (key === AppFunction.ScreenshotOcr) {
-					return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
-				}
-
-				if (key === AppFunction.ScreenshotOcrTranslate) {
-					return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
 				}
 
 				return true;

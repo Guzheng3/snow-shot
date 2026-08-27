@@ -38,15 +38,8 @@ import {
 	SerialNumberIcon,
 	TextIcon,
 } from "@/components/icons";
-import {
-	PLUGIN_ID_RAPID_OCR,
-} from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
-import {
-	AppSettingsActionContext,
-	AppSettingsPublisher,
-} from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
+import { AppSettingsActionContext, AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { createPublisher } from "@/hooks/useStatePublisher";
 import { useStateRef } from "@/hooks/useStateRef";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -257,7 +250,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 		[onDraggingChange],
 	);
 
-	const { isReadyStatus, isReady } = usePluginServiceContext();
 	/** 一键清屏：清除所有标注元素并清空历史 */
 	const clearAllAnnotations = useCallback(() => {
 		drawLayerActionRef.current?.updateScene({ elements: [] });
@@ -488,9 +480,7 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 					);
 					break;
 				case DrawState.OcrDetect:
-					if (isReady?.(PLUGIN_ID_RAPID_OCR)) {
-						onOcrDetect(next);
-					}
+					onOcrDetect(next);
 					break;
 				case DrawState.VideoRecord:
 				case DrawState.ScanQrcode:
@@ -513,7 +503,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 			enableLockDrawToolRef,
 			getDrawState,
 			intl,
-			isReady,
 			message,
 			onOcrDetect,
 			selectLayerActionRef,
@@ -960,9 +949,8 @@ return (
 								icon={<OcrDetectIcon style={{ fontSize: "0.88em" }} />}
 								drawState={DrawState.OcrDetect}
 								disable={
-									disableNormalScreenshotTool ||
-									!isReadyStatus?.(PLUGIN_ID_RAPID_OCR)
-								}
+								disableNormalScreenshotTool
+							}
 								onClick={() => {
 									onToolClick(DrawState.OcrDetect);
 								}}

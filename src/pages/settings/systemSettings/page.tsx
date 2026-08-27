@@ -32,10 +32,8 @@ import { ContentWrap } from "@/components/contentWrap";
 import { GroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import { useStateRef } from "@/hooks/useStateRef";
@@ -228,8 +226,6 @@ export const SystemSettingsPage = () => {
 			setIsAdmin(result);
 		});
 	}, [setIsAdmin]);
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	return (
 		<ContentWrap>
@@ -486,57 +482,55 @@ export const SystemSettingsPage = () => {
 						</Col>
 					</Row>
 
-					{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-						<Row gutter={token.marginLG}>
-							<Col span={12}>
-								<ProFormSwitch
-									label={
-										<IconLabel
-											label={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrHotStart" />
-											}
-											tooltipTitle={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrHotStart.tip" />
-											}
-										/>
-									}
-									name="ocrHotStart"
-									valuePropName="checked"
-								/>
-							</Col>
+					<Row gutter={token.marginLG}>
+						<Col span={12}>
+							<ProFormSwitch
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrHotStart" />
+										}
+										tooltipTitle={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrHotStart.tip" />
+										}
+									/>
+								}
+								name="ocrHotStart"
+								valuePropName="checked"
+							/>
+						</Col>
 
-							<Col span={12}>
-								<ProFormSwitch
-									label={
-										<IconLabel
-											label={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelWriteToMemory" />
-											}
-											tooltipTitle={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelWriteToMemory.tip" />
-											}
-										/>
-									}
-									name="ocrModelWriteToMemory"
-									valuePropName="checked"
-								/>
-							</Col>
+						<Col span={12}>
+							<ProFormSwitch
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelWriteToMemory" />
+										}
+										tooltipTitle={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelWriteToMemory.tip" />
+										}
+									/>
+								}
+								name="ocrModelWriteToMemory"
+								valuePropName="checked"
+							/>
+						</Col>
 
-							<Col span={12}>
-								<ProFormSwitch
-									label={
-										<IconLabel
-											label={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrDetectAngle" />
-											}
-										/>
-									}
-									name="ocrDetectAngle"
-									valuePropName="checked"
-								/>
-							</Col>
-						</Row>
-					)}
+						<Col span={12}>
+							<ProFormSwitch
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrDetectAngle" />
+										}
+									/>
+								}
+								name="ocrDetectAngle"
+								valuePropName="checked"
+							/>
+						</Col>
+					</Row>
 					<Row gutter={token.marginLG}>
 						{currentPlatform === "windows" && (
 							<Col span={12}>

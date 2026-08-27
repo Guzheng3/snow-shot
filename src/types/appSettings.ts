@@ -58,17 +58,6 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-export enum TranslationApiType {
-	DeepL = "translation_api_deepl",
-}
-
-export type TranslationApiConfig = {
-	api_type: TranslationApiType;
-	api_uri: string;
-	api_key: string;
-	deepl_prefer_quality_optimized?: boolean;
-};
-
 export enum AppSettingsGroup {
 	Common = "common",
 	ThemeSkin = "themeSkin",
@@ -357,7 +346,6 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */
 		optimizeAiTranslationLayout: boolean;
-		translationApiConfigList: TranslationApiConfig[];
 		sourceLanguage: string;
 		targetLanguage: string;
 	};

@@ -120,7 +120,6 @@ export const defaultAppSettingsData: AppSettingsData = {
 	},
 	[AppSettingsGroup.FunctionTranslation]: {
 		optimizeAiTranslationLayout: true,
-		translationApiConfigList: [],
 		sourceLanguage: "auto",
 		targetLanguage: "zh-CHS",
 	},

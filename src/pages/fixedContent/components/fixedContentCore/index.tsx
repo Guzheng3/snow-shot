@@ -35,9 +35,6 @@ import {
 import { showMainWindow } from "@/commands/videoRecord";
 import { OcrTranslateIcon } from "@/components/icons";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
-import {
-	PLUGIN_ID_RAPID_OCR,
-} from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -199,7 +196,7 @@ const FixedContentCoreInner: React.FC<{
 	onImageLoad,
 	disabled,
 }) => {
-	const { isReady, isReadyStatus } = usePluginServiceContext();
+	const { isReadyStatus } = usePluginServiceContext();
 	const intl = useIntl();
 	const { token } = theme.useToken();
 	const { message } = useContext(AntdContext);
@@ -771,10 +768,7 @@ const FixedContentCoreInner: React.FC<{
 			selectRectParamsRef.current = selectRectParams;
 
 			if (
-				!(
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
-					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
-				) &&
+				!getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr &&
 				!params.allOcrResult
 			) {
 				imageOcrSignRef.current = false;
@@ -835,7 +829,6 @@ const FixedContentCoreInner: React.FC<{
 					setEnableSelectText(true);
 					ocrResultActionRef.current.setEnable(true);
 				} else if (
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
 					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
 				) {
 					ocrResultActionRef.current?.init({
@@ -857,7 +850,6 @@ const FixedContentCoreInner: React.FC<{
 		[
 			setEnableSelectText,
 			setWindowSize,
-			isReady,
 			onDrawLoad,
 			tryInitImageLayer,
 			getAppSettings,
@@ -1754,7 +1746,6 @@ const FixedContentCoreInner: React.FC<{
 							},
 						]
 					: []),
-				isReadyStatus(PLUGIN_ID_RAPID_OCR) ||
 				getSelectTextMode(fixedContentType) !== "ocr"
 					? {
 							id: `${appWindow.label}-ocrTool`,

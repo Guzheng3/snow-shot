@@ -22,14 +22,12 @@ import { defaultAppFunctionConfigs } from "@/constants/appFunction";
 import { defaultAppSettingsData } from "@/constants/appSettings";
 import { defaultCommonKeyEventSettings } from "@/constants/commonKeyEvent";
 import { defaultDrawToolbarKeyEventSettings } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import {
 	AppSettingsActionContext,
 	AppSettingsLoadingPublisher,
 	AppSettingsPublisher,
 } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { releaseDrawPage } from "@/functions/screenshot";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -174,7 +172,6 @@ const AppSettingsContextProviderCore: React.FC<{
 		[writeAppSettings],
 	);
 
-	const { isReady } = usePluginServiceContext();
 	const updateAppSettings = useCallback(
 		(
 			group: AppSettingsGroup,
@@ -534,16 +531,7 @@ const AppSettingsContextProviderCore: React.FC<{
 				const settingsKeySet = new Set<string>();
 				const settingKeys: DrawToolbarKeyEventKey[] = Object.keys(
 					defaultDrawToolbarKeyEventSettings,
-				).filter((key) => {
-					if (
-						key === DrawToolbarKeyEventKey.OcrDetectTool ||
-						key === DrawToolbarKeyEventKey.OcrTranslateTool
-					) {
-						return isReady?.(PLUGIN_ID_RAPID_OCR);
-					}
-
-					return true;
-				}) as DrawToolbarKeyEventKey[];
+				) as DrawToolbarKeyEventKey[];
 				settingKeys.forEach((key) => {
 					const keyEventSettings = newSettings as Record<
 						DrawToolbarKeyEventKey,
@@ -765,20 +753,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.optimizeAiTranslationLayout
 							: (prevSettings?.optimizeAiTranslationLayout ??
 								defaultAppSettingsData[group].optimizeAiTranslationLayout),
-					translationApiConfigList: Array.isArray(
-						newSettings?.translationApiConfigList,
-					)
-						? newSettings.translationApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_type: item.api_type,
-								deepl_prefer_quality_optimized:
-									typeof item.deepl_prefer_quality_optimized === "boolean"
-										? item.deepl_prefer_quality_optimized
-										: false,
-							}))
-						: (prevSettings?.translationApiConfigList ??
-							defaultAppSettingsData[group].translationApiConfigList),
 					sourceLanguage:
 						typeof newSettings?.sourceLanguage === "string"
 							? newSettings.sourceLanguage
@@ -1284,7 +1258,7 @@ const AppSettingsContextProviderCore: React.FC<{
 
 			return settings;
 		},
-		[setAppSettings, isReady, writeAppSettingsDebounce, writeAppSettings],
+		[setAppSettings, writeAppSettingsDebounce, writeAppSettings],
 	);
 
 	const reloadAppSettings = useCallback(async () => {
