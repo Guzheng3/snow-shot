@@ -56,7 +56,7 @@ export const AboutPage = () => {
 					<Badge
 						style={{ display: "block", cursor: "pointer" }}
 						size="small"
-						onClick={() => openUrl("https://snowshot.top/")}
+						onClick={() => openUrl("https://github.com/Guzheng3/snow-shot")}
 					>
 						<div
 							style={{
@@ -80,7 +80,7 @@ export const AboutPage = () => {
 					<Tag color="blue">
 						<a
 							style={{ color: token.colorLink }}
-							onClick={() => openUrl("https://snowshot.top/")}
+							onClick={() => openUrl("https://github.com/Guzheng3/snow-shot")}
 						>
 							{intl.formatMessage({ id: "about.version" })} {version}
 						</a>
@@ -88,7 +88,7 @@ export const AboutPage = () => {
 					<Tag color="green">
 						<a
 							style={{ color: token.colorLink }}
-							onClick={() => openUrl("https://github.com/mg-chao")}
+							onClick={() => openUrl("https://github.com/Guzheng3")}
 						>
 							{intl.formatMessage({ id: "about.author" })}
 						</a>
@@ -144,7 +144,7 @@ export const AboutPage = () => {
 						type="primary"
 						icon={<GithubOutlined />}
 						onClick={() =>
-							openUrl("https://github.com/mg-chao/snow-shot/issues")
+							openUrl("https://github.com/Guzheng3/snow-shot/issues")
 						}
 						block
 					>
