@@ -43,11 +43,41 @@ fn normalize_fullwidth_to_halfwidth(text: &str) -> String {
         .collect()
 }
 
+fn is_cjk_ideograph(c: char) -> bool {
+    matches!(
+        c,
+        '\u{4E00}'..='\u{9FFF}'
+            | '\u{3400}'..='\u{4DBF}'
+            | '\u{20000}'..='\u{2A6DF}'
+            | '\u{F900}'..='\u{FAFF}'
+            | '\u{2F800}'..='\u{2FA1F}'
+    )
+}
+
+fn is_mostly_chinese(text: &str) -> bool {
+    let total = text.chars().count();
+    if total == 0 {
+        return false;
+    }
+    let cjk_count = text.chars().filter(|c| is_cjk_ideograph(*c)).count();
+    (cjk_count as f64 / total as f64) >= 0.3
+}
+
+fn contains_url_pattern(text: &str) -> bool {
+    let normalized = normalize_fullwidth_to_halfwidth(text);
+    normalized.contains("http://")
+        || normalized.contains("https://")
+        || normalized.contains("ftp://")
+        || normalized.contains("www.")
+}
+
 fn normalize_text_blocks(text_blocks: Vec<TextBlock>) -> Vec<TextBlock> {
     text_blocks
         .into_iter()
         .map(|mut block| {
-            block.text = normalize_fullwidth_to_halfwidth(&block.text);
+            if contains_url_pattern(&block.text) || !is_mostly_chinese(&block.text) {
+                block.text = normalize_fullwidth_to_halfwidth(&block.text);
+            }
             block
         })
         .collect()
