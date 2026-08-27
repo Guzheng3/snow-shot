@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { App as AntdApp } from "antd";
 import { initUiElements } from "@/commands";
+import { getBuiltinOcrModelDir } from "@/commands/file";
 import { installFont, isFontInstalled } from "@/commands/font";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import {
@@ -14,7 +15,6 @@ import { ocrInit } from "@/commands/ocr";
 import { videoRecordInit } from "@/commands/videoRecord";
 import {
 	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
 } from "@/constants/pluginService";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -98,34 +98,33 @@ export const InitService = () => {
 	}, [appSettings, message, modal, updateAppSettings]);
 
 	const initServices = useCallback(async () => {
-		if (!appSettings || !isReadyStatus) {
+		if (!appSettings) {
 			return;
 		}
 
 		if (
-			(!hasInitOcr.current ||
-				(prevAppSettings &&
-					(appSettings[AppSettingsGroup.FunctionOcr].ocrModel !==
-						prevAppSettings[AppSettingsGroup.FunctionOcr].ocrModel ||
-						appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart !==
-							prevAppSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart ||
-						appSettings[AppSettingsGroup.SystemScreenshot]
-							.ocrModelWriteToMemory !==
-							prevAppSettings[AppSettingsGroup.SystemScreenshot]
-								.ocrModelWriteToMemory))) &&
-			isReadyStatus(PLUGIN_ID_RAPID_OCR)
+			!hasInitOcr.current ||
+			(prevAppSettings &&
+				(appSettings[AppSettingsGroup.FunctionOcr].ocrModel !==
+					prevAppSettings[AppSettingsGroup.FunctionOcr].ocrModel ||
+					appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart !==
+						prevAppSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart ||
+					appSettings[AppSettingsGroup.SystemScreenshot]
+						.ocrModelWriteToMemory !==
+						prevAppSettings[AppSettingsGroup.SystemScreenshot]
+							.ocrModelWriteToMemory))
 		) {
-			hasInitOcr.current = true;
-
-			if (pluginConfigRef.current) {
+			try {
+				const rapidOcrResourceDir = await getBuiltinOcrModelDir();
 				ocrInit(
-					await pluginConfigRef.current.getPluginDirPath(PLUGIN_ID_RAPID_OCR),
+					rapidOcrResourceDir,
 					appSettings[AppSettingsGroup.FunctionOcr].ocrModel,
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart,
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrModelWriteToMemory,
 				);
-			} else {
-				appWarn("[InitService] pluginConfigRef.current is not set");
+				hasInitOcr.current = true;
+			} catch (e) {
+				appWarn(`[InitService] Failed to init OCR: ${e}`);
 			}
 		}
 

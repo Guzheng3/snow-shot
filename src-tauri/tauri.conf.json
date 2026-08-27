@@ -99,7 +99,8 @@
 		],
 		"resources": {
 			"app-icons/": "app-icons/",
-			"resources/fonts/": "fonts/"
+			"resources/fonts/": "fonts/",
+			"resources/rapid_ocr/": "rapid_ocr/"
 		}
 	}
 }

@@ -7,10 +7,7 @@ import {
 	pluginInit,
 	pluginRegisterPlugin,
 } from "@/commands/plugin";
-import {
-		PLUGIN_ID_FFMPEG,
-		PLUGIN_ID_RAPID_OCR,
-	} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { PluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useStateRef } from "@/hooks/useStateRef";
 import { PluginStatus, type PluginStatusResult } from "@/types/commands/plugin";
@@ -28,14 +25,6 @@ export const PluginServiceContextProvider: React.FC<{
 }> = ({ children, autoInit }) => {
 	const pluginList = useMemo<PluginItem[]>(() => {
 		return [
-			{
-				id: PLUGIN_ID_RAPID_OCR,
-				file_list: [
-					"ch_ppocr_mobile_v2.0_cls_mobile.onnx",
-					"ch_PP-OCRv6_det_medium.onnx",
-					"ch_PP-OCRv6_rec_medium.onnx",
-				],
-			},
 			{
 				id: PLUGIN_ID_FFMPEG,
 				file_list: getPlatform() === "windows" ? ["ffmpeg.exe"] : ["ffmpeg"],

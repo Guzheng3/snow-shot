@@ -262,6 +262,7 @@ pub fn run() {
             file::remove_dir,
             file::get_app_config_dir,
             file::get_app_config_base_dir,
+            file::get_builtin_ocr_model_dir,
             file::create_local_config_dir,
             ocr::ocr_detect,
             #[cfg(target_os = "windows")]

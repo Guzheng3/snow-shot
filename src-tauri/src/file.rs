@@ -97,3 +97,14 @@ pub async fn is_portable_app(
 ) -> Result<bool, String> {
     Ok(text_file_cache_service.is_portable_app())
 }
+
+/// 返回随包内置的 RapidOCR 模型目录（bundle.resources 中的 rapid_ocr/）
+#[command]
+pub async fn get_builtin_ocr_model_dir(app: tauri::AppHandle) -> Result<PathBuf, String> {
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("[get_builtin_ocr_model_dir] Failed to get resource dir: {e}"))?;
+
+    Ok(resource_dir.join("rapid_ocr"))
+}
