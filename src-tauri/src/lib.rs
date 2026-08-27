@@ -12,7 +12,6 @@ pub mod screenshot;
 pub mod scroll_screenshot;
 pub mod video_record;
 pub mod webview;
-pub mod wechat_ocr;
 
 use snow_shot_app_services::listen_mouse_service;
 use snow_shot_tauri_commands_core::{
@@ -36,7 +35,6 @@ use snow_shot_app_services::ocr_service::OcrService;
 use snow_shot_http_services::TranslateService;
 use snow_shot_app_services::resize_window_service;
 use snow_shot_app_services::video_record_service;
-use crate::wechat_ocr::WeChatOcrState;
 use snow_shot_app_shared::EnigoManager;
 use snow_shot_global_state::{
     CaptureState, OcrResultState, ReadClipboardState, WebViewSharedBufferState,
@@ -51,7 +49,6 @@ pub static PROFILER: std::sync::LazyLock<Mutex<Option<dhat::Profiler>>> =
 pub fn run() {
     let ocr_instance = Mutex::new(OcrService::new());
     let translate_service = TranslateService::new();
-    let wechat_ocr_state = WeChatOcrState::new();
     let video_record_service = Mutex::new(video_record_service::VideoRecordService::new());
     let hot_load_page_service = Arc::new(hot_load_page_service::HotLoadPageService::new());
     let enigo_instance = Mutex::new(EnigoManager::new());
@@ -223,7 +220,6 @@ pub fn run() {
         })
         .manage(ui_elements)
         .manage(ocr_instance)
-        .manage(wechat_ocr_state)
         .manage(translate_service)
         .manage(enigo_instance)
         .manage(scroll_screenshot_service)
@@ -339,9 +335,6 @@ pub fn run() {
             plugin::plugin_register_plugin,
             plugin::plugin_install_plugin,
             plugin::plugin_uninstall_plugin,
-            wechat_ocr::wechat_ocr_init,
-            wechat_ocr::wechat_ocr_detect,
-            wechat_ocr::wechat_ocr_release,
             webview::create_webview_shared_buffer,
             webview::set_support_webview_shared_buffer,
             #[cfg(target_os = "windows")]

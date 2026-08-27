@@ -128,7 +128,7 @@ export const defaultAppSettingsData: AppSettingsData = {
 		cacheTargetLanguage: "zh-CHS",
 	},
 	[AppSettingsGroup.FunctionOcr]: {
-		ocrModel: OcrModel.RapidOcrV4,
+		ocrModel: OcrModel.RapidOcrV6Medium,
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {
 		findChildrenElements: true,
