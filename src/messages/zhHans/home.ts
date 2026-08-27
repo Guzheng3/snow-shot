@@ -10,7 +10,6 @@ export const home = {
 	"home.screenshotFunction.screenshotDelay.tip":
 		"延迟截图会在截图完全准备好后显示截图编辑窗口，避免抢占焦点",
 	"home.screenshotFunction.screenshotCopy": "复制到剪贴板",
-		"home.chatFunction": "AI 对话",
 	"home.otherFunction": "其它",
 	"home.videoRecordFunction": "视频录制",
 	"home.videoRecordFunction.videoRecord": "视频录制",
@@ -22,8 +21,6 @@ export const home = {
 	"home.openCaptureHistory": "截图历史",
 	"home.fullScreenDraw": "全屏画布（启用/取消画布鼠标穿透）",
 			"home.screenshot": "截图",
-	"home.chat": "AI 对话",
-	"home.chatSelectText": "对话框填入选中的文本",
 	"home.screenshotAfter": "截图{text}",
 	"home.shortcut": "快捷键",
 	"home.shortcut.registered": "注册成功",

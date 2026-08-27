@@ -501,16 +501,6 @@ export const settings = {
 	"settings.systemSettings.coreSettings.hotLoadPageCount.tip":
 		"通过热加载页面，实现固定剪贴板内容到屏幕、视频录制、全屏画布等功能的快速加载，但同时提高了内存的占用",
 	"settings.functionSettings.ocrSettings": "文本识别",
-	"settings.functionSettings.ocrSettings.htmlVisionModel": "视觉理解模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.tip":
-		"将图片转为 HTML 的视觉理解模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.default": "默认",
-	"settings.functionSettings.ocrSettings.htmlVisionModel.default.tip":
-		"默认使用首个支持视觉理解的模型",
-	"settings.functionSettings.ocrSettings.htmlVisionModelSystemPrompt":
-		"图片转为 HTML 的 System 提示词",
-	"settings.functionSettings.ocrSettings.markdownVisionModelSystemPrompt":
-		"图片转为 Markdown 的 System 提示词",
 	"settings.functionSettings.globalShortcutSettings": "全局快捷键",
 	"settings.functionSettings.globalShortcutSettings.disableOnFocusedFullScreenWindow":
 		"存在被聚焦的全屏窗口时自动禁用",
