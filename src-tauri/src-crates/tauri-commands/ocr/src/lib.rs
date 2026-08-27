@@ -31,6 +31,28 @@ pub struct OcrDetectResult {
     pub scale_factor: f32,
 }
 
+/// 将全角 ASCII 字符（U+FF01–U+FF5E）及全角空格（U+3000）归一化为半角，
+/// 避免 OCR 把链接/代码/数字中的半角字符识别成全角（如 https：// 或 ＡＢＣ１２３）。
+fn normalize_fullwidth_to_halfwidth(text: &str) -> String {
+    text.chars()
+        .map(|c| match c {
+            '\u{3000}' => ' ',
+            '\u{FF01}'..='\u{FF5E}' => char::from_u32(c as u32 - 0xFEE0).unwrap_or(c),
+            _ => c,
+        })
+        .collect()
+}
+
+fn normalize_text_blocks(text_blocks: Vec<TextBlock>) -> Vec<TextBlock> {
+    text_blocks
+        .into_iter()
+        .map(|mut block| {
+            block.text = normalize_fullwidth_to_halfwidth(&block.text);
+            block
+        })
+        .collect()
+}
+
 fn convert_rgba_to_rgb(image: &[u8]) -> Vec<u8> {
     let pixel_count = image.len() / 4;
     let mut rgb_data = Vec::with_capacity(pixel_count * 3);
@@ -75,7 +97,7 @@ pub async fn ocr_detect_core(
                 .await?;
 
         return Ok(OcrDetectResult {
-            text_blocks,
+            text_blocks: normalize_text_blocks(text_blocks),
             scale_factor,
         });
     }
@@ -120,7 +142,7 @@ pub async fn ocr_detect_core(
 
     match ocr_result {
         Ok(ocr_result) => Ok(OcrDetectResult {
-            text_blocks: ocr_result.text_blocks,
+            text_blocks: normalize_text_blocks(ocr_result.text_blocks),
             scale_factor,
         }),
         Err(e) => return Err(format!("[ocr_detect_core] Failed to detect text: {}", e)),
