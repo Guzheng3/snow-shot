@@ -36,8 +36,8 @@ export const PluginServiceContextProvider: React.FC<{
 					"ch_PP-OCRv4_det_infer.onnx",
 					"ch_PP-OCRv4_rec_infer.onnx",
 					"ch_PP-OCRv5_rec_mobile_infer.onnx",
-					"ch_PP-OCRv6_det_tiny.onnx",
-					"ch_PP-OCRv6_rec_tiny.onnx",
+					"ch_PP-OCRv6_det_medium.onnx",
+					"ch_PP-OCRv6_rec_medium.onnx",
 				],
 			},
 			{

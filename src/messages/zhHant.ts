@@ -17,8 +17,8 @@ export const zhHant = {
 		"Rapid OCR V4",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
 		"Rapid OCR V5",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Tiny":
-		"Rapid OCR V6 Tiny",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
+		"Rapid OCR V6 Medium",
 	"settings.screenshotSettings": "截圖設定",
 	"settings.findChildrenElements": "尋找視窗子元素",
 	"settings.performanceMode": "效能優先",

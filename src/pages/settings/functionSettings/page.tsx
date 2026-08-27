@@ -598,9 +598,9 @@ export const FunctionSettingsPage = () => {
 			},
 			{
 				label: intl.formatMessage({
-					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Tiny",
+					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium",
 				}),
-				value: OcrModel.RapidOcrV6Tiny,
+				value: OcrModel.RapidOcrV6Medium,
 			},
 		];
 	}, [intl]);
