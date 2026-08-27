@@ -130,11 +130,9 @@ export const useTranslationRequest = (options?: {
 	return {
 		updateSourceLanguage,
 		updateTargetLanguage,
-		updateTranslationType: (_type: string) => {},
 		requestTranslate,
 		startTranslateLoading,
 		translatedContent,
-		translationType: "builtin",
 		sourceLanguage,
 		targetLanguage,
 		getTranslatedContent,

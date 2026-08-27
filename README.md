@@ -12,18 +12,18 @@
 
 <img width="64%" src="/docs/imgs/snow_shot_home.webp" style="margin-bottom: 24px;">
 
-![GitHub Release](https://img.shields.io/github/v/release/mg-chao/snow-shot?label=version)
-![GitHub License](https://img.shields.io/github/license/mg-chao/snow-shot)
+![GitHub Release](https://img.shields.io/github/v/release/Guzheng3/snow-shot?label=version)
+![GitHub License](https://img.shields.io/github/license/Guzheng3/snow-shot)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS-lightgrey)
-![GitHub Repo stars](https://img.shields.io/github/stars/mg-chao/snow-shot?style=social)
-![GitHub forks](https://img.shields.io/github/forks/mg-chao/snow-shot?style=social)
-![GitHub watchers](https://img.shields.io/github/watchers/mg-chao/snow-shot?style=social)
-![Downloads](https://img.shields.io/github/downloads/mg-chao/snow-shot/total?label=downloads)
-![GitHub Issues](https://img.shields.io/github/issues/mg-chao/snow-shot)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/mg-chao/snow-shot)
-![Last Commit](https://img.shields.io/github/last-commit/mg-chao/snow-shot)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/mg-chao/snow-shot)
-[![Lines Of Code](https://tokei.rs/b1/github/mg-chao/snow-shot?category=code)](https://github.com/mg-chao/snow-shot)
+![GitHub Repo stars](https://img.shields.io/github/stars/Guzheng3/snow-shot?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Guzheng3/snow-shot?style=social)
+![GitHub watchers](https://img.shields.io/github/watchers/Guzheng3/snow-shot?style=social)
+![Downloads](https://img.shields.io/github/downloads/Guzheng3/snow-shot/total?label=downloads)
+![GitHub Issues](https://img.shields.io/github/issues/Guzheng3/snow-shot)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Guzheng3/snow-shot)
+![Last Commit](https://img.shields.io/github/last-commit/Guzheng3/snow-shot)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Guzheng3/snow-shot)
+[![Lines Of Code](https://tokei.rs/b1/github/Guzheng3/snow-shot?category=code)](https://github.com/Guzheng3/snow-shot)
 
 </div>
 
@@ -39,14 +39,14 @@ Snow Shot 追求简单高效的使用体验，希望每个用户都能依照直�
 - 💾 **多种保存方式** - 支持保存到本地、复制到剪贴板、截图固定到屏幕，灵活满足不同使用场景
 - 🔥 **持续更新维护** - 开源项目，社区活跃，持续迭代优化，不断加入新功能，积极倾听用户反馈
 
-**访问[使用说明](https://snowshot.top/guide/index.html)获取更多功能信息**
+**访问[GitHub](https://github.com/Guzheng3/snow-shot)获取更多功能信息**
 
 ## ⭐ 如果你感觉有所帮助不妨给我们点击 star 支持一下~
 <img width="1000" height="247" alt="Click Star" src="/docs/imgs/guide-star.webp" />
 
 ## 下载安装
 
-访问我们的官网：[下载安装](https://snowshot.top/download/index.html)
+访问 [GitHub Releases](https://github.com/Guzheng3/snow-shot/releases) 下载安装
 
 ## 特别鸣谢
 
@@ -64,12 +64,12 @@ Snow Shot 追求简单高效的使用体验，希望每个用户都能依照直�
 
 如果您在使用过程中遇到任何问题，或有功能建议，欢迎通过以下方式交流反馈：
 
-- 提交 [Issue](https://github.com/mg-chao/snow-shot/issues)
+- 提交 [Issue](https://github.com/Guzheng3/snow-shot/issues)
 - B 站账号 [3N0W](https://space.bilibili.com/3546897042114689)
 - QQ 交流群 [974311403](https://qm.qq.com/q/cyUPEV4nwk)
-- [了解更多](https://snowshot.top/community/index.html)
+- [GitHub](https://github.com/Guzheng3/snow-shot)
 
 ## 文档
 
-- [官方网站](https://snowshot.top/index.html)
+- [GitHub](https://github.com/Guzheng3/snow-shot)
 - [开发文档](/docs/development.md)

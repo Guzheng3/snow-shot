@@ -10,7 +10,6 @@ import type { ItemType, MenuItemType } from "antd/es/menu/interface";
 import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { CheckEnvironment } from "@/components/checkEnvironment";
-import { CheckVersion } from "@/components/checkVersion";
 import { GlobalEventHandler } from "@/components/globalEventHandler";
 import { GlobalShortcut } from "@/components/globalShortcut";
 import { PersonalizationIcon } from "@/components/icons";
@@ -305,7 +304,6 @@ const MenuLayoutCore: React.FC<{ children: React.ReactNode }> = ({
 			<TrayIconLoader />
 			<GlobalEventHandler />
 			<CheckEnvironment />
-			<CheckVersion />
 			<div className="menu-layout-wrap">
 				<Layout>
 					<MenuSider

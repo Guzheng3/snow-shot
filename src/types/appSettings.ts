@@ -9,7 +9,6 @@ import type {
 	CommonKeyEventValue,
 } from "./core/commonKeyEvent";
 import { DrawState } from "./draw";
-import type { TranslationDomain, TranslationType } from "./servies/translation";
 import type { ImageFormat } from "./utils/file";
 
 export enum HistoryValidDuration {
@@ -59,26 +58,6 @@ export enum HdrColorAlgorithm {
 	None = "None",
 }
 
-export type ChatApiConfig = {
-	api_uri: string;
-	api_key: string;
-	api_model: string;
-	model_name: string;
-	support_thinking: boolean;
-	support_vision: boolean | undefined;
-};
-
-export enum TranslationApiType {
-	DeepL = "translation_api_deepl",
-}
-
-export type TranslationApiConfig = {
-	api_type: TranslationApiType;
-	api_uri: string;
-	api_key: string;
-	deepl_prefer_quality_optimized?: boolean;
-};
-
 export enum AppSettingsGroup {
 	Common = "common",
 	ThemeSkin = "themeSkin",
@@ -92,12 +71,10 @@ export enum AppSettingsGroup {
 	AppFunction = "appFunction",
 	Render = "render",
 	SystemCommon = "systemCommon",
-	SystemChat = "systemChat",
 	SystemNetwork = "systemNetwork",
 	SystemScreenshot = "systemScreenshot_20250627",
 	SystemCore = "systemCore",
 	SystemScrollScreenshot = "systemScrollScreenshot_20250628",
-	FunctionChat = "functionChat",
 	FunctionOcr = "functionOcr",
 	FunctionTranslation = "functionTranslation",
 	FunctionTranslationCache = "functionTranslationCache",
@@ -198,8 +175,7 @@ export enum ColorPickerShowMode {
 }
 
 export enum OcrModel {
-	RapidOcrV4 = "RapidOcrV4",
-	RapidOcrV5 = "RapidOcrV5",
+	RapidOcrV6Medium = "RapidOcrV6Medium",
 }
 
 export enum KeyDisplayDirection {
@@ -310,8 +286,6 @@ export type AppSettingsData = {
 	};
 	[AppSettingsGroup.Cache]: {
 		menuCollapsed: boolean;
-		chatModel: string;
-		chatModelEnableThinking: boolean;
 		colorPickerColorFormatIndex: number;
 		prevImageFormat: ImageFormat;
 		prevSelectRect: ElementRect;
@@ -359,48 +333,24 @@ export type AppSettingsData = {
 	};
 	[AppSettingsGroup.SystemCommon]: {
 		autoStart: boolean;
-		autoCheckVersion: boolean;
 		runLog: boolean;
-	};
-	[AppSettingsGroup.SystemChat]: {
-		maxTokens: number;
-		temperature: number;
-		thinkingBudgetTokens: number;
 	};
 	[AppSettingsGroup.SystemNetwork]: {
 		enableProxy: boolean;
 	};
-	[AppSettingsGroup.FunctionChat]: {
-		autoCreateNewSession: boolean;
-		/** 关闭窗口时自动创建新会话 */
-		autoCreateNewSessionOnCloseWindow: boolean;
-		chatApiConfigList: ChatApiConfig[];
-	};
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** 将图片转为 HTML 的视觉理解模型 */
-		htmlVisionModel: string;
-		/** 图片转为 HTML 的 System 提示词 */
-		htmlVisionModelSystemPrompt: string;
-		/** 图片转为 Markdown 的 System 提示词 */
-		markdownVisionModelSystemPrompt: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */
 		optimizeAiTranslationLayout: boolean;
-		translationSystemPrompt: string;
-		translationApiConfigList: TranslationApiConfig[];
 		sourceLanguage: string;
 		targetLanguage: string;
-		translationDomain: TranslationDomain;
-		translationType: TranslationType | string;
 	};
 	[AppSettingsGroup.FunctionTranslationCache]: {
 		cacheSourceLanguage: string;
 		cacheTargetLanguage: string;
-		cacheTranslationDomain: TranslationDomain;
-		cacheTranslationType: TranslationType | string;
 	};
 	[AppSettingsGroup.FunctionScreenshot]: {
 		/** 选取窗口子元素 */

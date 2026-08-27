@@ -44,23 +44,3 @@ export const ocrInit = async (
 export const ocrRelease = async (): Promise<void> => {
 	await invoke<void>("ocr_release");
 };
-
-/** WeChat OCR — 初始化（需先编译 wechat-ocr-helper 目录下的 C# 辅助程序） */
-export const wechatOcrInit = async (
-	helperPath: string,
-	wechatDir?: string,
-): Promise<void> => {
-	await invoke<void>("wechat_ocr_init", { helperPath, wechatDir });
-};
-
-/** WeChat OCR — 识别图像 */
-export const wechatOcrDetect = async (
-	data: ArrayBuffer | Uint8Array,
-): Promise<OcrDetectResult> => {
-	return await invoke<OcrDetectResult>("wechat_ocr_detect", data);
-};
-
-/** WeChat OCR — 释放资源 */
-export const wechatOcrRelease = async (): Promise<void> => {
-	await invoke<void>("wechat_ocr_release");
-};

@@ -14,5 +14,4 @@ export const about = {
 	"about.contact.bilibili": "B站 3N0W",
 	"about.contact.email": "邮件: chao@mgchao.top",
 	"about.contact.qqGroup": "QQ 交流群: 974311403",
-	"about.newVersion": "新版本",
 };

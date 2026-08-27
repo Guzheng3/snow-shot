@@ -31,7 +31,6 @@ import { DarkModeIcon, LanguageIcon } from "@/components/icons";
 import { PathInput } from "@/components/pathInput";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { getDefaultIconPath } from "@/components/trayIconLoader";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -183,16 +182,8 @@ export const GeneralSettingsPage = () => {
 				label: intl.formatMessage({ id: "draw.scrollScreenshotTool" }),
 				value: DrawState.ScrollScreenshot,
 			},
-		].filter((item) => {
-			if (
-				item.value === DrawState.OcrDetect
-			) {
-				return isReadyStatus(PLUGIN_ID_RAPID_OCR);
-			}
-
-			return true;
-		});
-	}, [intl, isReadyStatus]);
+		];
+	}, [intl]);
 
 	const [defaultIconsOptions, setDefaultIconsOptions] = useState<
 		CheckboxOptionType<TrayIconDefaultIcon>[]

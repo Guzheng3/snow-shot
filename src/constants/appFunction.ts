@@ -35,18 +35,10 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			group: AppFunctionGroup.Screenshot,
 		},
 		[AppFunction.ScreenshotFocusedWindow]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Screenshot,
-		},
-		[AppFunction.ChatSelectText]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Chat,
-		},
-		[AppFunction.Chat]: {
-			shortcutKey: "",
-			group: AppFunctionGroup.Chat,
-		},
-		[AppFunction.TranslationSelectText]: {
+		shortcutKey: "",
+		group: AppFunctionGroup.Screenshot,
+	},
+	[AppFunction.TranslationSelectText]: {
 			shortcutKey: "",
 			group: AppFunctionGroup.Translation,
 		},

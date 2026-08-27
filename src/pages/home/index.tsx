@@ -10,9 +10,8 @@ import { GroupTitle } from "@/components/groupTitle";
 import { KeyButton } from "@/components/keyButton";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import {
-		PLUGIN_ID_FFMPEG,
-		PLUGIN_ID_RAPID_OCR,
-	} from "@/constants/pluginService";
+	PLUGIN_ID_FFMPEG,
+} from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { usePlatform } from "@/hooks/usePlatform";
@@ -76,10 +75,6 @@ export const HomePage = () => {
 						return isReadyStatus?.(PLUGIN_ID_FFMPEG);
 					}
 
-					if (group === AppFunctionGroup.Chat) {
-												return false;
-											}
-
 					return true;
 				})
 				.map((group) => {
@@ -102,21 +97,6 @@ export const HomePage = () => {
 											}
 											appSettingsGroup={AppSettingsGroup.AppFunction}
 											filter={resetFliter(AppFunctionGroup.Screenshot)}
-										/>
-									}
-								>
-								</GroupTitle>
-							);
-							break;
-						case AppFunctionGroup.Chat:
-							groupTitle = (
-								<GroupTitle
-									id="chatFunction"
-									extra={
-										<ResetSettingsButton
-											title={<FormattedMessage id="home.chatFunction" />}
-											appSettingsGroup={AppSettingsGroup.AppFunction}
-											filter={resetFliter(AppFunctionGroup.Chat)}
 										/>
 									}
 								>
@@ -158,7 +138,6 @@ export const HomePage = () => {
 					let speicalKeys: string[] | undefined;
 					switch (group) {
 						case AppFunctionGroup.Screenshot:
-						case AppFunctionGroup.Chat:
 						case AppFunctionGroup.Other:
 							speicalKeys = ["PrintScreen"];
 							break;
@@ -183,11 +162,6 @@ export const HomePage = () => {
 												config.configKey === AppFunction.TopWindow
 											) {
 												return false;
-											}
-
-											if (
-												config.configKey === AppFunction.ScreenshotOcr										) {
-												return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
 											}
 
 											return true;

@@ -9,10 +9,8 @@ import {
 import { getVersion } from "@tauri-apps/api/app";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Badge, Button, Divider, Space, Tag, Typography, theme } from "antd";
-import { compare } from "compare-versions";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import { getLatestVersion } from "@/components/checkVersion";
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -20,7 +18,6 @@ export const AboutPage = () => {
 	const { token } = theme.useToken();
 	const intl = useIntl();
 	const [version, setVersion] = useState("0.1.3");
-	const [latestVersion, setLatestVersion] = useState<string>();
 
 	const inited = useRef(false);
 	const init = useCallback(async () => {
@@ -31,20 +28,11 @@ export const AboutPage = () => {
 
 		const version = await getVersion();
 		setVersion(version);
-
-		const latestVersion = await getLatestVersion();
-		if (latestVersion) {
-			setLatestVersion(latestVersion);
-		}
 	}, []);
 
 	useEffect(() => {
 		init();
 	}, [init]);
-
-	const hasNewVersion = useMemo(() => {
-		return latestVersion !== undefined && compare(latestVersion, version, ">");
-	}, [latestVersion, version]);
 
 	return (
 		<div
@@ -66,14 +54,9 @@ export const AboutPage = () => {
 
 				<Title level={2} style={{ marginTop: token.marginSM }}>
 					<Badge
-						count={
-							hasNewVersion
-								? intl.formatMessage({ id: "about.newVersion" })
-								: undefined
-						}
 						style={{ display: "block", cursor: "pointer" }}
 						size="small"
-						onClick={() => openUrl("https://snowshot.top/")}
+						onClick={() => openUrl("https://github.com/Guzheng3/snow-shot")}
 					>
 						<div
 							style={{
@@ -97,7 +80,7 @@ export const AboutPage = () => {
 					<Tag color="blue">
 						<a
 							style={{ color: token.colorLink }}
-							onClick={() => openUrl("https://snowshot.top/")}
+							onClick={() => openUrl("https://github.com/Guzheng3/snow-shot")}
 						>
 							{intl.formatMessage({ id: "about.version" })} {version}
 						</a>
@@ -105,7 +88,7 @@ export const AboutPage = () => {
 					<Tag color="green">
 						<a
 							style={{ color: token.colorLink }}
-							onClick={() => openUrl("https://github.com/mg-chao")}
+							onClick={() => openUrl("https://github.com/Guzheng3")}
 						>
 							{intl.formatMessage({ id: "about.author" })}
 						</a>
@@ -161,7 +144,7 @@ export const AboutPage = () => {
 						type="primary"
 						icon={<GithubOutlined />}
 						onClick={() =>
-							openUrl("https://github.com/mg-chao/snow-shot/issues")
+							openUrl("https://github.com/Guzheng3/snow-shot/issues")
 						}
 						block
 					>

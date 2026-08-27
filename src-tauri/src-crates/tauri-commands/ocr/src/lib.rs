@@ -31,6 +31,58 @@ pub struct OcrDetectResult {
     pub scale_factor: f32,
 }
 
+/// 将全角 ASCII 字符（U+FF01–U+FF5E）及全角空格（U+3000）归一化为半角，
+/// 避免 OCR 把链接/代码/数字中的半角字符识别成全角（如 https：// 或 ＡＢＣ１２３）。
+fn normalize_fullwidth_to_halfwidth(text: &str) -> String {
+    text.chars()
+        .map(|c| match c {
+            '\u{3000}' => ' ',
+            '\u{FF01}'..='\u{FF5E}' => char::from_u32(c as u32 - 0xFEE0).unwrap_or(c),
+            _ => c,
+        })
+        .collect()
+}
+
+fn is_cjk_ideograph(c: char) -> bool {
+    matches!(
+        c,
+        '\u{4E00}'..='\u{9FFF}'
+            | '\u{3400}'..='\u{4DBF}'
+            | '\u{20000}'..='\u{2A6DF}'
+            | '\u{F900}'..='\u{FAFF}'
+            | '\u{2F800}'..='\u{2FA1F}'
+    )
+}
+
+fn is_mostly_chinese(text: &str) -> bool {
+    let total = text.chars().count();
+    if total == 0 {
+        return false;
+    }
+    let cjk_count = text.chars().filter(|c| is_cjk_ideograph(*c)).count();
+    (cjk_count as f64 / total as f64) >= 0.3
+}
+
+fn contains_url_pattern(text: &str) -> bool {
+    let normalized = normalize_fullwidth_to_halfwidth(text);
+    normalized.contains("http://")
+        || normalized.contains("https://")
+        || normalized.contains("ftp://")
+        || normalized.contains("www.")
+}
+
+fn normalize_text_blocks(text_blocks: Vec<TextBlock>) -> Vec<TextBlock> {
+    text_blocks
+        .into_iter()
+        .map(|mut block| {
+            if contains_url_pattern(&block.text) || !is_mostly_chinese(&block.text) {
+                block.text = normalize_fullwidth_to_halfwidth(&block.text);
+            }
+            block
+        })
+        .collect()
+}
+
 fn convert_rgba_to_rgb(image: &[u8]) -> Vec<u8> {
     let pixel_count = image.len() / 4;
     let mut rgb_data = Vec::with_capacity(pixel_count * 3);
@@ -101,7 +153,7 @@ pub async fn ocr_detect_core(
 
     match ocr_result {
         Ok(ocr_result) => Ok(OcrDetectResult {
-            text_blocks: ocr_result.text_blocks,
+            text_blocks: normalize_text_blocks(ocr_result.text_blocks),
             scale_factor,
         }),
         Err(e) => return Err(format!("[ocr_detect_core] Failed to detect text: {}", e)),
@@ -165,7 +217,7 @@ pub async fn ocr_detect_with_shared_buffer(
 ) -> Result<OcrDetectResult, String> {
     log::info!("[ocr_detect_with_shared_buffer] start detect");
 
-    let image_data = match shared_buffer_service.receive_data(channel_id) {
+    let mut image_data = match shared_buffer_service.receive_data(channel_id) {
         Ok(image_data) => image_data,
         Err(e) => {
             return Err(format!(
@@ -174,6 +226,10 @@ pub async fn ocr_detect_with_shared_buffer(
             ));
         }
     };
+
+    if image_data.len() < 8 {
+        return Err("[ocr_detect_with_shared_buffer] Invalid image data".to_string());
+    }
 
     let image_width = u32::from_le_bytes(
         image_data[image_data.len() - 8..image_data.len() - 4]
@@ -185,6 +241,9 @@ pub async fn ocr_detect_with_shared_buffer(
             .try_into()
             .unwrap(),
     );
+
+    // 移除末尾 8 字节的宽高信息，仅保留纯 RGBA 像素数据
+    image_data.truncate(image_data.len() - 8);
 
     ocr_detect_core(
         ocr_service,

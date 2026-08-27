@@ -7,7 +7,6 @@ import ProForm, {
 	ProFormSelect,
 	ProFormSwitch,
 	ProFormText,
-	ProFormTextArea,
 } from "@ant-design/pro-form";
 import {
 	Alert,
@@ -18,7 +17,6 @@ import {
 	Form,
 	Row,
 	Select,
-	type SelectProps,
 	Spin,
 	Switch,
 	Typography,
@@ -40,24 +38,14 @@ import { DirectoryInput } from "@/components/directoryInput";
 import { GroupTitle, SubGroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import { defaultAppSettingsData } from "@/constants/appSettings";
 import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat";
 import {
-	SOURCE_LANGUAGE_ENV_VARIABLE,
-	TARGET_LANGUAGE_ENV_VARIABLE,
-	TRANSLATION_DOMAIN_ENV_VARIABLE,
-} from "@/constants/components/translation";
-import {
-	PLUGIN_ID_AI_CHAT,
 	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
 } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
-import { useVisionModelList } from "@/pages/fixedContent/components/ocrResult";
 import {
 	type AppSettingsData,
 	AppSettingsFixedContentInitialPosition,
@@ -69,7 +57,6 @@ import {
 	KeyDisplayDirection,
 	OcrDetectAfterAction,
 	OcrModel,
-	TranslationApiType,
 	TrayIconClickAction,
 	VideoMaxSize,
 } from "@/types/appSettings";
@@ -80,7 +67,6 @@ import {
 	getImageSaveDirectory,
 	getVideoRecordSaveDirectory,
 } from "@/utils/file";
-import { TestChat } from "./components/testChat";
 import { TranslationConfig } from "./components/translationConfig";
 
 export const FunctionSettingsPage = () => {
@@ -88,8 +74,6 @@ export const FunctionSettingsPage = () => {
 	const { token } = theme.useToken();
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
-	const [functionForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionChat]>();
 	const [functionDrawForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
@@ -126,14 +110,6 @@ export const FunctionSettingsPage = () => {
 					translationForm.setFieldsValue(
 						settings[AppSettingsGroup.FunctionTranslation],
 					);
-				}
-
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.FunctionChat] !==
-						settings[AppSettingsGroup.FunctionChat]
-				) {
-					functionForm.setFieldsValue(settings[AppSettingsGroup.FunctionChat]);
 				}
 
 				if (
@@ -243,7 +219,6 @@ export const FunctionSettingsPage = () => {
 			},
 			[
 				translationForm,
-				functionForm,
 				functionDrawForm,
 				screenshotForm,
 				outputForm,
@@ -548,17 +523,6 @@ export const FunctionSettingsPage = () => {
 		];
 	}, [intl]);
 
-	const translationApiTypeOptions = useMemo(() => {
-		return [
-			{
-				label: intl.formatMessage({
-					id: "settings.functionSettings.translationSettings.apiConfig.apiType.deepL",
-				}),
-				value: TranslationApiType.DeepL,
-			},
-		];
-	}, [intl]);
-
 	const encoderPresetOptions = useMemo(() => {
 		return [
 			{
@@ -622,71 +586,12 @@ export const FunctionSettingsPage = () => {
 		return [
 			{
 				label: intl.formatMessage({
-					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV4",
+					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium",
 				}),
-				value: OcrModel.RapidOcrV4,
-			},
-			{
-				label: intl.formatMessage({
-					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5",
-				}),
-				value: OcrModel.RapidOcrV5,
+				value: OcrModel.RapidOcrV6Medium,
 			},
 		];
 	}, [intl]);
-
-	const { getVisionModelList } = useVisionModelList();
-	const [htmlVisionModelOptions, setHtmlVisionModelOptions] = useState<
-		SelectProps["options"]
-	>([]);
-	useEffect(() => {
-		getVisionModelList().then((visionModelList) => {
-			const officialVisionModelList = visionModelList.filter(
-				(model) => model.isOfficial,
-			);
-			const customVisionModelList = visionModelList.filter(
-				(model) => !model.isOfficial,
-			);
-
-			const htmlVisionModelOptions = [
-				{
-					label: (
-						<IconLabel
-							label={intl.formatMessage({
-								id: "settings.functionSettings.ocrSettings.htmlVisionModel.default",
-							})}
-							tooltipTitle={intl.formatMessage({
-								id: "settings.functionSettings.ocrSettings.htmlVisionModel.default.tip",
-							})}
-						/>
-					),
-					value:
-						defaultAppSettingsData[AppSettingsGroup.FunctionOcr]
-							.htmlVisionModel,
-				},
-				customVisionModelList.length > 0
-					? {
-							label: <FormattedMessage id="tools.chat.custom" />,
-							options: customVisionModelList.map((model) => ({
-								label: model.config.model_name,
-								value: model.config.model_name,
-							})),
-						}
-					: undefined,
-				officialVisionModelList.length > 0
-					? {
-							label: <FormattedMessage id="tools.chat.official" />,
-							options: officialVisionModelList.map((model) => ({
-								label: model.config.model_name,
-								value: model.config.model_name,
-							})),
-						}
-					: undefined,
-			].filter(Boolean) as SelectProps["options"];
-
-			setHtmlVisionModelOptions(htmlVisionModelOptions);
-		});
-	}, [getVisionModelList, intl]);
 
 	const doubleClickActionOptions = useMemo(() => {
 		return [
@@ -775,30 +680,28 @@ export const FunctionSettingsPage = () => {
 						</Col>
 					</Row>
 
-					{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-						<Row gutter={token.marginLG}>
-							<Col span={12}>
-								<ProFormSelect
-									name="ocrAfterAction"
-									layout="horizontal"
-									label={
-										<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrAfterAction" />
-									}
-									options={ocrAfterActionOptions}
-								/>
-							</Col>
+					<Row gutter={token.marginLG}>
+						<Col span={12}>
+							<ProFormSelect
+								name="ocrAfterAction"
+								layout="horizontal"
+								label={
+									<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrAfterAction" />
+								}
+								options={ocrAfterActionOptions}
+							/>
+						</Col>
 
-							<Col span={12}>
-								<ProFormSwitch
-									name="ocrCopyText"
-									layout="horizontal"
-									label={
-										<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrCopyText" />
-									}
-								/>
-							</Col>
-						</Row>
-					)}
+						<Col span={12}>
+							<ProFormSwitch
+								name="ocrCopyText"
+								layout="horizontal"
+								label={
+									<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrCopyText" />
+								}
+							/>
+						</Col>
+					</Row>
 
 					<Row gutter={token.marginLG}>
 						<Col span={12}>
@@ -1223,17 +1126,15 @@ export const FunctionSettingsPage = () => {
 							/>
 						</Col>
 
-						{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-							<Col span={12}>
-								<ProFormSwitch
-									label={
-										<FormattedMessage id="settings.functionSettings.fixedContentSettings.autoOcr" />
-									}
-									name="autoOcr"
-									layout="horizontal"
-								/>
-							</Col>
-						)}
+						<Col span={12}>
+							<ProFormSwitch
+								label={
+									<FormattedMessage id="settings.functionSettings.fixedContentSettings.autoOcr" />
+								}
+								name="autoOcr"
+								layout="horizontal"
+							/>
+						</Col>
 
 						<Col span={12}>
 							<ProFormSwitch
@@ -1265,123 +1166,61 @@ export const FunctionSettingsPage = () => {
 				</ProForm>
 			</Spin>
 
-			{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-				<>
-					<Divider />
+			<>
+				<Divider />
 
-					<GroupTitle
-						id="ocrSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.ocrSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionOcr}
-							/>
-						}
+				<GroupTitle
+					id="ocrSettings"
+					extra={
+						<ResetSettingsButton
+							title={
+								<FormattedMessage id="settings.functionSettings.ocrSettings" />
+							}
+							appSettingsGroup={AppSettingsGroup.FunctionOcr}
+						/>
+					}
+				>
+					<FormattedMessage id="settings.functionSettings.ocrSettings" />
+				</GroupTitle>
+
+				<Spin spinning={appSettingsLoading}>
+					<ProForm
+						form={functionOcrForm}
+						onValuesChange={(_, values) => {
+							updateAppSettings(
+								AppSettingsGroup.FunctionOcr,
+								values,
+								true,
+								true,
+								true,
+								true,
+								false,
+							);
+						}}
+						submitter={false}
+						layout="vertical"
 					>
-						<FormattedMessage id="settings.functionSettings.ocrSettings" />
-					</GroupTitle>
+						<Row gutter={token.marginLG}>
+							<Col span={12}>
+								<ProFormSelect
+									label={
+										<IconLabel
+											label={
+												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel" />
+											}
+										/>
+									}
+									name="ocrModel"
+									options={ocrModelOptions}
+								/>
+							</Col>
+						</Row>
+					</ProForm>
+				</Spin>
+			</>
 
-					<Spin spinning={appSettingsLoading}>
-						<ProForm
-							form={functionOcrForm}
-							onValuesChange={(_, values) => {
-								updateAppSettings(
-									AppSettingsGroup.FunctionOcr,
-									values,
-									true,
-									true,
-									true,
-									true,
-									false,
-								);
-							}}
-							submitter={false}
-							layout="vertical"
-						>
-							<Row gutter={token.marginLG}>
-								<Col span={12}>
-									<ProFormSelect
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel" />
-												}
-											/>
-										}
-										name="ocrModel"
-										options={ocrModelOptions}
-									/>
-								</Col>
-
-								{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-									<>
-										<Col span={12}>
-											<ProFormSelect
-												name="htmlVisionModel"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModel" />
-														}
-														tooltipTitle={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModel.tip" />
-														}
-													/>
-												}
-												layout="vertical"
-												options={htmlVisionModelOptions}
-												allowClear={false}
-											/>
-										</Col>
-										<Col span={24}>
-											<ProFormTextArea
-												name="htmlVisionModelSystemPrompt"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.htmlVisionModelSystemPrompt" />
-														}
-													/>
-												}
-												fieldProps={{
-													autoSize: {
-														minRows: 1,
-														maxRows: 1,
-													},
-												}}
-											/>
-										</Col>
-										<Col span={24}>
-											<ProFormTextArea
-												name="markdownVisionModelSystemPrompt"
-												label={
-													<IconLabel
-														label={
-															<FormattedMessage id="settings.functionSettings.ocrSettings.markdownVisionModelSystemPrompt" />
-														}
-													/>
-												}
-												fieldProps={{
-													autoSize: {
-														minRows: 1,
-														maxRows: 1,
-													},
-												}}
-											/>
-										</Col>
-									</>
-								)}
-							</Row>
-						</ProForm>
-					</Spin>
-				</>
-			)}
-
-			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
-				<>
-					<Divider />
+			<>
+				<Divider />
 
 					<GroupTitle
 						id="translationSettings"
@@ -1434,448 +1273,9 @@ export const FunctionSettingsPage = () => {
 								</Col>
 							</Row>
 
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<ProFormList
-										name="translationApiConfigList"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig" />
-												}
-											/>
-										}
-										creatorButtonProps={{
-											creatorButtonText: intl.formatMessage({
-												id: "settings.functionSettings.translationSettings.apiConfig.add",
-											}),
-										}}
-										className="api-config-list"
-										min={0}
-										itemRender={({ listDom, action }) => (
-											<Flex align="end" justify="space-between">
-												{listDom}
-
-												<div>{action}</div>
-											</Flex>
-										)}
-										creatorRecord={() => ({
-											api_uri: "",
-											api_key: "",
-											api_type: TranslationApiType.DeepL,
-										})}
-									>
-										<Row gutter={token.marginLG} style={{ width: "100%" }}>
-											<Col span={12}>
-												<ProFormSelect
-													name="api_type"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiType" />
-															}
-														/>
-													}
-													allowClear={false}
-													options={translationApiTypeOptions}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText
-													name="api_uri"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiUri" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiUri.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.translationSettings.apiConfig.apiUri.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText.Password
-													name="api_key"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiKey" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.apiKey.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.translationSettings.apiConfig.apiKey.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-
-											<ProFormDependency<{ api_type: TranslationApiType }>
-												name={["api_type"]}
-											>
-												{({ api_type }) => {
-													if (api_type === TranslationApiType.DeepL) {
-														return (
-															<Col span={12}>
-																<ProFormSwitch
-																	name="deepl_prefer_quality_optimized"
-																	label={
-																		<IconLabel
-																			label={
-																				<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized" />
-																			}
-																			tooltipTitle={
-																				<FormattedMessage id="settings.functionSettings.translationSettings.apiConfig.deeplPreferQualityOptimized.tip" />
-																			}
-																		/>
-																	}
-																/>
-															</Col>
-														);
-													}
-
-													return null;
-												}}
-											</ProFormDependency>
-										</Row>
-									</ProFormList>
-								</Col>
-							</Row>
-
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<Alert
-										message={
-											<Typography>
-												<Row>
-													<Col span={24}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.variables" />
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.sourceLanguage" />
-														<code>{SOURCE_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.targetLanguage" />
-														<code>{TARGET_LANGUAGE_ENV_VARIABLE}</code>
-													</Col>
-													<Col span={12}>
-														<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.translationDomain" />
-														<code>{TRANSLATION_DOMAIN_ENV_VARIABLE}</code>
-													</Col>
-												</Row>
-											</Typography>
-										}
-										type="info"
-										style={{ marginBottom: token.margin }}
-									/>
-									<ProFormTextArea
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.translationSettings.chatPrompt.tip" />
-												}
-											/>
-										}
-										layout="horizontal"
-										name="translationSystemPrompt"
-										rules={[
-											{
-												required: true,
-												message: intl.formatMessage({
-													id: "settings.functionSettings.translationSettings.chatPrompt.required",
-												}),
-											},
-										]}
-										fieldProps={{
-											autoSize: {
-												minRows: 1,
-												maxRows: 1,
-											},
-										}}
-									/>
-								</Col>
-							</Row>
 						</ProForm>
-					</Spin>
-				</>
-			)}
-
-			{(isReadyStatus?.(PLUGIN_ID_TRANSLATE) ||
-				isReadyStatus?.(PLUGIN_ID_AI_CHAT)) && (
-				<>
-					<Divider />
-
-					<GroupTitle
-						id="chatSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.chatSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionChat}
-							/>
-						}
-					>
-						<FormattedMessage id="settings.functionSettings.chatSettings" />
-					</GroupTitle>
-
-					<Spin spinning={appSettingsLoading}>
-						<ProForm
-							form={functionForm}
-							onValuesChange={(_, values) => {
-								updateAppSettings(
-									AppSettingsGroup.FunctionChat,
-									values,
-									true,
-									true,
-									true,
-									true,
-									false,
-								);
-							}}
-							submitter={false}
-						>
-							{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-								<Row gutter={token.marginLG}>
-									<Col span={12}>
-										<ProForm.Item
-											label={
-												<IconLabel
-													label={
-														<FormattedMessage id="settings.functionSettings.chatSettings.autoCreateNewSession" />
-													}
-												/>
-											}
-											layout="horizontal"
-											name="autoCreateNewSession"
-											valuePropName="checked"
-										>
-											<Switch />
-										</ProForm.Item>
-									</Col>
-
-									<Col span={12}>
-										<ProForm.Item
-											label={
-												<IconLabel
-													label={
-														<FormattedMessage id="settings.functionSettings.chatSettings.autoCreateNewSessionOnCloseWindow" />
-													}
-												/>
-											}
-											layout="horizontal"
-											name="autoCreateNewSessionOnCloseWindow"
-											valuePropName="checked"
-										>
-											<Switch />
-										</ProForm.Item>
-									</Col>
-								</Row>
-							)}
-
-							<Row gutter={token.marginLG}>
-								<Col span={24}>
-									<ProFormList
-										name="chatApiConfigList"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.tip" />
-												}
-											/>
-										}
-										creatorButtonProps={{
-											creatorButtonText: intl.formatMessage({
-												id: "settings.functionSettings.chatSettings.apiConfig.add",
-											}),
-										}}
-										actionRender={(...params) => {
-											const [field, , defaultActionDom] = params;
-											return [
-												defaultActionDom,
-												<TestChat
-													key="test-chat"
-													config={
-														functionForm.getFieldValue("chatApiConfigList")[
-															field.name
-														]
-													}
-												/>,
-											];
-										}}
-										className="api-config-list"
-										min={0}
-										itemRender={({ listDom, action }) => (
-											<Flex align="end" justify="space-between">
-												{listDom}
-												<div>{action}</div>
-											</Flex>
-										)}
-										creatorRecord={() => ({
-											api_uri: "",
-											api_key: "",
-											api_model: "",
-											model_name: "",
-										})}
-									>
-										<Row gutter={token.marginLG} style={{ width: "100%" }}>
-											<Col span={12}>
-												<ProFormText
-													name="model_name"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.modelName" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.modelName.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.modelName.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-										<Row gutter={token.marginLG}>
-											<Col span={12}>
-												<ProFormText
-													name="api_uri"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiUri" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiUri.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiUri.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText.Password
-													name="api_key"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiKey" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiKey.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiKey.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-											<Col span={12}>
-												<ProFormText
-													name="api_model"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiModel" />
-															}
-															tooltipTitle={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.apiModel.tip" />
-															}
-														/>
-													}
-													rules={[
-														{
-															required: true,
-															message: intl.formatMessage({
-																id: "settings.functionSettings.chatSettings.apiConfig.apiModel.required",
-															}),
-														},
-													]}
-												/>
-											</Col>
-										</Row>
-										<Row gutter={token.marginLG}>
-											<Col span={12}>
-												<ProFormSwitch
-													name="support_thinking"
-													label={
-														<IconLabel
-															label={
-																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportThinking" />
-															}
-														/>
-													}
-												/>
-											</Col>
-											{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-												<Col span={12}>
-													<ProFormSwitch
-														name="support_vision"
-														label={
-															<IconLabel
-																label={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision" />
-																}
-																tooltipTitle={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision.tip" />
-																}
-															/>
-														}
-													/>
-												</Col>
-											)}
-										</Row>
-									</ProFormList>
-								</Col>
-							</Row>
-						</ProForm>
-					</Spin>
-				</>
-			)}
+				</Spin>
+			</>
 
 			<Divider />
 

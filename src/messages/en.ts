@@ -47,13 +47,11 @@ export const en = {
 		"More iterations create smoother lines",
 	"settings.systemSettings.commonSettings": "Common Settings",
 	"settings.systemSettings.commonSettings.autoStart": "Launch at Startup",
-		"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
-	"settings.chatSettings.maxTokens": "Max Tokens",
-	"settings.chatSettings.maxTokens.tip":
-		"Maximum number of tokens the model will generate in a response",
-	"settings.chatSettings.temperature": "Temperature",
-	"settings.chatSettings.temperature.tip":
-		"Higher values (e.g., 0.8) make outputs more random; lower values (e.g., 0.2) make them focused/deterministic",
+	"settings.systemSettings.screenshotSettings.ocrModel":
+		"Text Recognition Model",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
+		"Rapid OCR V6 Medium",
+	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
 			"home.screenshot": "Screenshot",
@@ -145,26 +143,8 @@ export const en = {
 	"draw.shadowColor": "Shadow Color",
 	"draw.resizeModal": "Resize",
 	"draw.confirm": "Confirm",
-																						"tools.chat.placeholder": "Send a message",
-	"tools.chat.welcome.title": "👋 Hello, how can I help you?",
-	"tools.chat.welcome.description":
-		"I'm an AI assistant. Feel free to ask me anything!",
-	"tools.chat.requestAborted": "Request aborted",
-	"tools.chat.requestFailed": "Request failed, please try again",
-	"tools.chat.agentPlaceholder": "Generating content...",
-	"tools.chat.newSession.tip": "New session created",
-	"tools.chat.session.current": "Current",
-	"tools.chat.sessions": "Sessions",
-	"tools.chat.newSession": "New Session",
-	"tools.chat.session.clear": "Clear All Sessions",
-	"tools.chat.session.clear.tip": "Confirm to clear all sessions?",
-	"tools.chat.reasoner": "Reasoning",
-	"tools.chat.custom": "Custom",
 									"settings.systemSettings.networkSettings": "Network Settings",
 	"settings.systemSettings.networkSettings.proxy": "System Proxy",
-	"settings.chatSettings.thinkingBudgetTokens": "Thinking Budget Tokens",
-	"settings.chatSettings.thinkingBudgetTokens.tip":
-		'For reasoning modes like Claude models, the thinking budget determines the maximum number of tokens for their internal reasoning process. Note: The thinking budget tokens cannot be less than "Max Tokens", therefore if this value is effective, the "Max Tokens" may be determined by the server',
 	"about.title": "Snow Shot",
 	"about.subtitle":
 		"A tool software designed with simplicity and elegance as the concept ❄️",

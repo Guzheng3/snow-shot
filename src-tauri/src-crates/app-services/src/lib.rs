@@ -7,4 +7,3 @@ pub mod listen_mouse_service;
 pub mod ocr_service;
 pub mod resize_window_service;
 pub mod video_record_service;
-pub mod wechat_ocr_service;

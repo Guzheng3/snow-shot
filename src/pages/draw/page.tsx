@@ -72,7 +72,6 @@ import {
 } from "@/utils/appStore";
 import {
 	writeFilePathToClipboard,
-	writeHtmlToClipboard,
 	writeTextToClipboard,
 } from "@/utils/clipboard";
 import {
@@ -91,9 +90,7 @@ import {
 } from "../fixedContent/components/fixedContentCore";
 import {
 	covertOcrResultToText,
-	OcrResultType,
 } from "../fixedContent/components/ocrResult";
-import { getOcrResultIframeSrcDoc } from "../fixedContent/components/ocrResult/extra";
 import {
 	DrawContext as CommonDrawContext,
 	type DrawContextType as CommonDrawContextType,
@@ -1152,7 +1149,6 @@ const DrawPageCore: React.FC<{
 			selectedText = ocrBlocksActionRef.current?.getSelectedText();
 		} else if (getDrawState() === DrawState.ScanQrcode) {
 			selectedText = {
-				type: "text",
 				text: window.getSelection()?.toString().trim() ?? "",
 			};
 		}
@@ -1165,42 +1161,15 @@ const DrawPageCore: React.FC<{
 			selectedText.text.trim() !== "" &&
 			(isOcrTool(getDrawState()) || getDrawState() === DrawState.ScanQrcode)
 		) {
-			if (selectedText.type === "visionModelHtml") {
-				writeHtmlToClipboard(selectedText.text);
-			} else {
-				writeTextToClipboard(selectedText.text);
-			}
+			writeTextToClipboard(selectedText.text);
 			finishCapture();
 			return;
 		} else if (
 			isOcrTool(getDrawState()) &&
-			(getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText ||
-				ocrResult?.ocrResultType === OcrResultType.VisionModelHtml ||
-				ocrResult?.ocrResultType === OcrResultType.VisionModelMarkdown)
+			getAppSettings()[AppSettingsGroup.FunctionScreenshot].ocrCopyText
 		) {
-			if (
-				ocrResult &&
-				(ocrResult.ocrResultType === OcrResultType.Ocr ||
-					false)
-			) {
+			if (ocrResult) {
 				writeTextToClipboard(covertOcrResultToText(ocrResult.result));
-			} else if (
-				ocrResult &&
-				ocrResult.ocrResultType === OcrResultType.VisionModelHtml
-			) {
-				const html = getOcrResultIframeSrcDoc(
-					ocrResult.result.text_blocks[0].text,
-					ocrResult.ocrResultType,
-					undefined,
-					undefined,
-					undefined,
-				);
-				writeHtmlToClipboard(html);
-			} else if (
-				ocrResult &&
-				ocrResult.ocrResultType === OcrResultType.VisionModelMarkdown
-			) {
-				writeTextToClipboard(ocrResult.result.text_blocks[0].text);
 			}
 
 			finishCapture();

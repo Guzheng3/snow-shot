@@ -22,14 +22,12 @@ import { defaultAppFunctionConfigs } from "@/constants/appFunction";
 import { defaultAppSettingsData } from "@/constants/appSettings";
 import { defaultCommonKeyEventSettings } from "@/constants/commonKeyEvent";
 import { defaultDrawToolbarKeyEventSettings } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import {
 	AppSettingsActionContext,
 	AppSettingsLoadingPublisher,
 	AppSettingsPublisher,
 } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { releaseDrawPage } from "@/functions/screenshot";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -48,6 +46,7 @@ import {
 	type HdrColorAlgorithm,
 	type HistoryValidDuration,
 	OcrDetectAfterAction,
+	OcrModel,
 	type TrayIconClickAction,
 	type TrayIconDefaultIcon,
 	type VideoMaxSize,
@@ -174,7 +173,6 @@ const AppSettingsContextProviderCore: React.FC<{
 		[writeAppSettings],
 	);
 
-	const { isReady } = usePluginServiceContext();
 	const updateAppSettings = useCallback(
 		(
 			group: AppSettingsGroup,
@@ -331,16 +329,6 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.menuCollapsed === "boolean"
 							? newSettings.menuCollapsed
 							: (prevSettings?.menuCollapsed ?? false),
-					chatModel:
-						typeof newSettings?.chatModel === "string"
-							? newSettings.chatModel
-							: (prevSettings?.chatModel ??
-								defaultAppSettingsData[group].chatModel),
-					chatModelEnableThinking:
-						typeof newSettings?.chatModelEnableThinking === "boolean"
-							? newSettings.chatModelEnableThinking
-							: (prevSettings?.chatModelEnableThinking ??
-								defaultAppSettingsData[group].chatModelEnableThinking),
 					colorPickerColorFormatIndex:
 						typeof newSettings?.colorPickerColorFormatIndex === "number"
 							? newSettings.colorPickerColorFormatIndex
@@ -544,16 +532,7 @@ const AppSettingsContextProviderCore: React.FC<{
 				const settingsKeySet = new Set<string>();
 				const settingKeys: DrawToolbarKeyEventKey[] = Object.keys(
 					defaultDrawToolbarKeyEventSettings,
-				).filter((key) => {
-					if (
-						key === DrawToolbarKeyEventKey.OcrDetectTool ||
-						key === DrawToolbarKeyEventKey.OcrTranslateTool
-					) {
-						return isReady?.(PLUGIN_ID_RAPID_OCR);
-					}
-
-					return true;
-				}) as DrawToolbarKeyEventKey[];
+				) as DrawToolbarKeyEventKey[];
 				settingKeys.forEach((key) => {
 					const keyEventSettings = newSettings as Record<
 						DrawToolbarKeyEventKey,
@@ -714,38 +693,10 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.autoStart
 							: (prevSettings?.autoStart ??
 								defaultAppSettingsData[group].autoStart),
-					autoCheckVersion:
-						typeof newSettings?.autoCheckVersion === "boolean"
-							? newSettings.autoCheckVersion
-							: (prevSettings?.autoCheckVersion ??
-								defaultAppSettingsData[group].autoCheckVersion),
 					runLog:
 						typeof newSettings?.runLog === "boolean"
 							? newSettings.runLog
 							: (prevSettings?.runLog ?? defaultAppSettingsData[group].runLog),
-				};
-			} else if (group === AppSettingsGroup.SystemChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					maxTokens:
-						typeof newSettings?.maxTokens === "number"
-							? Math.min(Math.max(newSettings.maxTokens, 512), 8192)
-							: (prevSettings?.maxTokens ??
-								defaultAppSettingsData[group].maxTokens),
-					temperature:
-						typeof newSettings?.temperature === "number"
-							? Math.min(Math.max(newSettings.temperature, 0), 2)
-							: (prevSettings?.temperature ??
-								defaultAppSettingsData[group].temperature),
-					thinkingBudgetTokens:
-						typeof newSettings?.thinkingBudgetTokens === "number"
-							? Math.min(Math.max(newSettings.thinkingBudgetTokens, 1024), 8192)
-							: (prevSettings?.thinkingBudgetTokens ??
-								defaultAppSettingsData[group].thinkingBudgetTokens),
 				};
 			} else if (group === AppSettingsGroup.SystemNetwork) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -768,55 +719,12 @@ const AppSettingsContextProviderCore: React.FC<{
 
 				settings = {
 					ocrModel:
-						typeof newSettings?.ocrModel === "string"
-							? newSettings.ocrModel
-							: (prevSettings?.ocrModel ??
-								defaultAppSettingsData[group].ocrModel),
-					htmlVisionModel:
-						typeof newSettings?.htmlVisionModel === "string"
-							? newSettings.htmlVisionModel
-							: (prevSettings?.htmlVisionModel ??
-								defaultAppSettingsData[group].htmlVisionModel),
-					htmlVisionModelSystemPrompt:
-						typeof newSettings?.htmlVisionModelSystemPrompt === "string"
-							? newSettings.htmlVisionModelSystemPrompt
-							: (prevSettings?.htmlVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].htmlVisionModelSystemPrompt),
-					markdownVisionModelSystemPrompt:
-						typeof newSettings?.markdownVisionModelSystemPrompt === "string"
-							? newSettings.markdownVisionModelSystemPrompt
-							: (prevSettings?.markdownVisionModelSystemPrompt ??
-								defaultAppSettingsData[group].markdownVisionModelSystemPrompt),
-				};
-			} else if (group === AppSettingsGroup.FunctionChat) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					autoCreateNewSession:
-						typeof newSettings?.autoCreateNewSession === "boolean"
-							? newSettings.autoCreateNewSession
-							: (prevSettings?.autoCreateNewSession ??
-								defaultAppSettingsData[group].autoCreateNewSession),
-					chatApiConfigList: Array.isArray(newSettings?.chatApiConfigList)
-						? newSettings.chatApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_model: `${item.api_model ?? ""}`,
-								model_name: `${item.model_name ?? ""}`,
-								support_thinking: !!item.support_thinking,
-								support_vision: !!item.support_vision,
-							}))
-						: (prevSettings?.chatApiConfigList ??
-							defaultAppSettingsData[group].chatApiConfigList),
-					autoCreateNewSessionOnCloseWindow:
-						typeof newSettings?.autoCreateNewSessionOnCloseWindow === "boolean"
-							? newSettings.autoCreateNewSessionOnCloseWindow
-							: (prevSettings?.autoCreateNewSessionOnCloseWindow ??
-								defaultAppSettingsData[group]
-									.autoCreateNewSessionOnCloseWindow),
+						newSettings?.ocrModel === OcrModel.RapidOcrV6Medium
+							? OcrModel.RapidOcrV6Medium
+							: (prevSettings?.ocrModel ===
+								OcrModel.RapidOcrV6Medium
+								? OcrModel.RapidOcrV6Medium
+								: defaultAppSettingsData[group].ocrModel),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -835,17 +743,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.cacheTargetLanguage
 							: (prevSettings?.cacheTargetLanguage ??
 								defaultAppSettingsData[group].cacheTargetLanguage),
-					cacheTranslationDomain:
-						typeof newSettings?.cacheTranslationDomain === "string"
-							? newSettings.cacheTranslationDomain
-							: (prevSettings?.cacheTranslationDomain ??
-								defaultAppSettingsData[group].cacheTranslationDomain),
-					cacheTranslationType:
-						typeof newSettings?.cacheTranslationType === "number" ||
-						typeof newSettings?.cacheTranslationType === "string"
-							? newSettings.cacheTranslationType
-							: (prevSettings?.cacheTranslationType ??
-								defaultAppSettingsData[group].cacheTranslationType),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslation) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -854,30 +751,11 @@ const AppSettingsContextProviderCore: React.FC<{
 					| undefined;
 
 				settings = {
-					translationSystemPrompt:
-						typeof newSettings?.translationSystemPrompt === "string"
-							? newSettings.translationSystemPrompt
-							: (prevSettings?.translationSystemPrompt ??
-								defaultAppSettingsData[group].translationSystemPrompt),
 					optimizeAiTranslationLayout:
 						typeof newSettings?.optimizeAiTranslationLayout === "boolean"
 							? newSettings.optimizeAiTranslationLayout
 							: (prevSettings?.optimizeAiTranslationLayout ??
 								defaultAppSettingsData[group].optimizeAiTranslationLayout),
-					translationApiConfigList: Array.isArray(
-						newSettings?.translationApiConfigList,
-					)
-						? newSettings.translationApiConfigList.map((item) => ({
-								api_uri: `${item.api_uri ?? ""}`,
-								api_key: `${item.api_key ?? ""}`,
-								api_type: item.api_type,
-								deepl_prefer_quality_optimized:
-									typeof item.deepl_prefer_quality_optimized === "boolean"
-										? item.deepl_prefer_quality_optimized
-										: false,
-							}))
-						: (prevSettings?.translationApiConfigList ??
-							defaultAppSettingsData[group].translationApiConfigList),
 					sourceLanguage:
 						typeof newSettings?.sourceLanguage === "string"
 							? newSettings.sourceLanguage
@@ -888,17 +766,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.targetLanguage
 							: (prevSettings?.targetLanguage ??
 								defaultAppSettingsData[group].targetLanguage),
-					translationDomain:
-						typeof newSettings?.translationDomain === "string"
-							? newSettings.translationDomain
-							: (prevSettings?.translationDomain ??
-								defaultAppSettingsData[group].translationDomain),
-					translationType:
-						typeof newSettings?.translationType === "number" ||
-						typeof newSettings?.translationType === "string"
-							? newSettings.translationType
-							: (prevSettings?.translationType ??
-								defaultAppSettingsData[group].translationType),
 				};
 			} else if (group === AppSettingsGroup.FunctionScreenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];
@@ -1394,7 +1261,7 @@ const AppSettingsContextProviderCore: React.FC<{
 
 			return settings;
 		},
-		[setAppSettings, isReady, writeAppSettingsDebounce, writeAppSettings],
+		[setAppSettings, writeAppSettingsDebounce, writeAppSettings],
 	);
 
 	const reloadAppSettings = useCallback(async () => {
