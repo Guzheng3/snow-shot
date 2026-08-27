@@ -32,9 +32,12 @@ export const PluginServiceContextProvider: React.FC<{
 				id: PLUGIN_ID_RAPID_OCR,
 				file_list: [
 					"ch_ppocr_mobile_v2.0_cls_infer.onnx",
+					"ch_ppocr_mobile_v2.0_cls_mobile.onnx",
 					"ch_PP-OCRv4_det_infer.onnx",
 					"ch_PP-OCRv4_rec_infer.onnx",
 					"ch_PP-OCRv5_rec_mobile_infer.onnx",
+					"ch_PP-OCRv6_det_tiny.onnx",
+					"ch_PP-OCRv6_rec_tiny.onnx",
 				],
 			},
 			{
@@ -63,7 +66,7 @@ export const PluginServiceContextProvider: React.FC<{
 
 		const pluginConfig = new PluginConfig(
 			pluginList,
-			"20251005",
+			"20260827",
 			await path.join(configDirPath, "plugins"),
 			await path.join(configDirPath, "pluginsDownloads"),
 			"https://snowshot.top/plugins/",

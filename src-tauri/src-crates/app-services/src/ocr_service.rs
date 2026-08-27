@@ -17,6 +17,7 @@ pub struct OcrService {
 pub enum OcrModel {
     RapidOcrV4,
     RapidOcrV5,
+    RapidOcrV6Tiny,
     WeChatOcr,
 }
 
@@ -146,6 +147,11 @@ impl OcrService {
                 orc_plugin_path.join("ch_PP-OCRv4_det_infer.onnx"),
                 orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_infer.onnx"),
                 orc_plugin_path.join("ch_PP-OCRv5_rec_mobile_infer.onnx"),
+            ),
+            OcrModel::RapidOcrV6Tiny => (
+                orc_plugin_path.join("ch_PP-OCRv6_det_tiny.onnx"),
+                orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
+                orc_plugin_path.join("ch_PP-OCRv6_rec_tiny.onnx"),
             ),
             OcrModel::WeChatOcr => {
                 return Ok(()); // WeChat OCR 不使用本地 ONNX 模型

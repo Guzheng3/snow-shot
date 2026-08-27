@@ -53,6 +53,8 @@ export const en = {
 		"Rapid OCR V4",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5":
 		"Rapid OCR V5",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Tiny":
+		"Rapid OCR V6 Tiny",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",

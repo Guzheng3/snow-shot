@@ -596,6 +596,12 @@ export const FunctionSettingsPage = () => {
 				}),
 				value: OcrModel.RapidOcrV5,
 			},
+			{
+				label: intl.formatMessage({
+					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Tiny",
+				}),
+				value: OcrModel.RapidOcrV6Tiny,
+			},
 		];
 	}, [intl]);
 
