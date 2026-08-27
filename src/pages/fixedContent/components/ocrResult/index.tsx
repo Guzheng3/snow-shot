@@ -15,6 +15,10 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 import { ocrDetect, ocrDetectWithSharedBuffer } from "@/commands/ocr";
 import { createWebViewSharedBufferChannel } from "@/commands/webview";
+import {
+	CUSTOM_MODEL_PREFIX,
+	MarkdownContent,
+} from "@/components/tools/markdownView";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppContext } from "@/contexts/appContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
@@ -28,7 +32,6 @@ import {
 	type CaptureBoundingBoxInfo,
 	ElementDraggingPublisher,
 } from "@/pages/draw/extra";
-import { CUSTOM_MODEL_PREFIX, MarkdownContent } from "@/pages/tools/chat/page";
 import { appFetch, getUrl } from "@/services/tools";
 import { getChatModelsWithCache } from "@/services/tools/chat";
 import { AppSettingsGroup, type ChatApiConfig } from "@/types/appSettings";

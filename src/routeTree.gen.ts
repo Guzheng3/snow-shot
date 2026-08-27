@@ -55,7 +55,6 @@ const LayoutSettingsSystemSettingsLazyRouteImport = createFileRoute(
 const LayoutToolsCaptureHistoryLazyRouteImport = createFileRoute(
   '/_layout/tools/captureHistory',
 )()
-const LayoutToolsChatLazyRouteImport = createFileRoute('/_layout/tools/chat')()
 const LayoutToolsTranslationLazyRouteImport = createFileRoute(
   '/_layout/tools/translation',
 )()
@@ -204,13 +203,6 @@ const LayoutToolsCaptureHistoryLazyRoute =
   } as any).lazy(() =>
     import('./routes/_layout/tools/captureHistory.lazy').then((d) => d.Route),
   )
-const LayoutToolsChatLazyRoute = LayoutToolsChatLazyRouteImport.update({
-  id: '/tools/chat',
-  path: '/tools/chat',
-  getParentRoute: () => LayoutRouteRoute,
-} as any).lazy(() =>
-  import('./routes/_layout/tools/chat.lazy').then((d) => d.Route),
-)
 const LayoutToolsTranslationLazyRoute =
   LayoutToolsTranslationLazyRouteImport.update({
     id: '/tools/translation',
@@ -238,7 +230,6 @@ export interface FileRoutesByFullPath {
   '/settings/hotKeySettings': typeof LayoutSettingsHotKeySettingsLazyRoute
   '/settings/systemSettings': typeof LayoutSettingsSystemSettingsLazyRoute
   '/tools/captureHistory': typeof LayoutToolsCaptureHistoryLazyRoute
-  '/tools/chat': typeof LayoutToolsChatLazyRoute
   '/tools/translation': typeof LayoutToolsTranslationLazyRoute
 }
 export interface FileRoutesByTo {
@@ -259,7 +250,6 @@ export interface FileRoutesByTo {
   '/settings/hotKeySettings': typeof LayoutSettingsHotKeySettingsLazyRoute
   '/settings/systemSettings': typeof LayoutSettingsSystemSettingsLazyRoute
   '/tools/captureHistory': typeof LayoutToolsCaptureHistoryLazyRoute
-  '/tools/chat': typeof LayoutToolsChatLazyRoute
   '/tools/translation': typeof LayoutToolsTranslationLazyRoute
 }
 export interface FileRoutesById {
@@ -283,7 +273,6 @@ export interface FileRoutesById {
   '/_layout/settings/hotKeySettings': typeof LayoutSettingsHotKeySettingsLazyRoute
   '/_layout/settings/systemSettings': typeof LayoutSettingsSystemSettingsLazyRoute
   '/_layout/tools/captureHistory': typeof LayoutToolsCaptureHistoryLazyRoute
-  '/_layout/tools/chat': typeof LayoutToolsChatLazyRoute
   '/_layout/tools/translation': typeof LayoutToolsTranslationLazyRoute
 }
 export interface FileRouteTypes {
@@ -306,7 +295,6 @@ export interface FileRouteTypes {
     | '/settings/hotKeySettings'
     | '/settings/systemSettings'
     | '/tools/captureHistory'
-    | '/tools/chat'
     | '/tools/translation'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -327,7 +315,6 @@ export interface FileRouteTypes {
     | '/settings/hotKeySettings'
     | '/settings/systemSettings'
     | '/tools/captureHistory'
-    | '/tools/chat'
     | '/tools/translation'
   id:
     | '__root__'
@@ -350,7 +337,6 @@ export interface FileRouteTypes {
     | '/_layout/settings/hotKeySettings'
     | '/_layout/settings/systemSettings'
     | '/_layout/tools/captureHistory'
-    | '/_layout/tools/chat'
     | '/_layout/tools/translation'
   fileRoutesById: FileRoutesById
 }
@@ -494,13 +480,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutToolsCaptureHistoryLazyRouteImport
       parentRoute: typeof LayoutRouteRoute
     }
-    '/_layout/tools/chat': {
-      id: '/_layout/tools/chat'
-      path: '/tools/chat'
-      fullPath: '/tools/chat'
-      preLoaderRoute: typeof LayoutToolsChatLazyRouteImport
-      parentRoute: typeof LayoutRouteRoute
-    }
     '/_layout/tools/translation': {
       id: '/_layout/tools/translation'
       path: '/tools/translation'
@@ -521,7 +500,6 @@ interface LayoutRouteRouteChildren {
   LayoutSettingsHotKeySettingsLazyRoute: typeof LayoutSettingsHotKeySettingsLazyRoute
   LayoutSettingsSystemSettingsLazyRoute: typeof LayoutSettingsSystemSettingsLazyRoute
   LayoutToolsCaptureHistoryLazyRoute: typeof LayoutToolsCaptureHistoryLazyRoute
-  LayoutToolsChatLazyRoute: typeof LayoutToolsChatLazyRoute
   LayoutToolsTranslationLazyRoute: typeof LayoutToolsTranslationLazyRoute
 }
 
@@ -537,7 +515,6 @@ const LayoutRouteRouteChildren: LayoutRouteRouteChildren = {
   LayoutSettingsHotKeySettingsLazyRoute: LayoutSettingsHotKeySettingsLazyRoute,
   LayoutSettingsSystemSettingsLazyRoute: LayoutSettingsSystemSettingsLazyRoute,
   LayoutToolsCaptureHistoryLazyRoute: LayoutToolsCaptureHistoryLazyRoute,
-  LayoutToolsChatLazyRoute: LayoutToolsChatLazyRoute,
   LayoutToolsTranslationLazyRoute: LayoutToolsTranslationLazyRoute,
 }
 

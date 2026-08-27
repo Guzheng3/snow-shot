@@ -28,7 +28,6 @@ import {
 import { getCaptureState } from "@/commands/globalSate";
 import { IconLabel } from "@/components/iconLable";
 import {
-	ChatIcon,
 	ClipboardIcon,
 	FixedIcon,
 	FocusedWindowIcon,
@@ -52,8 +51,6 @@ import {
 	executeScreenshotFocusedWindow,
 } from "@/functions/screenshot";
 import {
-	executeChat,
-	executeChatSelectedText,
 	executeTranslate,
 	executeTranslateSelectedText,
 	openCaptureHistory,
@@ -223,20 +220,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonIcon = <TranslationIcon />;
 							buttonOnClick = () => {
 								executeTranslate();
-							};
-							break;
-						case AppFunction.ChatSelectText:
-							buttonTitle = <FormattedMessage id="home.chatSelectText" />;
-							buttonIcon = <SelectTextIcon style={{ fontSize: "1em" }} />;
-							buttonOnClick = async () => {
-								executeChatSelectedText();
-							};
-							break;
-						case AppFunction.Chat:
-							buttonTitle = <FormattedMessage id="home.chat" />;
-							buttonIcon = <ChatIcon />;
-							buttonOnClick = () => {
-								executeChat();
 							};
 							break;
 						case AppFunction.TopWindow:

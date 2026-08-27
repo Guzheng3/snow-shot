@@ -4,14 +4,6 @@ export const updateSelectedText = async () => {
 	await emit("update-selected-text");
 };
 
-export const executeChat = async () => {
-	await emit("execute-chat");
-};
-
-export const executeChatSelectedText = async () => {
-	await emit("execute-chat-selected-text");
-};
-
 export const executeTranslate = async () => {
 	await emit("execute-translate");
 };

@@ -1,6 +1,3 @@
-import type { BubbleDataType } from "@ant-design/x/es/bubble/BubbleList";
-import type { Conversation } from "@ant-design/x/es/conversations";
-import type { MessageInfo } from "@ant-design/x/es/use-x-chat";
 import type {
 	NonDeletedExcalidrawElement,
 	Ordered,
@@ -83,39 +80,11 @@ class BaseStore<Value> {
 	}
 }
 
-export class ChatHistoryStore extends BaseStore<{
-	session: Conversation;
-	messages: MessageInfo<BubbleDataType>[];
-}> {
-	constructor() {
-		super("chat-history", 1000);
-	}
-}
-
 export class ExcalidrawAppStateStore extends BaseStore<{
 	appState: Partial<AppState>;
 }> {
 	constructor() {
 		super("excalidraw-app-state", 1000);
-	}
-}
-
-export type ChatWorkflowFlow = {
-	variable_name?: string;
-	ignore_context: boolean;
-	message: string;
-};
-
-export type ChatWorkflowConfig = {
-	id: string;
-	name: string;
-	description?: string;
-	flow_list: ChatWorkflowFlow[];
-};
-
-export class ChatWorkflowConfigStore extends BaseStore<ChatWorkflowConfig> {
-	constructor() {
-		super("chat-workflow-config", 0);
 	}
 }
 
@@ -150,19 +119,9 @@ export class CaptureHistoryStore extends BaseStore<CaptureHistoryItem> {
 
 export const clearAllAppStore = async () => {
 	// 忽略截图历史的存储，因为和图片文件关联
-	// const chatHistoryStore = new ChatHistoryStore();
 	const excalidrawAppStateStore = new ExcalidrawAppStateStore();
-	const chatWorkflowConfigStore = new ChatWorkflowConfigStore();
 
-	await Promise.all([
-		// chatHistoryStore.init(),
-		excalidrawAppStateStore.init(),
-		chatWorkflowConfigStore.init(),
-	]);
+	await Promise.all([excalidrawAppStateStore.init()]);
 
-	await Promise.all([
-		// chatHistoryStore.clear(),
-		excalidrawAppStateStore.clear(),
-		chatWorkflowConfigStore.clear(),
-	]);
+	await Promise.all([excalidrawAppStateStore.clear()]);
 };
