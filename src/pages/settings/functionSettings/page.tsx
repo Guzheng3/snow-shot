@@ -47,10 +47,7 @@ import {
 	TARGET_LANGUAGE_ENV_VARIABLE,
 	TRANSLATION_DOMAIN_ENV_VARIABLE,
 } from "@/constants/components/translation";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_FFMPEG,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -1603,12 +1600,10 @@ export const FunctionSettingsPage = () => {
 						</ProForm>
 					</Spin>
 
-			{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-				<>
-					<Divider />
+			<Divider />
 
-					<GroupTitle
-						id="chatSettings"
+				<GroupTitle
+					id="chatSettings"
 						extra={
 							<ResetSettingsButton
 								title={
@@ -1637,8 +1632,7 @@ export const FunctionSettingsPage = () => {
 							}}
 							submitter={false}
 						>
-							{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-								<Row gutter={token.marginLG}>
+							<Row gutter={token.marginLG}>
 									<Col span={12}>
 										<ProForm.Item
 											label={
@@ -1673,7 +1667,6 @@ export const FunctionSettingsPage = () => {
 										</ProForm.Item>
 									</Col>
 								</Row>
-							)}
 
 							<Row gutter={token.marginLG}>
 								<Col span={24}>
@@ -1832,31 +1825,27 @@ export const FunctionSettingsPage = () => {
 													}
 												/>
 											</Col>
-											{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-												<Col span={12}>
-													<ProFormSwitch
-														name="support_vision"
-														label={
-															<IconLabel
-																label={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision" />
-																}
-																tooltipTitle={
-																	<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision.tip" />
-																}
-															/>
-														}
-													/>
-												</Col>
-											)}
+											<Col span={12}>
+												<ProFormSwitch
+													name="support_vision"
+													label={
+														<IconLabel
+															label={
+																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision" />
+															}
+															tooltipTitle={
+																<FormattedMessage id="settings.functionSettings.chatSettings.apiConfig.supportVision.tip" />
+															}
+														/>
+													}
+												/>
+											</Col>
 										</Row>
 									</ProFormList>
 								</Col>
 							</Row>
 						</ProForm>
 					</Spin>
-				</>
-			)}
 
 			<Divider />
 

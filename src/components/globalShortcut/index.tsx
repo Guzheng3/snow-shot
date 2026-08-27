@@ -44,10 +44,7 @@ import {
 } from "@/components/icons";
 import { TrayIconStatePublisher } from "@/components/trayIconLoader";
 import { defaultAppFunctionConfigs } from "@/constants/appFunction";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_FFMPEG,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
@@ -135,10 +132,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 					key === AppFunction.VideoRecordCopy
 				) {
 					return isReadyStatus?.(PLUGIN_ID_FFMPEG);
-				}
-
-				if (key === AppFunction.Chat) {
-					return isReadyStatus?.(PLUGIN_ID_AI_CHAT);
 				}
 
 				return true;
