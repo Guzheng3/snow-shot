@@ -42,7 +42,6 @@ import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat"
 import {
 	PLUGIN_ID_FFMPEG,
 	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
 } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -1245,9 +1244,8 @@ export const FunctionSettingsPage = () => {
 				</>
 			)}
 
-			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
-				<>
-					<Divider />
+			<>
+				<Divider />
 
 					<GroupTitle
 						id="translationSettings"
@@ -1426,9 +1424,8 @@ export const FunctionSettingsPage = () => {
 							</Row>
 
 						</ProForm>
-					</Spin>
-				</>
-			)}
+				</Spin>
+			</>
 
 			<Divider />
 

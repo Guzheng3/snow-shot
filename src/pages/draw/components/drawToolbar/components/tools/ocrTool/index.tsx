@@ -3,8 +3,6 @@ import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
 import { OcrTranslateIcon } from "@/components/icons";
-import { PLUGIN_ID_TRANSLATE } from "@/constants/pluginService";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
 	type AppOcrResult,
@@ -52,8 +50,6 @@ const OcrTool: React.FC<{
 		}, []),
 	);
 
-	const { isReadyStatus } = usePluginServiceContext();
-
 	if (!enabled) {
 		return null;
 	}
@@ -61,36 +57,32 @@ const OcrTool: React.FC<{
 	return (
 		<SubTools
 			buttons={[
-				...(isReadyStatus?.(PLUGIN_ID_TRANSLATE)
-					? [
-							<Button
-								disabled={!currentOcrResult}
-								loading={translateLoading}
-								onClick={() => {
-									if (ocrResult) {
-										if (translatedOcrResult) {
-											onSwitchOcrResult(
-												currentOcrResult?.ocrResultType ===
-													OcrResultType.Translated
-													? OcrResultType.Ocr
-													: OcrResultType.Translated,
-											);
-										} else {
-											onTranslate();
-										}
-									}
-								}}
-								type={
-									currentOcrResult?.ocrResultType === OcrResultType.Translated
-										? "primary"
-										: "text"
-								}
-								icon={<OcrTranslateIcon />}
-								title={intl.formatMessage({ id: "draw.ocrDetect.translate" })}
-								key="translate"
-							/>,
-						]
-					: []),
+				<Button
+					disabled={!currentOcrResult}
+					loading={translateLoading}
+					onClick={() => {
+						if (ocrResult) {
+							if (translatedOcrResult) {
+								onSwitchOcrResult(
+									currentOcrResult?.ocrResultType ===
+										OcrResultType.Translated
+										? OcrResultType.Ocr
+										: OcrResultType.Translated,
+								);
+							} else {
+								onTranslate();
+							}
+						}
+					}}
+					type={
+						currentOcrResult?.ocrResultType === OcrResultType.Translated
+							? "primary"
+							: "text"
+					}
+					icon={<OcrTranslateIcon />}
+					title={intl.formatMessage({ id: "draw.ocrDetect.translate" })}
+					key="translate"
+				/>,
 				<OcrToolModalSettings
 					key="ocrToolModalSettings"
 					onFinish={async () => {

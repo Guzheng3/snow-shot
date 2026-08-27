@@ -37,7 +37,6 @@ import { OcrTranslateIcon } from "@/components/icons";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
 import {
 	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
 } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
@@ -286,10 +285,9 @@ const FixedContentCoreInner: React.FC<{
 		return (
 			getSelectTextMode(fixedContentType) === "ocr" &&
 			ocrResult &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_TRANSLATE)
+			enableSelectText
 		);
-	}, [fixedContentType, enableSelectText, ocrResult, isReadyStatus]);
+	}, [fixedContentType, enableSelectText, ocrResult]);
 
 	const [textContent, setTextContent, textContentRef] = useStateRef<
 		| {
