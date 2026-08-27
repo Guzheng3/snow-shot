@@ -35,11 +35,6 @@ import {
 import { showMainWindow } from "@/commands/videoRecord";
 import { OcrTranslateIcon } from "@/components/icons";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -202,7 +197,7 @@ const FixedContentCoreInner: React.FC<{
 	onImageLoad,
 	disabled,
 }) => {
-	const { isReady, isReadyStatus } = usePluginServiceContext();
+	const { isReadyStatus } = usePluginServiceContext();
 	const intl = useIntl();
 	const { token } = theme.useToken();
 	const { message } = useContext(AntdContext);
@@ -294,24 +289,21 @@ const FixedContentCoreInner: React.FC<{
 		return (
 			getSelectTextMode(fixedContentType) === "ocr" &&
 			ocrResult &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_TRANSLATE)
+			enableSelectText
 		);
-	}, [fixedContentType, enableSelectText, ocrResult, isReadyStatus]);
+	}, [fixedContentType, enableSelectText, ocrResult]);
 	const enableVisionModelHtml = useMemo(() => {
 		return (
 			getSelectTextMode(fixedContentType) === "ocr" &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_AI_CHAT)
+			enableSelectText
 		);
-	}, [fixedContentType, enableSelectText, isReadyStatus]);
+	}, [fixedContentType, enableSelectText]);
 	const enableVisionModelMarkdown = useMemo(() => {
 		return (
 			getSelectTextMode(fixedContentType) === "ocr" &&
-			enableSelectText &&
-			isReadyStatus?.(PLUGIN_ID_AI_CHAT)
+			enableSelectText
 		);
-	}, [fixedContentType, enableSelectText, isReadyStatus]);
+	}, [fixedContentType, enableSelectText]);
 
 	const [textContent, setTextContent, textContentRef] = useStateRef<
 		| {
@@ -796,7 +788,6 @@ const FixedContentCoreInner: React.FC<{
 
 			if (
 				!(
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
 					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
 				) &&
 				!params.allOcrResult
@@ -859,7 +850,6 @@ const FixedContentCoreInner: React.FC<{
 					setEnableSelectText(true);
 					ocrResultActionRef.current.setEnable(true);
 				} else if (
-					isReady?.(PLUGIN_ID_RAPID_OCR) &&
 					getAppSettings()[AppSettingsGroup.FunctionFixedContent].autoOcr
 				) {
 					ocrResultActionRef.current?.init({
@@ -1883,22 +1873,19 @@ const FixedContentCoreInner: React.FC<{
 							},
 						]
 					: []),
-				isReadyStatus(PLUGIN_ID_RAPID_OCR) ||
-				getSelectTextMode(fixedContentType) !== "ocr"
-					? {
-							id: `${appWindow.label}-ocrTool`,
-							text:
-								getSelectTextMode(fixedContentType) === "ocr"
-									? intl.formatMessage({ id: "draw.showOrHideOcrResult" })
-									: intl.formatMessage({ id: "draw.selectText" }),
-							accelerator: formatKey(
-								hotkeys?.[CommonKeyEventKey.FixedContentSelectText]?.hotKey,
-							),
-							checked: enableSelectText,
-							enabled: !isThumbnail,
-							action: switchSelectText,
-						}
-					: undefined,
+				{
+						id: `${appWindow.label}-ocrTool`,
+						text:
+							getSelectTextMode(fixedContentType) === "ocr"
+								? intl.formatMessage({ id: "draw.showOrHideOcrResult" })
+								: intl.formatMessage({ id: "draw.selectText" }),
+						accelerator: formatKey(
+							hotkeys?.[CommonKeyEventKey.FixedContentSelectText]?.hotKey,
+						),
+						checked: enableSelectText,
+						enabled: !isThumbnail,
+						action: switchSelectText,
+					},
 				{
 					item: "Separator",
 				},

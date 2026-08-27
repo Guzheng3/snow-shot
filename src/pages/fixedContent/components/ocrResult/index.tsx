@@ -15,11 +15,9 @@ import {
 import { FormattedMessage, useIntl } from "react-intl";
 import { ocrDetect, ocrDetectWithSharedBuffer } from "@/commands/ocr";
 import { createWebViewSharedBufferChannel } from "@/commands/webview";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppContext } from "@/contexts/appContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useTranslationRequest } from "@/core/translations";
 import { releaseOcrSession } from "@/functions/ocr";
 import { useHotkeysApp } from "@/hooks/useHotkeysApp";
@@ -557,7 +555,6 @@ export const OcrResult: React.FC<{
 
 	/** 请求 ID，避免 OCR 检测中切换工具后仍然触发 OCR 结果 */
 	const requestIdRef = useRef<number>(0);
-	const { isReady } = usePluginServiceContext();
 
 	const [ocrResult, setOcrResult, ocrResultRef] = useStateRef<
 		AppOcrResult | undefined
@@ -576,10 +573,6 @@ export const OcrResult: React.FC<{
 	] = useStateRef<AppOcrResult | undefined>(undefined);
 	const initDrawCanvas = useCallback(
 		async (params: OcrResultInitDrawCanvasParams) => {
-			if (!isReady?.(PLUGIN_ID_RAPID_OCR)) {
-				return;
-			}
-
 			setCurrentOcrResult(undefined);
 			setOcrResult(undefined);
 			setTranslatorOcrResult(undefined);
@@ -697,7 +690,6 @@ export const OcrResult: React.FC<{
 			onOcrDetect?.(ocrResult.result);
 		},
 		[
-			isReady,
 			onOcrDetect,
 			updateOcrTextElements,
 			ocrDetectByCanvas,
@@ -712,10 +704,6 @@ export const OcrResult: React.FC<{
 
 	const initImage = useCallback(
 		async (params: OcrResultInitImageParams) => {
-			if (!isReady?.(PLUGIN_ID_RAPID_OCR)) {
-				return;
-			}
-
 			setCurrentOcrResult(undefined);
 			setOcrResult(undefined);
 			setTranslatorOcrResult(undefined);
@@ -756,7 +744,6 @@ export const OcrResult: React.FC<{
 		},
 		[
 			getAppSettings,
-			isReady,
 			onOcrDetect,
 			updateOcrTextElements,
 			ocrDetectByCanvas,

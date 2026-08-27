@@ -9,10 +9,7 @@ import { GlobalShortcutContext } from "@/components/globalShortcut";
 import { GroupTitle } from "@/components/groupTitle";
 import { KeyButton } from "@/components/keyButton";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
-import {
-		PLUGIN_ID_FFMPEG,
-		PLUGIN_ID_RAPID_OCR,
-	} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { usePlatform } from "@/hooks/usePlatform";
@@ -183,11 +180,6 @@ export const HomePage = () => {
 												config.configKey === AppFunction.TopWindow
 											) {
 												return false;
-											}
-
-											if (
-												config.configKey === AppFunction.ScreenshotOcr										) {
-												return isReadyStatus?.(PLUGIN_ID_RAPID_OCR);
 											}
 
 											return true;

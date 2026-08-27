@@ -50,8 +50,6 @@ import {
 import {
 	PLUGIN_ID_AI_CHAT,
 	PLUGIN_ID_FFMPEG,
-	PLUGIN_ID_RAPID_OCR,
-	PLUGIN_ID_TRANSLATE,
 } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
@@ -775,30 +773,28 @@ export const FunctionSettingsPage = () => {
 						</Col>
 					</Row>
 
-					{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-						<Row gutter={token.marginLG}>
-							<Col span={12}>
-								<ProFormSelect
-									name="ocrAfterAction"
-									layout="horizontal"
-									label={
-										<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrAfterAction" />
-									}
-									options={ocrAfterActionOptions}
-								/>
-							</Col>
+					<Row gutter={token.marginLG}>
+						<Col span={12}>
+							<ProFormSelect
+								name="ocrAfterAction"
+								layout="horizontal"
+								label={
+									<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrAfterAction" />
+								}
+								options={ocrAfterActionOptions}
+							/>
+						</Col>
 
-							<Col span={12}>
-								<ProFormSwitch
-									name="ocrCopyText"
-									layout="horizontal"
-									label={
-										<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrCopyText" />
-									}
-								/>
-							</Col>
-						</Row>
-					)}
+						<Col span={12}>
+							<ProFormSwitch
+								name="ocrCopyText"
+								layout="horizontal"
+								label={
+									<FormattedMessage id="settings.functionSettings.screenshotSettings.ocrCopyText" />
+								}
+							/>
+						</Col>
+					</Row>
 
 					<Row gutter={token.marginLG}>
 						<Col span={12}>
@@ -1223,17 +1219,15 @@ export const FunctionSettingsPage = () => {
 							/>
 						</Col>
 
-						{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-							<Col span={12}>
-								<ProFormSwitch
-									label={
-										<FormattedMessage id="settings.functionSettings.fixedContentSettings.autoOcr" />
-									}
-									name="autoOcr"
-									layout="horizontal"
-								/>
-							</Col>
-						)}
+						<Col span={12}>
+							<ProFormSwitch
+								label={
+									<FormattedMessage id="settings.functionSettings.fixedContentSettings.autoOcr" />
+								}
+								name="autoOcr"
+								layout="horizontal"
+							/>
+						</Col>
 
 						<Col span={12}>
 							<ProFormSwitch
@@ -1265,23 +1259,21 @@ export const FunctionSettingsPage = () => {
 				</ProForm>
 			</Spin>
 
-			{isReadyStatus?.(PLUGIN_ID_RAPID_OCR) && (
-				<>
-					<Divider />
+			<Divider />
 
-					<GroupTitle
-						id="ocrSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.ocrSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionOcr}
-							/>
+			<GroupTitle
+				id="ocrSettings"
+				extra={
+					<ResetSettingsButton
+						title={
+							<FormattedMessage id="settings.functionSettings.ocrSettings" />
 						}
-					>
-						<FormattedMessage id="settings.functionSettings.ocrSettings" />
-					</GroupTitle>
+						appSettingsGroup={AppSettingsGroup.FunctionOcr}
+					/>
+				}
+			>
+				<FormattedMessage id="settings.functionSettings.ocrSettings" />
+			</GroupTitle>
 
 					<Spin spinning={appSettingsLoading}>
 						<ProForm
@@ -1315,11 +1307,9 @@ export const FunctionSettingsPage = () => {
 									/>
 								</Col>
 
-								{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
-									<>
-										<Col span={12}>
-											<ProFormSelect
-												name="htmlVisionModel"
+								<Col span={12}>
+									<ProFormSelect
+										name="htmlVisionModel"
 												label={
 													<IconLabel
 														label={
@@ -1371,20 +1361,14 @@ export const FunctionSettingsPage = () => {
 												}}
 											/>
 										</Col>
-									</>
-								)}
 							</Row>
 						</ProForm>
 					</Spin>
-				</>
-			)}
 
-			{isReadyStatus?.(PLUGIN_ID_TRANSLATE) && (
-				<>
-					<Divider />
+			<Divider />
 
-					<GroupTitle
-						id="translationSettings"
+				<GroupTitle
+					id="translationSettings"
 						extra={
 							<ResetSettingsButton
 								title={
@@ -1618,11 +1602,8 @@ export const FunctionSettingsPage = () => {
 							</Row>
 						</ProForm>
 					</Spin>
-				</>
-			)}
 
-			{(isReadyStatus?.(PLUGIN_ID_TRANSLATE) ||
-				isReadyStatus?.(PLUGIN_ID_AI_CHAT)) && (
+			{isReadyStatus?.(PLUGIN_ID_AI_CHAT) && (
 				<>
 					<Divider />
 

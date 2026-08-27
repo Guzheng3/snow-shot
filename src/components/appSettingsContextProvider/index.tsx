@@ -22,14 +22,12 @@ import { defaultAppFunctionConfigs } from "@/constants/appFunction";
 import { defaultAppSettingsData } from "@/constants/appSettings";
 import { defaultCommonKeyEventSettings } from "@/constants/commonKeyEvent";
 import { defaultDrawToolbarKeyEventSettings } from "@/constants/drawToolbarKeyEvent";
-import { PLUGIN_ID_RAPID_OCR } from "@/constants/pluginService";
 import { AppContext } from "@/contexts/appContext";
 import {
 	AppSettingsActionContext,
 	AppSettingsLoadingPublisher,
 	AppSettingsPublisher,
 } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { releaseDrawPage } from "@/functions/screenshot";
 import { withStatePublisher } from "@/hooks/useStatePublisher";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -174,7 +172,6 @@ const AppSettingsContextProviderCore: React.FC<{
 		[writeAppSettings],
 	);
 
-	const { isReady } = usePluginServiceContext();
 	const updateAppSettings = useCallback(
 		(
 			group: AppSettingsGroup,
@@ -542,18 +539,9 @@ const AppSettingsContextProviderCore: React.FC<{
 					| undefined;
 
 				const settingsKeySet = new Set<string>();
-				const settingKeys: DrawToolbarKeyEventKey[] = Object.keys(
+				const settingKeys = Object.keys(
 					defaultDrawToolbarKeyEventSettings,
-				).filter((key) => {
-					if (
-						key === DrawToolbarKeyEventKey.OcrDetectTool ||
-						key === DrawToolbarKeyEventKey.OcrTranslateTool
-					) {
-						return isReady?.(PLUGIN_ID_RAPID_OCR);
-					}
-
-					return true;
-				}) as DrawToolbarKeyEventKey[];
+				) as DrawToolbarKeyEventKey[];
 				settingKeys.forEach((key) => {
 					const keyEventSettings = newSettings as Record<
 						DrawToolbarKeyEventKey,
@@ -1394,7 +1382,7 @@ const AppSettingsContextProviderCore: React.FC<{
 
 			return settings;
 		},
-		[setAppSettings, isReady, writeAppSettingsDebounce, writeAppSettings],
+		[setAppSettings, writeAppSettingsDebounce, writeAppSettings],
 	);
 
 	const reloadAppSettings = useCallback(async () => {

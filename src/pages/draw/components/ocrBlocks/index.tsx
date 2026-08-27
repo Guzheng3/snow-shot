@@ -8,13 +8,8 @@ import {
 import { useIntl } from "react-intl";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
-import {
-	PLUGIN_ID_AI_CHAT,
-	PLUGIN_ID_TRANSLATE,
-} from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
 import {
 	type AllOcrResult,
@@ -237,27 +232,22 @@ export const OcrBlocks: React.FC<{
 		onConvertImageToVisionModelFormat("markdown");
 	}, [onConvertImageToVisionModelFormat]);
 
-	const { isReadyStatus } = usePluginServiceContext();
-
 	return (
 		<>
-			{(isReadyStatus?.(PLUGIN_ID_TRANSLATE) ||
-				isReadyStatus?.(PLUGIN_ID_AI_CHAT)) && (
-				<OcrTool
-					onSwitchOcrResult={onSwitchOcrResult}
-					onTranslate={onTranslate}
-					onConvertImageToHtml={onConvertImageToHtml}
-					onConvertImageToMarkdown={onConvertImageToMarkdown}
-					currentOcrResult={currentOcrResult}
-					ocrResult={ocrResult}
-					translatedOcrResult={translatedOcrResult}
-					translateLoading={translateLoading}
-					visionModelHtmlResult={visionModelHtmlResult}
-					visionModelHtmlLoading={visionModelHtmlLoading}
-					visionModelMarkdownResult={visionModelMarkdownResult}
-					visionModelMarkdownLoading={visionModelMarkdownLoading}
-				/>
-			)}
+			<OcrTool
+				onSwitchOcrResult={onSwitchOcrResult}
+				onTranslate={onTranslate}
+				onConvertImageToHtml={onConvertImageToHtml}
+				onConvertImageToMarkdown={onConvertImageToMarkdown}
+				currentOcrResult={currentOcrResult}
+				ocrResult={ocrResult}
+				translatedOcrResult={translatedOcrResult}
+				translateLoading={translateLoading}
+				visionModelHtmlResult={visionModelHtmlResult}
+				visionModelHtmlLoading={visionModelHtmlLoading}
+				visionModelMarkdownResult={visionModelMarkdownResult}
+				visionModelMarkdownLoading={visionModelMarkdownLoading}
+			/>
 
 			<OcrResult
 				zIndex={zIndexs.Draw_OcrResult}

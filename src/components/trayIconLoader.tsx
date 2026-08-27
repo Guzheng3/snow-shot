@@ -13,10 +13,7 @@ import {
 	createFixedContentWindow,
 	createFullScreenDrawWindow,
 } from "@/commands/core";
-import {
-		PLUGIN_ID_FFMPEG,
-		PLUGIN_ID_RAPID_OCR,
-	} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppContext } from "@/contexts/appContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
@@ -229,23 +226,18 @@ const TrayIconLoaderComponent = () => {
 						executeScreenshot(ScreenshotType.Fixed);
 					},
 				},
-				...(isReadyStatus(PLUGIN_ID_RAPID_OCR)
-					? [
-							{
-								id: `${appWindow.label}-screenshot-ocr`,
-								text: intl.formatMessage({ id: "draw.ocrDetectTool" }),
-								accelerator: disableShortcut
-									? undefined
-									: formatKey(
-											shortcutKeys[AppFunction.ScreenshotOcr].shortcutKey,
-										),
-								action: async () => {
-									executeScreenshot(ScreenshotType.OcrDetect);
-								},
-							},
-							
-						]
-					: []),
+				{
+					id: `${appWindow.label}-screenshot-ocr`,
+					text: intl.formatMessage({ id: "draw.ocrDetectTool" }),
+					accelerator: disableShortcut
+						? undefined
+						: formatKey(
+								shortcutKeys[AppFunction.ScreenshotOcr].shortcutKey,
+							),
+					action: async () => {
+						executeScreenshot(ScreenshotType.OcrDetect);
+					},
+				},
 				{
 					id: `${appWindow.label}-screenshot-copy`,
 					text: intl.formatMessage({
