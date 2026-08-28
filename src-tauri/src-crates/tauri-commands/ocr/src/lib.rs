@@ -114,19 +114,33 @@ pub async fn ocr_detect_core(
     detect_angle: bool,
 ) -> Result<OcrDetectResult, String> {
     let mut ocr_service = ocr_service.lock().await;
-    let mut scale_factor = scale_factor;
     let mut image = image;
+    // 当前识别图相对原始输入图的整体缩放倍数，识别后需把 box 坐标映射回原图，保证前端叠加不偏移
+    let mut total_scale: f32 = 1.0;
 
     // 分辨率过小的图片识别可能有问题，当 scale_factor 低于 1.5 时，放大图片使有效缩放达到 1.5
     let target_scale_factor = 1.5;
     if scale_factor < target_scale_factor && scale_factor > 0.0 {
-        scale_factor = target_scale_factor;
         let resize_factor = target_scale_factor / scale_factor;
         image = image.resize(
             (image.width() as f32 * resize_factor) as u32,
             (image.height() as f32 * resize_factor) as u32,
             image::imageops::FilterType::Lanczos3,
         );
+        total_scale *= resize_factor;
+    }
+
+    // 大图保护：长边超过上限时等比缩小以降低 OCR 计算量
+    const MAX_DIMENSION: u32 = 4096;
+    let longest = image.height().max(image.width());
+    if longest > MAX_DIMENSION {
+        let down_factor = longest as f32 / MAX_DIMENSION as f32;
+        image = image.resize(
+            (image.width() as f32 / down_factor).round() as u32,
+            (image.height() as f32 / down_factor).round() as u32,
+            image::imageops::FilterType::Lanczos3,
+        );
+        total_scale /= down_factor;
     }
 
     let max_size = image.height().max(image.width());
@@ -152,10 +166,24 @@ pub async fn ocr_detect_core(
     );
 
     match ocr_result {
-        Ok(ocr_result) => Ok(OcrDetectResult {
-            text_blocks: normalize_text_blocks(ocr_result.text_blocks),
-            scale_factor,
-        }),
+        Ok(ocr_result) => {
+            let mut text_blocks = ocr_result.text_blocks;
+            // 识别图相对原始图被整体缩放（放大提精度 / 缩小保护），需把 box 映射回原图坐标，
+            // 使前端叠加的文字框与 canvas 物理坐标对齐
+            let inverse_scale = 1.0 / total_scale;
+            if (inverse_scale - 1.0).abs() > f32::EPSILON {
+                for block in &mut text_blocks {
+                    for p in &mut block.box_points {
+                        p.x = (p.x as f32 * inverse_scale).round() as u32;
+                        p.y = (p.y as f32 * inverse_scale).round() as u32;
+                    }
+                }
+            }
+            Ok(OcrDetectResult {
+                text_blocks: normalize_text_blocks(text_blocks),
+                scale_factor,
+            })
+        }
         Err(e) => return Err(format!("[ocr_detect_core] Failed to detect text: {}", e)),
     }
 }
@@ -171,30 +199,18 @@ pub async fn ocr_detect(
         _ => return Err("[ocr_detect] Invalid request body".to_string()),
     };
 
-    let mut image = match image::load(Cursor::new(image_data), image::ImageFormat::Png) {
+    let image = match image::load(Cursor::new(image_data), image::ImageFormat::Png) {
         Ok(image) => image,
         Err(_) => return Err("[ocr_detect] Invalid image".to_string()),
     };
 
-    let mut scale_factor: f32 = match request.headers().get("x-scale-factor") {
+    let scale_factor: f32 = match request.headers().get("x-scale-factor") {
         Some(header) => match header.to_str() {
             Ok(scale_factor) => scale_factor.parse::<f32>().unwrap(),
             Err(_) => return Err("[ocr_detect] Invalid scale factor".to_string()),
         },
         None => return Err("[ocr_detect] Missing scale factor".to_string()),
     };
-
-    // 分辨率过小的图片识别可能有问题，当 scale_factor 低于 1.5 时，放大图片使有效缩放达到 1.5
-    let target_scale_factor = 1.5;
-    if scale_factor < target_scale_factor && scale_factor > 0.0 {
-        scale_factor = target_scale_factor;
-        let resize_factor = target_scale_factor / scale_factor;
-        image = image.resize(
-            (image.width() as f32 * resize_factor) as u32,
-            (image.height() as f32 * resize_factor) as u32,
-            image::imageops::FilterType::Lanczos3,
-        );
-    }
 
     let detect_angle = match request.headers().get("x-detect-angle") {
         Some(header) => match header.to_str() {

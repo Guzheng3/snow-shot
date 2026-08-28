@@ -69,8 +69,10 @@ impl OcrService {
 
     fn build_session(builder: SessionBuilder) -> Result<SessionBuilder, ort::Error> {
         let num_thread = num_cpus::get_physical();
+        // inter 线程池负责 operator 间调度，保持为 1 可避免线程争抢；
+        // intra 线程池负责 operator 内部并行，设为物理核数以充分利用算力
         Ok(builder
-            .with_inter_threads(num_thread)?
+            .with_inter_threads(1)?
             .with_intra_threads(num_thread)?
             .with_optimization_level(ort::session::builder::GraphOptimizationLevel::Level3)?)
     }
