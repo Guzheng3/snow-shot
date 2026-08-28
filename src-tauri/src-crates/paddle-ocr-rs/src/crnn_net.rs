@@ -72,7 +72,10 @@ impl CrnnNet {
 
     /// 从外部字典文件加载字符表。
     ///
-    /// 字典文件为文本格式，每行一个字符；忽略空白行和仅含空白的行。
+    /// 字典文件为文本格式，每行一个字符。注意：只能跳过「完全空」的行
+    /// （文件末尾的换行），不能对每行做 trim——字典中可能包含全角空格
+    /// （U+3000）等带空白尾首的合法字符，trim 会误删导致字符表少一项、
+    /// 后续索引整体错位而乱码。
     /// 与 onnx 元数据缺失时的处理保持一致：自动在开头补 "#"（blank）、结尾补 " "。
     pub fn init_keys_from_path(&mut self, path: &str) -> Result<(), OcrError> {
         let content = fs::read_to_string(path)?;
@@ -81,9 +84,8 @@ impl CrnnNet {
         keys.push("#".to_string());
 
         for line in content.lines() {
-            let trimmed = line.trim();
-            if !trimmed.is_empty() {
-                keys.push(trimmed.to_string());
+            if !line.is_empty() {
+                keys.push(line.to_string());
             }
         }
 
