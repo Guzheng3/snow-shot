@@ -136,8 +136,28 @@ jobs:
           }
         shell: pwsh
 
-      # 上传产物（NSIS 安装包 + 主程序 + resources），Actions 页面可直接下载
-      # resources/ 含 app-icons 托盘图标 png，裸 exe 依赖它显示设置页预览图，必须一起传
+      # 裸 exe 兼容：把 OCR 模型（rapid_ocr）与内置字体（fonts）也复制到 exe 同级。
+      # resourceDir() 对裸 exe 解析到 exe 所在目录，模型/字体缺失将导致 OCR 无法识别、字体安装失败。
+      - name: Copy rapid_ocr & fonts next to exe (bare-exe compatibility)
+        run: |
+          $releaseDir = "src-tauri\target\x86_64-pc-windows-msvc\release"
+          if (Test-Path "src-tauri\resources\rapid_ocr") {
+            Copy-Item -Path "src-tauri\resources\rapid_ocr" -Destination "$releaseDir\rapid_ocr" -Recurse -Force
+            Write-Host "Copied rapid_ocr next to exe"
+          } else {
+            Write-Host "src-tauri/resources/rapid_ocr not found, skip"
+          }
+          if (Test-Path "src-tauri\resources\fonts") {
+            Copy-Item -Path "src-tauri\resources\fonts" -Destination "$releaseDir\fonts" -Recurse -Force
+            Write-Host "Copied fonts next to exe"
+          } else {
+            Write-Host "src-tauri/resources/fonts not found, skip"
+          }
+        shell: pwsh
+
+      # 上传产物（NSIS 安装包 + 主程序 + resources + 随包模型/字体），Actions 页面可直接下载
+      # resources/ 含 app-icons 托盘图标 png，裸 exe 依赖它显示设置页预览图，必须一起传；
+      # rapid_ocr/ 与 fonts/ 已复制到 exe 同级（裸 exe 兼容），也必须上传，否则 OCR 无法识别。
       - name: Upload bundle artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -147,5 +167,7 @@ jobs:
             src-tauri/target/**/release/snowshot.exe
             src-tauri/target/**/release/resources/
             src-tauri/target/**/release/app-icons/
+            src-tauri/target/**/release/rapid_ocr/
+            src-tauri/target/**/release/fonts/
           if-no-files-found: warn
           retention-days: 14

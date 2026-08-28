@@ -6,6 +6,7 @@ members = [
     "src-crates/app-scroll-screenshot-service",
     "src-crates/app-os",
     "src-crates/global_state",
+    "src-crates/paddle-ocr-rs",
     "src-crates/tauri-commands/core",
     "src-crates/tauri-commands/file",
     "src-crates/tauri-commands/ocr",
@@ -86,6 +87,10 @@ snow-shot-plugin-service = { path = "src-crates/plugin-service" }
 snow-shot-webview = { path = "src-crates/webview" }
 snow-shot-http-services = { path = "src-crates/http-services" }
 snow-shot-global-state = { path = "src-crates/global_state" }
+
+# 本地 vendored 的 paddle-ocr-rs（新增外部字典文件支持，解决 PP-OCRv6 无 character 元数据问题）
+[patch.crates-io]
+paddle-ocr-rs = { path = "src-crates/paddle-ocr-rs" }
 
 
 [dependencies]

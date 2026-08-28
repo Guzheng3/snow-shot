@@ -336,6 +336,7 @@ export const settings = {
 		"自定义图标路径（暗黑）",
 	"settings.commonSettings.trayIconSettings.iconPath.tip":
 		"建议 32x32 或 64x64 的图标",
+	"settings.hotKeySettings.translation": "翻译",
 	"settings.hotKeySettings.fixedContent": "固定到屏幕",
 	"settings.hotKeySettings.fixedContent.fixedContentEnableDraw": "绘制模式",
 	"settings.hotKeySettings.fixedContent.fixedContentSwitchThumbnail":
@@ -498,6 +499,11 @@ export const settings = {
 	"settings.systemSettings.coreSettings.hotLoadPageCount": "热加载页面数量",
 	"settings.systemSettings.coreSettings.hotLoadPageCount.tip":
 		"通过热加载页面，实现固定剪贴板内容到屏幕、视频录制、全屏画布等功能的快速加载，但同时提高了内存的占用",
+	"settings.functionSettings.translationSettings": "翻译设置",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
+		"优化 AI 翻译排版",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
+		"根据 AI 翻译结果优化布局，使文本排版更整齐",
 	"settings.functionSettings.ocrSettings": "文本识别",
 	"settings.functionSettings.globalShortcutSettings": "全局快捷键",
 	"settings.functionSettings.globalShortcutSettings.disableOnFocusedFullScreenWindow":

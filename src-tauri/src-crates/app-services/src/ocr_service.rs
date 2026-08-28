@@ -11,6 +11,8 @@ pub struct OcrService {
     det_model: Option<(PathBuf, Option<Vec<u8>>)>,
     rec_model: Option<(PathBuf, Option<Vec<u8>>)>,
     cls_model: Option<(PathBuf, Option<Vec<u8>>)>,
+    /// 识别模型的字符字典文件路径（PP-OCRv6 不内嵌 character 元数据，需外部字典）
+    rec_keys_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy, PartialOrd, Serialize, Deserialize)]
@@ -27,6 +29,7 @@ impl OcrService {
             det_model: None,
             rec_model: None,
             cls_model: None,
+            rec_keys_path: None,
         }
     }
 
@@ -114,6 +117,23 @@ impl OcrService {
         }
         .map_err(|e| format!("[OcrService::init_ocr_core] Failed to init models: {}", e))?;
 
+        // PP-OCRv6 识别模型不内嵌 character 元数据，需通过外部字典文件指定字符表
+        if let Some(rec_keys_path) = &self.rec_keys_path {
+            ocr_core
+                .init_rec_keys_from_path(
+                    rec_keys_path
+                        .to_str()
+                        .ok_or("[OcrService::init_ocr_core] rec_keys_path is not valid UTF-8")?,
+                )
+                .map_err(|e| {
+                    format!(
+                        "[OcrService::init_ocr_core] Failed to init rec keys from {}, e: {}",
+                        rec_keys_path.display(),
+                        e
+                    )
+                })?;
+        }
+
         self.ocr_core.replace(ocr_core);
 
         Ok(())
@@ -164,6 +184,7 @@ impl OcrService {
         self.det_model = det_model_config;
         self.cls_model = cls_model_config;
         self.rec_model = rec_model_config;
+        self.rec_keys_path = Some(orc_plugin_path.join("ppocrv6_dict.txt"));
         self.hot_start = hot_start;
 
         if self.hot_start {

@@ -24,6 +24,7 @@ export const zhHant = {
 	"settings.hotKeySettings.statusBarTip": "截圖快捷鍵提示顯示項（勾選 = 截圖時顯示）",
 	"settings.hotKeySettings.showInToolbar": "顯示在工具列",
 	"settings.hotKeySettings.showInHotKeyTip": "截圖時顯示快捷鍵提示",
+	"settings.hotKeySettings.translation": "翻譯",
 	"settings.addKeyConfig": "新增按鍵配置",
 	"settings.pleasePressTheKey": "請按按鍵",
 	"settings.keyConfig": '"{title}"按鍵配置',
@@ -169,4 +170,9 @@ export const zhHant = {
 	"common.permission.error.description":
 		"請在開啟應用正常運行所必要的「錄屏與系統錄音」和「輔助功能」權限",
 	"common.permission.error.goToSettings": "前往授權",
+	"settings.functionSettings.translationSettings": "翻譯設定",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
+		"優化 AI 翻譯排版",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
+		"根據 AI 翻譯結果優化版面，使文字排版更整齊",
 };

@@ -52,6 +52,7 @@ export const en = {
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
 		"Rapid OCR V6 Medium",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
+	"settings.hotKeySettings.translation": "Translation",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
 			"home.screenshot": "Screenshot",
@@ -195,4 +196,9 @@ export const en = {
 		"Horizontal",
 	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.vertical":
 		"Vertical",
+	"settings.functionSettings.translationSettings": "Translation Settings",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
+		"Optimize AI translation layout",
+	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
+		"Optimize the layout based on AI translation results for cleaner text alignment",
 };
