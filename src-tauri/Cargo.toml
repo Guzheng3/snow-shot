@@ -69,7 +69,8 @@ windows = "0.61"
 base64 = "^0.22"
 tauri-plugin-clipboard-manager = "^2"
 clipboard-win = "5.4.1"
-paddle-ocr-rs = "0.6.0"
+# 本地 vendored 的 paddle-ocr-rs（新增外部字典文件支持，解决 PP-OCRv6 无 character 元数据问题）
+paddle-ocr-rs = { path = "src-crates/paddle-ocr-rs" }
 
 # 项目内依赖
 snow-shot-app-services = { path = "src-crates/app-services" }
