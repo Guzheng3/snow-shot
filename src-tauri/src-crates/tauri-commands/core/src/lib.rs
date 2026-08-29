@@ -291,6 +291,11 @@ pub async fn create_ocr_result_window(
         if let Some(window) =
             app.get_webview_window(labels.ocr_result_window_label.as_str())
         {
+            // 上一轮可能被最小化了，show() 不会取消最小化，须先 unminimize 再 show，
+            // 否则本次 OCR 结果弹窗仍然是最小化状态、看起来"弹不出来"
+            let _ = window.unminimize();
+            let _ = window.set_skip_taskbar(false);
+            let _ = window.set_focus();
             window.emit("ocr-result-show", window_info.clone()).unwrap();
             window.show().unwrap();
             return Ok(());
@@ -345,6 +350,10 @@ pub async fn create_ocr_result_window(
                 window_height as u32,
             ))
             .unwrap();
+        // OCR 结果窗口需在任务栏可见，最小化后可从状态栏调回（hot_load_page 默认 skip_taskbar=true）
+        let _ = window.set_skip_taskbar(false);
+        let _ = window.unminimize();
+        let _ = window.set_focus();
         window.show().unwrap();
 
         match window.emit(
@@ -405,7 +414,7 @@ pub async fn create_ocr_result_window(
         .decorations(false)
         .shadow(false)
         .transparent(true)
-        .skip_taskbar(true)
+        .skip_taskbar(false)
         .min_inner_size(400.0, 500.0)
         .inner_size(window_width, window_height)
         .build()
