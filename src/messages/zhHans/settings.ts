@@ -421,8 +421,8 @@ export const settings = {
 	"settings.systemSettings.screenshotSettings.tryGetElementByFocus.always":
 		"保持启用",
 	"settings.systemSettings.screenshotSettings.ocrModel": "文本识别模型",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
-		"Rapid OCR V6 Medium",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
+		"Rapid OCR V5 Server",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
 	"settings.systemSettings.screenshotSettings.ocrHotStart.tip":
 		"预加载文本识别模型，提高文本识别的识别速度，但会提高内存占用",

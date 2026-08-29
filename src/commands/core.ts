@@ -49,12 +49,15 @@ export const createFixedContentWindow = async (scrollScreenshot?: boolean) => {
 
 /**
  * 创建 OCR 识别结果弹窗窗口（独立窗口展示可编辑的识别文本）
+ * @param mode ocr —— 纯识别（默认展示原文）；translate —— 工具栏翻译（默认只展示译文）
  */
 export const createOcrResultWindow = async (
 	ocrResult: OcrDetectResult,
+	mode?: "ocr" | "translate",
 ) => {
 	const result = await invoke<void>("create_ocr_result_window", {
 		ocrResultJson: JSON.stringify(ocrResult),
+		mode: mode ?? "ocr",
 	});
 	return result;
 };

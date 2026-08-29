@@ -15,6 +15,7 @@ export const OcrResultPage: React.FC = () => {
 	const [ocrResult, setOcrResult] = useState<OcrDetectResult | undefined>(
 		undefined,
 	);
+	const [mode, setMode] = useState<"ocr" | "translate">("ocr");
 	const [open, setOpen] = useState(false);
 
 	const initedRef = useRef(false);
@@ -25,9 +26,9 @@ export const OcrResultPage: React.FC = () => {
 		const monitorInfo = await getCurrentMonitorInfo();
 		const scaleFactor = window.devicePixelRatio;
 
-		// 基准逻辑像素尺寸，根据 DPI 自动缩放
-		const logicalWidth = 560;
-		const logicalHeight = 720;
+		// 基准逻辑像素尺寸，根据 DPI 自动缩放（PixPin 风格紧凑识别窗口）
+		const logicalWidth = 480;
+		const logicalHeight = 640;
 		const windowWidth = Math.round(logicalWidth * scaleFactor);
 		const windowHeight = Math.round(logicalHeight * scaleFactor);
 
@@ -64,6 +65,7 @@ export const OcrResultPage: React.FC = () => {
 		}
 
 		setOcrResult(result);
+		setMode(state.mode === "translate" ? "translate" : "ocr");
 		setOpen(true);
 		await positionAndShowWindow();
 	}, [positionAndShowWindow]);
@@ -100,6 +102,7 @@ export const OcrResultPage: React.FC = () => {
 			<OcrResultModal
 				open={open}
 				ocrResult={ocrResult}
+				mode={mode}
 				onClose={handleClose}
 			/>
 		</TextScaleFactorContextProvider>

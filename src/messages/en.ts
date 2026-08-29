@@ -49,8 +49,8 @@ export const en = {
 	"settings.systemSettings.commonSettings.autoStart": "Launch at Startup",
 	"settings.systemSettings.screenshotSettings.ocrModel":
 		"Text Recognition Model",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV6Medium":
-		"Rapid OCR V6 Medium",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
+		"Rapid OCR V5 Server",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"settings.hotKeySettings.translation": "Translation",
 	"home.commonFunction": "Common Features",

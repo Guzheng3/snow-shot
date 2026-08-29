@@ -35,10 +35,15 @@ impl ReadClipboardState {
 #[serde(rename_all = "camelCase")]
 pub struct OcrResultState {
     pub ocr_result_json: String,
+    /// 弹窗模式：ocr —— 纯识别（默认展示原文）；translate —— 工具栏翻译（默认只展示译文）
+    pub mode: String,
 }
 
 impl OcrResultState {
     pub fn new(ocr_result_json: String) -> Self {
-        Self { ocr_result_json }
+        Self {
+            ocr_result_json,
+            mode: String::from("ocr"),
+        }
     }
 }

@@ -1,9 +1,5 @@
-import {
-	useCallback,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from "react";
+import { useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -15,11 +11,13 @@ import {
 	type OcrResultActionType,
 	type OcrResultType,
 } from "@/pages/fixedContent/components/ocrResult";
+import { createOcrResultWindow } from "@/commands/core";
 import { AppSettingsGroup, OcrDetectAfterAction } from "@/types/appSettings";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import type { ElementRect } from "@/types/commands/screenshot";
 import { DrawState } from "@/types/draw";
 import { writeTextToClipboard } from "@/utils/clipboard";
+import { appError } from "@/utils/log";
 import { ScreenshotType } from "@/utils/types";
 import { zIndexs } from "@/utils/zIndex";
 import {
@@ -47,7 +45,7 @@ export type OcrBlocksActionType = {
 export const OcrBlocks: React.FC<{
 	actionRef: React.RefObject<OcrBlocksActionType | undefined>;
 	finishCapture: () => void;
-}> = ({ actionRef, finishCapture }) => {
+}> = ({ actionRef }) => {
 	const ocrResultActionRef = useRef<OcrResultActionType>(undefined);
 
 	const [getScreenshotType] = useStateSubscriber(
@@ -99,6 +97,21 @@ export const OcrBlocks: React.FC<{
 				return;
 			}
 
+			// 打开独立 OCR 结果窗口（关闭当前截图窗口）
+			// 工具栏"翻译"按钮走 translate 模式（默认隐藏原文，展示译文）；OCR 按钮走 ocr 模式
+			const mode =
+				getDrawState() === DrawState.OcrTranslate ? "translate" : "ocr";
+			createOcrResultWindow(ocrResult, mode)
+				.then(() => {
+					getCurrentWindow().close();
+				})
+				.catch((error) => {
+					appError(
+						"[OcrBlocks.onOcrDetect] createOcrResultWindow error",
+						error,
+					);
+				});
+
 			// 只在 OCR 检测时启用 OCR 后操作,截图翻译时不启用
 			if (getDrawState() === DrawState.OcrDetect) {
 				const ocrAfterAction =
@@ -117,13 +130,10 @@ export const OcrBlocks: React.FC<{
 						getScreenshotType().type === ScreenshotType.OcrDetect)
 				) {
 					writeTextToClipboard(covertOcrResultToText(ocrResult));
-					finishCapture?.();
 				}
-			} else if (getDrawState() === DrawState.OcrTranslate) {
-				ocrResultActionRef.current?.startTranslate();
 			}
 		},
-		[finishCapture, getAppSettings, getDrawState, getScreenshotType],
+		[getAppSettings, getDrawState, getScreenshotType],
 	);
 
 	const onTranslate = useCallback(() => {
@@ -159,6 +169,7 @@ export const OcrBlocks: React.FC<{
 				zIndex={zIndexs.Draw_OcrResult}
 				actionRef={ocrResultActionRef}
 				onOcrDetect={onOcrDetect}
+				hideOcrTextBlocks
 				onCurrentOcrResultChange={setCurrentOcrResult}
 				onOcrResultChange={setOcrResult}
 				onTranslatedResultChange={setTranslatedOcrResult}

@@ -256,6 +256,7 @@ pub struct OcrResultWindowLabels {
 #[derive(Serialize, Clone)]
 struct OcrResultWindowInfo {
     ocr_result_json: String,
+    mode: String,
 }
 
 /// 创建 OCR 识别结果弹窗窗口
@@ -269,6 +270,7 @@ pub async fn create_ocr_result_window(
     ocr_result_window_labels: tauri::State<'_, Mutex<Option<OcrResultWindowLabels>>>,
     hot_load_page_service: tauri::State<'_, Arc<HotLoadPageService>>,
     ocr_result_json: String,
+    mode: String,
 ) -> Result<(), String> {
     let mut ocr_result_window_labels = ocr_result_window_labels.lock().await;
 
@@ -277,21 +279,19 @@ pub async fn create_ocr_result_window(
     {
         let mut state = ocr_result_state.lock().await;
         state.ocr_result_json = ocr_result_json.clone();
+        state.mode = mode.clone();
     }
+    let window_info = OcrResultWindowInfo {
+        ocr_result_json: ocr_result_json.clone(),
+        mode: mode.clone(),
+    };
 
     // 已有窗口：复用并通知前端拉取新数据
     if let Some(labels) = ocr_result_window_labels.as_ref() {
         if let Some(window) =
             app.get_webview_window(labels.ocr_result_window_label.as_str())
         {
-            window
-                .emit(
-                    "ocr-result-show",
-                    OcrResultWindowInfo {
-                        ocr_result_json,
-                    },
-                )
-                .unwrap();
+            window.emit("ocr-result-show", window_info.clone()).unwrap();
             window.show().unwrap();
             return Ok(());
         }
@@ -305,9 +305,9 @@ pub async fn create_ocr_result_window(
     let monitor_height = monitor.height().unwrap() as f64;
     let monitor_scale_factor = monitor.scale_factor().unwrap() as f64;
 
-    // 基准逻辑像素尺寸，根据 DPI 缩放为物理像素
-    let logical_width = 560.0;
-    let logical_height = 720.0;
+    // 基准逻辑像素尺寸，根据 DPI 缩放为物理像素（PixPin 风格紧凑识别窗口）
+    let logical_width = 480.0;
+    let logical_height = 640.0;
     let window_width = logical_width * monitor_scale_factor;
     let window_height = logical_height * monitor_scale_factor;
 
@@ -364,7 +364,8 @@ pub async fn create_ocr_result_window(
         match window.emit(
             "ocr-result-show",
             OcrResultWindowInfo {
-                ocr_result_json,
+                ocr_result_json: ocr_result_json.clone(),
+                mode: mode.clone(),
             },
         ) {
             Ok(_) => (),
@@ -419,7 +420,8 @@ pub async fn create_ocr_result_window(
             .emit(
                 "ocr-result-show",
                 OcrResultWindowInfo {
-                    ocr_result_json,
+                    ocr_result_json: ocr_result_json.clone(),
+                    mode,
                 },
             )
             .unwrap();

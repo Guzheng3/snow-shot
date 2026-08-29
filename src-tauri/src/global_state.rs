@@ -44,9 +44,13 @@ pub async fn get_read_clipboard_state(
 pub async fn set_ocr_result_state(
     ocr_result_state: tauri::State<'_, Mutex<OcrResultState>>,
     ocr_result_json: String,
+    mode: Option<String>,
 ) -> Result<(), String> {
     let mut ocr_result_state = ocr_result_state.lock().await;
     ocr_result_state.ocr_result_json = ocr_result_json;
+    if let Some(mode) = mode {
+        ocr_result_state.mode = mode;
+    }
     Ok(())
 }
 

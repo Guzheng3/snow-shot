@@ -4,16 +4,52 @@ import {
 	ExportOutlined,
 	LinkOutlined,
 	MailOutlined,
+	MaximizeOutlined,
+	MinusOutlined,
 	MobileOutlined,
+	PushpinOutlined,
 	QqOutlined,
+	RestOutlined,
 } from "@ant-design/icons";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	type ReactNode,
+} from "react";
+import { useIntl } from "react-intl";
 import { AntdContext } from "@/contexts/antdContext";
+import { useTranslationRequest } from "@/core/translations";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import { writeTextToClipboard } from "@/utils/clipboard";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { alignTranslatedBySourceProportion } from "@/pages/fixedContent/components/ocrResult/extra";
 import styles from "./index.module.css";
+
+/** 已选语言（auto / en / zh-CHS 等）映射为展示标签 */
+const languageLabel = (code: string, intl: ReturnType<typeof useIntl>) => {
+	if (code === "auto") {
+		return intl.formatMessage({ id: "tools.translation.language.auto" });
+	}
+	if (code === "zh-CHS") {
+		return intl.formatMessage({
+			id: "tools.translation.language.simplifiedChinese",
+		});
+	}
+	if (code === "zh-CHT") {
+		return intl.formatMessage({
+			id: "tools.translation.language.traditionalChinese",
+		});
+	}
+	if (code === "en") {
+		return intl.formatMessage({ id: "tools.translation.language.english" });
+	}
+	return code;
+};
 
 /** Tauri v2 ResizeDirection 枚举值 */
 const RESIZE_DIRECTIONS = {
@@ -297,9 +333,13 @@ const ITEM_ORDER: ("urls" | "emails" | "phones" | "qqs")[] = [
 export const OcrResultModal: React.FC<{
 	open: boolean;
 	ocrResult: OcrDetectResult | undefined;
+	/** ocr —— 纯识别（默认展示原文）；translate —— 工具栏翻译（默认只展示译文，可打开原文对照） */
+	mode?: "ocr" | "translate";
 	onClose: () => void;
-}> = ({ open, ocrResult, onClose }) => {
+}> = ({ open, ocrResult, mode = "ocr", onClose }) => {
+	const intl = useIntl();
 	const { message } = useContext(AntdContext);
+	const isTranslateMode = mode === "translate";
 	const [layoutType, setLayoutType] = useState<LayoutType>("original");
 	const [editableText, setEditableText] = useState("");
 	const [copying, setCopying] = useState(false);
@@ -310,19 +350,99 @@ export const OcrResultModal: React.FC<{
 		qqs: [],
 	});
 	const [copiedItem, setCopiedItem] = useState("");
+	const [translateOpen, setTranslateOpen] = useState(false);
+	const [translatedText, setTranslatedText] = useState("");
+	// 翻译模式下默认隐藏原文，展示译文；可通过"原文对照"打开
+	const [showOcrText, setShowOcrText] = useState(!isTranslateMode);
+	// 原文/译文对照模式：当前激活的行索引（点击对应展示）
+	const [activePair, setActivePair] = useState(-1);
+	const autoTranslatedTextRef = useRef<string | undefined>(undefined);
+	const sourceCompareRootRef = useRef<HTMLDivElement | null>(null);
+	const translateCompareRootRef = useRef<HTMLDivElement | null>(null);
+
 	// 每次 OCR 结果变化时，重置为语义智能排版（按几何位置聚类行与段落，更贴近阅读顺序）
 	useEffect(() => {
 		if (open && ocrResult) {
 			setLayoutType("semantic");
 			setEditableText(semanticLayout(ocrResult));
+			// 翻译模式下默认隐藏原文
+			setShowOcrText(!isTranslateMode);
+			setTranslatedText("");
+			setActivePair(-1);
+			setTranslateOpen(false);
 		}
-	}, [open, ocrResult]);
+	}, [open, ocrResult, isTranslateMode]);
 
 	// 编辑内容变化 → 实时重新提取链接/邮箱（编辑后成为链接也会自动显示）
 	useEffect(() => {
 		setExtracted(extractLinks(editableText));
 		setCopiedItem("");
 	}, [editableText]);
+
+	const { requestTranslate, startTranslateLoading, targetLanguage } =
+		useTranslationRequest({
+			onComplete: useCallback((result) => {
+				setTranslatedText(result.map((r) => r.content).join("\n"));
+			}, []),
+		});
+
+	// 翻译模式下，打开窗口即自动翻译（与工具栏"翻译"走同一套 requestTranslate/翻译引擎）
+	useEffect(() => {
+		if (isTranslateMode && open && editableText) {
+			if (autoTranslatedTextRef.current !== editableText) {
+				autoTranslatedTextRef.current = editableText;
+				requestTranslate(editableText.split("\n"));
+			}
+		}
+	}, [isTranslateMode, open, editableText, requestTranslate]);
+
+	// 原文/译文逐行对照的源数据：源文本按行，译文按源文本长度占比切分对齐
+	const sourceLines = useMemo(() => editableText.split("\n"), [editableText]);
+	const translatedSegments = useMemo(
+		() =>
+			translatedText
+				? alignTranslatedBySourceProportion(
+						sourceLines,
+						translatedText.split("\n"),
+					)
+				: [],
+		[translatedText, sourceLines],
+	);
+
+	const toggleOcrText = useCallback(() => {
+		setActivePair(-1);
+		setShowOcrText((prev) => !prev);
+	}, []);
+
+	// 点击原文/译文某一行，在另一列滚动到对应行并高亮（对应显示）
+	const onPairClick = useCallback(
+		(index: number, from: "source" | "translate") => {
+			setActivePair((prev) => (prev === index ? -1 : index));
+			const targetRoot =
+				from === "source"
+					? translateCompareRootRef.current
+					: sourceCompareRootRef.current;
+			targetRoot
+				?.querySelector<HTMLElement>(`[data-pair="${index}"]`)
+				?.scrollIntoView({ block: "nearest" });
+		},
+		[],
+	);
+
+	const sourceLanguage = useMemo(
+		() => ocrResult?.lang ?? "auto",
+		[ocrResult],
+	);
+
+	const onToggleTranslate = useCallback(() => {
+		setTranslateOpen((prev) => {
+			const next = !prev;
+			if (next && editableText) {
+				requestTranslate(editableText.split("\n"));
+			}
+			return next;
+		});
+	}, [editableText, requestTranslate]);
 
 	const handleLayoutChange = (type: LayoutType) => {
 		setLayoutType(type);
@@ -336,23 +456,31 @@ export const OcrResultModal: React.FC<{
 	};
 
 	const handleCopy = async () => {
-				if (!editableText) {
-					return;
-				}
-				setCopying(true);
-				try {
-					await writeTextToClipboard(editableText);
-					message.success("已复制到剪贴板");
-				} catch {
-					message.error("复制失败");
-				} finally {
-					setCopying(false);
-				}
-			};
+		if (!editableText) {
+			return;
+		}
+		setCopying(true);
+		try {
+			await writeTextToClipboard(editableText);
+			message.success("已复制到剪贴板");
+		} catch {
+			message.error("复制失败");
+		} finally {
+			setCopying(false);
+		}
+	};
 
-			
-
-			
+	const handleCopyTranslated = useCallback(async () => {
+		if (!translatedText) {
+			return;
+		}
+		try {
+			await writeTextToClipboard(translatedText);
+			message.success("翻译已复制到剪贴板");
+		} catch {
+			message.error("复制失败");
+		}
+	}, [translatedText, message]);
 
 	const handleCopyItem = async (
 		value: string,
@@ -378,6 +506,31 @@ export const OcrResultModal: React.FC<{
 		}
 	};
 
+	const minWindow = useCallback(() => {
+		getCurrentWindow().minimize();
+	}, []);
+	const [pinned, setPinned] = useState(false);
+	// 窗口默认置顶创建，进入时同步置顶按钮初始状态
+	useEffect(() => {
+		if (open) {
+			getCurrentWindow().isAlwaysOnTop().then(setPinned).catch(() => setPinned(true));
+		}
+	}, [open]);
+	const togglePinned = useCallback(() => {
+		const win = getCurrentWindow();
+		const next = !pinned;
+		setPinned(next);
+		win.setAlwaysOnTop(next);
+	}, [pinned]);
+	const [maximized, setMaximized] = useState(false);
+	const maxWindow = useCallback(() => {
+		const win = getCurrentWindow();
+		win.isMaximized().then((max) => {
+			setMaximized(!max);
+			max ? win.unmaximize() : win.maximize();
+		});
+	}, []);
+
 	if (!open) {
 		return null;
 	}
@@ -390,159 +543,268 @@ export const OcrResultModal: React.FC<{
 		extracted.qqs.length;
 
 	return (
-		<div className={styles.panel}>
+		<div className={styles.window}>
 			{/* 拖拽调整窗口大小边框（四边 + 四角） */}
 			<ResizeBorder />
 
-			{/* 顶部工具栏（可拖动区域） */}
-			<div className={styles.header} data-tauri-drag-region>
-				<div className={styles.titleWrap}>
-					<h2 className={styles.title}>
-						文本识别结果
-						{blockCount > 0 && (
-							<span className={styles.titleBadge}>
-								{blockCount} 个文本块
-							</span>
-						)}
-					</h2>
-				</div>
-				<div className={styles.headerActions}>
-					<div className={styles.layoutGroup}>
-						<button
-							className={`${styles.layoutItem} ${
-								layoutType === "original" ? styles.layoutItemActive : ""
-							}`}
-							onClick={() => handleLayoutChange("original")}
-						>
-							原图排版
-						</button>
-						<button
-							className={`${styles.layoutItem} ${
-								layoutType === "semantic" ? styles.layoutItemActive : ""
-							}`}
-							onClick={() => handleLayoutChange("semantic")}
-						>
-							语义排版
-						</button>
-					</div>
+			{/* 标题栏（PixPin 风格） */}
+			<div className={styles.title} data-tauri-drag-region>
+				<span className={styles.logo}>P</span>
+				<span className={styles.titleText}>Snow Shot 文字识别</span>
+				<span className={styles.spacer} />
+				<span className={styles.titleActions}>
 					<button
-						className={styles.closeBtn}
+						className={`${styles.titleBtn} ${pinned ? styles.pinned : ""}`}
+						title={pinned ? "取消置顶" : "置顶"}
+						onClick={togglePinned}
+					>
+						<PushpinOutlined />
+					</button>
+					<button
+						className={styles.titleBtn}
+						title="最小化"
+						onClick={minWindow}
+					>
+						<MinusOutlined />
+					</button>
+					<button
+						className={styles.titleBtn}
+						title={maximized ? "还原" : "最大化"}
+						onClick={maxWindow}
+					>
+						{maximized ? <RestOutlined /> : <MaximizeOutlined />}
+					</button>
+					<button
+						className={`${styles.titleBtn} ${styles.closeBtn}`}
 						title="关闭"
 						onClick={onClose}
 					>
 						<CloseOutlined />
 					</button>
-				</div>
+				</span>
 			</div>
 
-			{/* 编辑区 */}
-			{blockCount === 0 ? (
-				<div className={styles.empty}>识别结果为空</div>
-			) : (
-				<div className={styles.editor}>
-					<div className={styles.editorBar}>
-						<span className={styles.editorDot} />
-						<span className={styles.editorHint}>可编辑</span>
-					</div>
-					<textarea
-						className={styles.editorArea}
-						value={editableText}
-						onChange={(e) => setEditableText(e.target.value)}
-						placeholder="识别结果为空"
-						spellCheck={false}
-					/>
+			{/* 操作行 */}
+			<div className={styles.body}>
+				<div className={styles.actions}>
+					<button
+						className={`${styles.actionBtn} ${
+							layoutType === "semantic" ? styles.active : ""
+						}`}
+						title="排版设置"
+						onClick={() =>
+							handleLayoutChange(
+								layoutType === "semantic" ? "original" : "semantic",
+							)
+						}
+					>
+						<span>{layoutType === "semantic" ? "语义排版" : "原图排版"}</span>
+					</button>
+					{isTranslateMode ? (
+						<button
+							className={`${styles.actionBtn} ${
+								showOcrText ? styles.active : ""
+							}`}
+							title={showOcrText ? "隐藏原文，只显示译文" : "打开原文对照"}
+							onClick={toggleOcrText}
+						>
+							<span>{showOcrText ? "隐藏原文" : "原文对照"}</span>
+						</button>
+					) : (
+						<button
+							className={`${styles.actionBtn} ${
+								translateOpen ? styles.active : ""
+							}`}
+							title="翻译"
+							onClick={onToggleTranslate}
+						>
+							<span>翻译</span>
+						</button>
+					)}
+					<span className={styles.langTag}>
+						识别：{languageLabel(sourceLanguage, intl)}
+					</span>
+					{(isTranslateMode || translateOpen) && (
+						<span className={styles.langTag}>
+							译至：{languageLabel(targetLanguage, intl)}
+						</span>
+					)}
 				</div>
-			)}
 
-			{/* 提取区 */}
-			{totalExtracted > 0 && (
-				<div className={styles.extracted}>
-					<div className={styles.extractedHeader}>
-						<span className={styles.extractedTitle}>识别到的信息</span>
+				{blockCount === 0 ? (
+					<div className={styles.empty}>识别结果为空</div>
+				) : isTranslateMode && showOcrText ? (
+					/* 翻译模式：原文 ↔ 译文 逐行对照（点击某行，另一侧对应展示） */
+					<div className={styles.compareGrid}>
+						<div
+							className={styles.compareCol}
+							ref={sourceCompareRootRef}
+						>
+							<div className={styles.compareColHeader}>
+								原文
+								<span className={styles.tag}>
+									{languageLabel(sourceLanguage, intl)}
+								</span>
+							</div>
+							<div className={styles.compareRows}>
+								{sourceLines.map((line, i) => (
+									<div
+										key={i}
+										data-pair={i}
+										className={`${styles.compareRow} ${
+											activePair === i ? styles.active : ""
+										}`}
+										onClick={() => onPairClick(i, "source")}
+									>
+										{line || "\u00A0"}
+									</div>
+								))}
+							</div>
+						</div>
+						<div
+							className={styles.compareCol}
+							ref={translateCompareRootRef}
+						>
+							<div className={styles.compareColHeader}>
+								译文
+								<span className={styles.tag}>
+									{languageLabel(targetLanguage, intl)}
+								</span>
+							</div>
+							{startTranslateLoading ? (
+								<div className={styles.empty} style={{ minHeight: 200 }}>
+									翻译中…
+								</div>
+							) : (
+								<div className={styles.compareRows}>
+									{translatedSegments.map((line, i) => (
+										<div
+											key={i}
+											data-pair={i}
+											className={`${styles.compareRow} ${
+												activePair === i ? styles.active : ""
+											}`}
+											onClick={() => onPairClick(i, "translate")}
+										>
+											{line || "\u00A0"}
+										</div>
+									))}
+								</div>
+							)}
+						</div>
 					</div>
-					<div className={styles.extractedGrid}>
+				) : isTranslateMode ? (
+					/* 翻译模式：默认只展示译文 */
+					<div className={styles.translateOnly}>
+						<button
+							className={styles.copyCorner}
+							title="复制翻译"
+							onClick={handleCopyTranslated}
+							disabled={!translatedText}
+						>
+							<CopyOutlined />
+							<span>复制</span>
+						</button>
+						<div className={styles.ocrText}>
+							{startTranslateLoading
+								? "翻译中…"
+								: translatedText || "（暂无译文，请检查网络或翻译引擎配置）"}
+						</div>
+					</div>
+				) : (
+					<div className={styles.ocrResult}>
+						<div className={styles.ocrCol}>
+							<button
+								className={styles.copyCorner}
+								title="复制文本"
+								onClick={handleCopy}
+								disabled={!editableText || copying}
+							>
+								<CopyOutlined />
+								<span>{copying ? "复制中…" : "复制"}</span>
+							</button>
+							<textarea
+								className={styles.ocrText}
+								value={editableText}
+								onChange={(e) => setEditableText(e.target.value)}
+								placeholder="识别结果为空"
+								spellCheck={false}
+							/>
+						</div>
+						{translateOpen && (
+							<div className={styles.translateCol}>
+								<button
+									className={styles.copyCorner}
+									title="复制翻译"
+									onClick={handleCopyTranslated}
+									disabled={!translatedText}
+								>
+									<CopyOutlined />
+									<span>复制</span>
+								</button>
+								<div className={styles.ocrText}>
+									{startTranslateLoading ? "翻译中…" : translatedText}
+								</div>
+							</div>
+						)}
+					</div>
+				)}
+
+				{/* 提取区 */}
+				{totalExtracted > 0 && (
+					<div className={styles.extractPanel}>
 						{ITEM_ORDER.map((key) =>
 							extracted[key].map((value) => {
 								const meta = ICONS[key];
 								const copied = copiedItem === value;
 								return (
-									<div
+									<span
 										key={`${key}-${value}`}
-										className={styles.extractedItem}
+										className={styles.extractChip}
+										title={key === "urls" ? "点击在浏览器打开" : "点击复制"}
+										onClick={() => handleItemClick(key, value)}
 									>
-										<div
-											className={styles.extractedMain}
-											title={
-												key === "urls"
-													? "点击在浏览器打开"
-													: "点击复制"
-											}
-											onClick={() => handleItemClick(key, value)}
+										<span className={styles.extractIcon}>
+											{meta.icon}
+										</span>
+										<span className={styles.extractLabel}>
+											{meta.label}
+										</span>
+										<span
+											className={`${styles.extractValue} ${
+												key === "urls" ? styles.link : ""
+											} ${copied ? styles.copied : ""}`}
 										>
-											<span className={styles.extractedIcon}>
-												{meta.icon}
-											</span>
-											<span className={styles.extractedLabel}>
-												{meta.label}
-											</span>
-											<span
-												className={`${styles.extractedValue} ${
-													key === "urls" ? styles.link : ""
-												} ${copied ? styles.copied : ""}`}
-											>
-												{copied ? "已复制" : value}
-											</span>
-										</div>
-										<div className={styles.extractedActions}>
-											{key === "urls" && (
-												<button
-													className={styles.extractedAction}
-													title="在浏览器打开"
-													onClick={() => handleItemClick(key, value)}
-												>
-													<ExportOutlined />
-												</button>
-											)}
+											{copied ? "已复制" : value}
+										</span>
+										{key === "urls" && (
 											<button
-												className={styles.extractedAction}
-												title="复制"
-												onClick={() =>
-													handleCopyItem(value, meta.type)
-												}
+												className={styles.extractAction}
+												title="在浏览器打开"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleItemClick(key, value);
+												}}
 											>
-												<CopyOutlined />
+												<ExportOutlined />
 											</button>
-										</div>
-									</div>
+										)}
+									</span>
 								);
 							}),
 						)}
 					</div>
-				</div>
-			)}
+				)}
 
 				{/* 底部操作栏 */}
-			<div className={styles.footer}>
-				<span className={styles.footerHint}>
-					{layoutType === "semantic"
-						? "语义排版 · 已按阅读顺序整理"
-						: "原图排版 · 与截图顺序一致"}
-				</span>
-				<div className={styles.footerRight}>
-					<button
-						className={styles.closeWinBtn}
-						onClick={onClose}
-					>
-						<CloseOutlined />
-						<span>关闭窗口</span>
-					</button>
-					<button
-						className={styles.copyBtn}
-						onClick={handleCopy}
-						disabled={!editableText || copying}
-					>
-						<CopyOutlined />
-						<span>{copying ? "复制中…" : "一键复制"}</span>
+				<div className={styles.footer}>
+					<span className={styles.footerHint}>
+						{layoutType === "semantic"
+							? "语义排版 · 已按阅读顺序整理"
+							: "原图排版 · 与截图顺序一致"}
+					</span>
+					<button className={styles.closeWinBtn} onClick={onClose}>
+						关闭窗口
 					</button>
 				</div>
 			</div>

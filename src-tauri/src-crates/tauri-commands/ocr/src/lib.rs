@@ -29,6 +29,13 @@ pub async fn ocr_init(
 pub struct OcrDetectResult {
     pub text_blocks: Vec<TextBlock>,
     pub scale_factor: f32,
+    /// 识别出的源语言（当前恒为 auto，前端可据此判断是否展示源语言标签）
+    #[serde(default = "default_lang")]
+    pub lang: String,
+}
+
+fn default_lang() -> String {
+    "auto".to_string()
 }
 
 /// 将全角 ASCII 字符（U+FF01–U+FF5E）及全角空格（U+3000）归一化为半角，
@@ -182,6 +189,7 @@ pub async fn ocr_detect_core(
             Ok(OcrDetectResult {
                 text_blocks: normalize_text_blocks(text_blocks),
                 scale_factor,
+                lang: "auto".to_string(),
             })
         }
         Err(e) => return Err(format!("[ocr_detect_core] Failed to detect text: {}", e)),

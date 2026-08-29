@@ -11,14 +11,14 @@ pub struct OcrService {
     det_model: Option<(PathBuf, Option<Vec<u8>>)>,
     rec_model: Option<(PathBuf, Option<Vec<u8>>)>,
     cls_model: Option<(PathBuf, Option<Vec<u8>>)>,
-    /// 识别模型的字符字典文件路径（PP-OCRv6 不内嵌 character 元数据，需外部字典）
+    /// 识别模型的字符字典文件路径（PP-OCRv5 不内嵌 character 元数据，需外部字典）
     rec_keys_path: Option<PathBuf>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy, PartialOrd, Serialize, Deserialize)]
 pub enum OcrModel {
     #[serde(other)]
-    RapidOcrV6Medium,
+    RapidOcrV5Server,
 }
 
 impl OcrService {
@@ -158,10 +158,10 @@ impl OcrService {
 
         // 加载模型到内存
         let (det_model_path, cls_model_path, rec_model_path) = match model {
-            OcrModel::RapidOcrV6Medium => (
-                orc_plugin_path.join("ch_PP-OCRv6_det_medium.onnx"),
+            OcrModel::RapidOcrV5Server => (
+                orc_plugin_path.join("ch_PP-OCRv5_server_det.onnx"),
                 orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
-                orc_plugin_path.join("ch_PP-OCRv6_rec_medium.onnx"),
+                orc_plugin_path.join("ch_PP-OCRv5_rec_server.onnx"),
             ),
         };
 
@@ -186,7 +186,7 @@ impl OcrService {
         self.det_model = det_model_config;
         self.cls_model = cls_model_config;
         self.rec_model = rec_model_config;
-        self.rec_keys_path = Some(orc_plugin_path.join("ppocrv6_dict.txt"));
+        self.rec_keys_path = Some(orc_plugin_path.join("ppocrv5_dict.txt"));
         self.hot_start = hot_start;
 
         if self.hot_start {

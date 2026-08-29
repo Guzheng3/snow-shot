@@ -87,12 +87,14 @@ pub async fn create_ocr_result_window(
         Arc<snow_shot_app_services::hot_load_page_service::HotLoadPageService>,
     >,
     ocr_result_json: String,
+    mode: String,
 ) -> Result<(), String> {
     snow_shot_tauri_commands_core::create_ocr_result_window(
         app,
         ocr_result_window_labels,
         hot_load_page_service,
         ocr_result_json,
+        mode,
     )
     .await
 }

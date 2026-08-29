@@ -99,6 +99,8 @@ export const OcrResult: React.FC<{
 	onWheel?: (event: React.WheelEvent<HTMLDivElement>) => void;
 	enableCopy?: boolean;
 	disabled?: boolean;
+	/** 为 true 时不绘制截图内的文字块浮层（识别完即切独立结果窗口，避免浮层闪现） */
+	hideOcrTextBlocks?: boolean;
 	onMouseDown?: (event: React.MouseEvent<HTMLDivElement>) => void;
 	onMouseMove?: (event: React.MouseEvent<HTMLDivElement>) => void;
 	onMouseUp?: (event: React.MouseEvent<HTMLDivElement>) => void;
@@ -125,6 +127,7 @@ export const OcrResult: React.FC<{
 	onOcrResultChange,
 	onCurrentOcrResultChange,
 	onTranslateLoading,
+	hideOcrTextBlocks,
 }) => {
 	const intl = useIntl();
 	const { token } = theme.useToken();
@@ -190,6 +193,11 @@ export const OcrResult: React.FC<{
 				ignoreScale: ignoreScale,
 				ocrResultType: ocrResultType,
 			});
+
+			// 截图 OCR 场景：识别完即切独立结果窗口，不在截图内绘制文字块浮层
+			if (hideOcrTextBlocks) {
+				return;
+			}
 
 			const transformScale = 1 / monitorScaleFactor;
 
@@ -358,7 +366,7 @@ export const OcrResult: React.FC<{
 				containerElementRef.current.style.opacity = "1";
 			}
 		},
-		[token.colorBgContainer, token.colorText, setCurrentOcrResult],
+		[token.colorBgContainer, token.colorText, setCurrentOcrResult, hideOcrTextBlocks],
 	);
 	const setScale = useCallback((scale: number) => {
 		if (
