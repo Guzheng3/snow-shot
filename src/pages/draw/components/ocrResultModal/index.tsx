@@ -3,8 +3,8 @@ import {
 	CopyOutlined,
 	ExportOutlined,
 	LinkOutlined,
+	FullscreenOutlined,
 	MailOutlined,
-	MaximizeOutlined,
 	MinusOutlined,
 	MobileOutlined,
 	PushpinOutlined,
@@ -572,7 +572,7 @@ export const OcrResultModal: React.FC<{
 						title={maximized ? "还原" : "最大化"}
 						onClick={maxWindow}
 					>
-						{maximized ? <RestOutlined /> : <MaximizeOutlined />}
+						{maximized ? <RestOutlined /> : <FullscreenOutlined />}
 					</button>
 					<button
 						className={`${styles.titleBtn} ${styles.closeBtn}`}
