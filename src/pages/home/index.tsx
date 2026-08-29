@@ -247,7 +247,11 @@ export const HomePage = () => {
 																	false,
 																);
 															}}
-															maxLength={1}
+															maxLength={
+																config.configKey === AppFunction.Screenshot
+																	? 2
+																	: 1
+															}
 														/>
 													</FunctionButton>
 												</div>

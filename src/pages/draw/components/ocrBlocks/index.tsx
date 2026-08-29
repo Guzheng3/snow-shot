@@ -1,5 +1,4 @@
 import { useCallback, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -45,7 +44,7 @@ export type OcrBlocksActionType = {
 export const OcrBlocks: React.FC<{
 	actionRef: React.RefObject<OcrBlocksActionType | undefined>;
 	finishCapture: () => void;
-}> = ({ actionRef }) => {
+}> = ({ actionRef, finishCapture }) => {
 	const ocrResultActionRef = useRef<OcrResultActionType>(undefined);
 
 	const [getScreenshotType] = useStateSubscriber(
@@ -103,7 +102,9 @@ export const OcrBlocks: React.FC<{
 				getDrawState() === DrawState.OcrTranslate ? "translate" : "ocr";
 			createOcrResultWindow(ocrResult, mode)
 				.then(() => {
-					getCurrentWindow().close();
+					// 关闭截图窗口前执行正常清理流程：创建新的空闲 draw 窗口并重置截图状态，
+					// 否则直接关闭窗口会导致热加载窗口池耗尽，下一次无法再次调用截图功能
+					finishCapture();
 				})
 				.catch((error) => {
 					appError(
@@ -133,7 +134,7 @@ export const OcrBlocks: React.FC<{
 				}
 			}
 		},
-		[getAppSettings, getDrawState, getScreenshotType],
+		[finishCapture, getAppSettings, getDrawState, getScreenshotType],
 	);
 
 	const onTranslate = useCallback(() => {

@@ -22,10 +22,12 @@ import {
 	type ReactNode,
 } from "react";
 import { useIntl } from "react-intl";
+import { getCurrentMonitorInfo } from "@/commands/core";
 import { AntdContext } from "@/contexts/antdContext";
 import { useTranslationRequest } from "@/core/translations";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import { writeTextToClipboard } from "@/utils/clipboard";
+import { setWindowRect } from "@/utils/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { alignTranslatedBySourceProportion } from "@/pages/fixedContent/components/ocrResult/extra";
 import styles from "./index.module.css";
@@ -531,6 +533,74 @@ export const OcrResultModal: React.FC<{
 		});
 	}, []);
 
+	// 是否处于双栏布局（原文/译文对照 或 翻译弹开）：双栏时窗口加宽一倍并保持居中
+	const isDualColumn =
+		(!isTranslateMode && translateOpen) || (isTranslateMode && showOcrText);
+
+	useEffect(() => {
+		if (!open) {
+			return;
+		}
+
+		let cancelled = false;
+		const resizeWindowForLayout = async () => {
+			try {
+				const appWindow = getCurrentWindow();
+				const monitorInfo = await getCurrentMonitorInfo();
+				const scaleFactor = window.devicePixelRatio;
+
+				// 基准逻辑尺寸（与 ocrResult/page.tsx 保持一致）
+				const baseLogicalWidth = 480;
+				const baseLogicalHeight = 640;
+				// 双栏时窗口宽度扩一倍
+				const targetLogicalWidth = isDualColumn
+					? baseLogicalWidth * 2
+					: baseLogicalWidth;
+
+				const windowHeight = Math.round(baseLogicalHeight * scaleFactor);
+				// 受当前显示器宽度限制（左右留边）
+				const maxWindowWidth = Math.round(monitorInfo.monitor_width * 0.94);
+				const windowWidth = Math.min(
+					Math.round(targetLogicalWidth * scaleFactor),
+					maxWindowWidth,
+				);
+
+				// 以当前窗口中心为锚点扩展/收缩，保证切换前后居中
+				const [pos, size] = await Promise.all([
+					appWindow.outerPosition(),
+					appWindow.outerSize(),
+				]);
+				const centerX = pos.x + size.width / 2;
+				const centerY = pos.y + size.height / 2;
+
+				const minX = Math.round(centerX - windowWidth / 2);
+				const minY = Math.round(centerY - windowHeight / 2);
+
+				if (cancelled) {
+					return;
+				}
+
+				await setWindowRect(appWindow, {
+					min_x: minX,
+					min_y: minY,
+					max_x: minX + windowWidth,
+					max_y: minY + windowHeight,
+				});
+			} catch (error) {
+				console.warn(
+					"[OcrResultModal] resizeWindowForLayout failed:",
+					error,
+				);
+			}
+		};
+
+		resizeWindowForLayout();
+
+		return () => {
+			cancelled = true;
+		};
+	}, [open, isDualColumn]);
+
 	if (!open) {
 		return null;
 	}
@@ -803,9 +873,19 @@ export const OcrResultModal: React.FC<{
 							? "语义排版 · 已按阅读顺序整理"
 							: "原图排版 · 与截图顺序一致"}
 					</span>
-					<button className={styles.closeWinBtn} onClick={onClose}>
-						关闭窗口
-					</button>
+					<div className={styles.footerActions}>
+						<button
+							className={styles.minWinBtn}
+							title="最小化到状态栏"
+							onClick={minWindow}
+						>
+							<MinusOutlined />
+							<span>最小化</span>
+						</button>
+						<button className={styles.closeWinBtn} onClick={onClose}>
+							关闭窗口
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -388,6 +388,31 @@
 	gap: 12px;
 	margin-top: 16px;
 }
+.footerActions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.minWinBtn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	border: 1px solid #e7ecf4;
+	border-radius: 8px;
+	padding: 8px 18px;
+	font-size: 13px;
+	font-family: inherit;
+	font-weight: 500;
+	color: #344054;
+	background: #ffffff;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.minWinBtn:hover {
+	border-color: #2f7df6;
+	color: #2f7df6;
+	background: #eaf2ff;
+}
 .footerHint {
 	font-size: 12px;
 	color: #9aa0a8;

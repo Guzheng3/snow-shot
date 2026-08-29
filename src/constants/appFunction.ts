@@ -7,7 +7,7 @@ import {
 export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 	{
 		[AppFunction.Screenshot]: {
-			shortcutKey: "F1",
+			shortcutKey: "Alt+A, Ctrl+F1",
 			group: AppFunctionGroup.Screenshot,
 		},
 		[AppFunction.ScreenshotDelay]: {
