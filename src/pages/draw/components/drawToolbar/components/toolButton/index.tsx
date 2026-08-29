@@ -22,6 +22,7 @@ const TOOLBAR_SHORT_NAMES: Partial<Record<DrawToolbarKeyEventKey, string>> = {
 	[DrawToolbarKeyEventKey.FixedTool]: "贴图",
 	[DrawToolbarKeyEventKey.ScrollScreenshotTool]: "长图",
 	[DrawToolbarKeyEventKey.CopyTool]: "复制",
+	[DrawToolbarKeyEventKey.OcrTranslateTool]: "翻译",
 };
 
 const ToolButtonCore: React.FC<{

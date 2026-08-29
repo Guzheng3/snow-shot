@@ -31,6 +31,7 @@ import {
 	FastSaveIcon,
 	FixedIcon,
 	OcrDetectIcon,
+	OcrTranslateIcon,
 	PenIcon,
 	SaveIcon,
 	SaveToCloudIcon,
@@ -480,6 +481,9 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 					);
 					break;
 				case DrawState.OcrDetect:
+					onOcrDetect(next);
+					break;
+				case DrawState.OcrTranslate:
 					onOcrDetect(next);
 					break;
 				case DrawState.VideoRecord:
@@ -953,6 +957,23 @@ return (
 							}
 								onClick={() => {
 									onToolClick(DrawState.OcrDetect);
+								}}
+							/>
+
+
+							{/* 文本识别翻译 */}
+							<ToolButton
+								hidden={
+									customToolbarToolHiddenMap?.[DrawState.OcrTranslate]
+								}
+								componentKey={DrawToolbarKeyEventKey.OcrTranslateTool}
+								icon={<OcrTranslateIcon style={{ fontSize: "0.88em" }} />}
+								drawState={DrawState.OcrTranslate}
+								disable={
+								disableNormalScreenshotTool
+							}
+								onClick={() => {
+									onToolClick(DrawState.OcrTranslate);
 								}}
 							/>
 

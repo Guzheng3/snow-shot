@@ -47,13 +47,15 @@ export interface TranslateResult {
 }
 
 export const translateText = async (
-    text: string,
-    sourceLang: string,
-    targetLang: string,
+	text: string,
+	sourceLang: string,
+	targetLang: string,
+	engineOrder?: string[],
 ): Promise<TranslateResult> => {
-    return await invoke<TranslateResult>("translate_text", {
-        text,
-        sourceLang,
-        targetLang,
-    });
+	return await invoke<TranslateResult>("translate_text", {
+		text,
+		sourceLang,
+		targetLang,
+		engineOrder,
+	});
 };

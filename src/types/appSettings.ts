@@ -347,6 +347,8 @@ export type AppSettingsData = {
 		optimizeAiTranslationLayout: boolean;
 		sourceLanguage: string;
 		targetLanguage: string;
+		/** 翻译引擎优先级（从上到下依次尝试） */
+		translateEngineOrder: string[];
 	};
 	[AppSettingsGroup.FunctionTranslationCache]: {
 		cacheSourceLanguage: string;

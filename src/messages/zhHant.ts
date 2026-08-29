@@ -110,6 +110,7 @@ export const zhHant = {
 	"draw.saveTool": "儲存為檔案",
 	"draw.close": "關閉",
 	"draw.ocrDetectTool": "文字辨識",
+	"draw.ocrTranslateTool": "文字辨識翻譯",
 	"draw.fixedTool": "固定在螢幕",
 	"draw.lockWidthHeightPicker": "切換鎖定寬高",
 	"draw.lockAnglePicker": "切換鎖定角度",
@@ -175,4 +176,13 @@ export const zhHant = {
 		"優化 AI 翻譯排版",
 	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
 		"根據 AI 翻譯結果優化版面，使文字排版更整齊",
+	"settings.functionSettings.translationSettings.engineOrder": "翻譯引擎優先級",
+	"settings.functionSettings.translationSettings.engineOrder.tip":
+		"翻譯時依自上而下的順序依次嘗試，越靠前越優先",
+	"settings.functionSettings.translationSettings.engineOrder.moveUp": "上移",
+	"settings.functionSettings.translationSettings.engineOrder.moveDown": "下移",
+	"tools.translation.engine.transmart": "騰訊翻譯",
+	"tools.translation.engine.icibaTranslate": "金山翻譯",
+	"tools.translation.engine.microsoft": "微軟翻譯",
+	"tools.translation.engine.yandex": "Yandex 翻譯",
 };

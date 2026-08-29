@@ -504,6 +504,11 @@ export const settings = {
 		"优化 AI 翻译排版",
 	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
 		"根据 AI 翻译结果优化布局，使文本排版更整齐",
+	"settings.functionSettings.translationSettings.engineOrder": "翻译引擎优先级",
+	"settings.functionSettings.translationSettings.engineOrder.tip":
+		"翻译时按自上而下的顺序依次尝试，靠前优先",
+	"settings.functionSettings.translationSettings.engineOrder.moveUp": "上移",
+	"settings.functionSettings.translationSettings.engineOrder.moveDown": "下移",
 	"settings.functionSettings.ocrSettings": "文本识别",
 	"settings.functionSettings.globalShortcutSettings": "全局快捷键",
 	"settings.functionSettings.globalShortcutSettings.disableOnFocusedFullScreenWindow":

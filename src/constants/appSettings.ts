@@ -122,6 +122,8 @@ export const defaultAppSettingsData: AppSettingsData = {
 		optimizeAiTranslationLayout: true,
 		sourceLanguage: "auto",
 		targetLanguage: "zh-CHS",
+		// 腾讯 → 金山翻译 → 微软 → Yandex；国内可直连的优先
+		translateEngineOrder: ["Transmart", "ICibaTranslate", "Microsoft", "Yandex"],
 	},
 	[AppSettingsGroup.FunctionTranslationCache]: {
 		cacheSourceLanguage: "auto",

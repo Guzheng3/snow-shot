@@ -117,6 +117,7 @@ export const en = {
 	"draw.saveTool": "Save as File",
 	"draw.close": "Close",
 	"draw.ocrDetectTool": "Text Recognition",
+	"draw.ocrTranslateTool": "OCR Translate",
 	"draw.fixedTool": "Pin to Screen",
 	"draw.lockWidthHeightPicker": "Toggle Lock Aspect Ratio",
 	"draw.lockAnglePicker": "Toggle Angle Lock",
@@ -201,4 +202,13 @@ export const en = {
 		"Optimize AI translation layout",
 	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
 		"Optimize the layout based on AI translation results for cleaner text alignment",
+	"settings.functionSettings.translationSettings.engineOrder": "Translation engine priority",
+	"settings.functionSettings.translationSettings.engineOrder.tip":
+		"Engines are tried top-to-bottom in order; earlier means higher priority",
+	"settings.functionSettings.translationSettings.engineOrder.moveUp": "Move up",
+	"settings.functionSettings.translationSettings.engineOrder.moveDown": "Move down",
+	"tools.translation.engine.transmart": "Tencent Translate",
+	"tools.translation.engine.icibaTranslate": "Kingsoft Translate",
+	"tools.translation.engine.microsoft": "Microsoft Translator",
+	"tools.translation.engine.yandex": "Yandex Translate",
 };

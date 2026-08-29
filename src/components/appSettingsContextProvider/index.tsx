@@ -751,22 +751,28 @@ const AppSettingsContextProviderCore: React.FC<{
 					| undefined;
 
 				settings = {
-					optimizeAiTranslationLayout:
-						typeof newSettings?.optimizeAiTranslationLayout === "boolean"
-							? newSettings.optimizeAiTranslationLayout
-							: (prevSettings?.optimizeAiTranslationLayout ??
-								defaultAppSettingsData[group].optimizeAiTranslationLayout),
-					sourceLanguage:
-						typeof newSettings?.sourceLanguage === "string"
-							? newSettings.sourceLanguage
-							: (prevSettings?.sourceLanguage ??
-								defaultAppSettingsData[group].sourceLanguage),
-					targetLanguage:
-						typeof newSettings?.targetLanguage === "string"
-							? newSettings.targetLanguage
-							: (prevSettings?.targetLanguage ??
-								defaultAppSettingsData[group].targetLanguage),
-				};
+				optimizeAiTranslationLayout:
+					typeof newSettings?.optimizeAiTranslationLayout === "boolean"
+						? newSettings.optimizeAiTranslationLayout
+						: (prevSettings?.optimizeAiTranslationLayout ??
+							defaultAppSettingsData[group].optimizeAiTranslationLayout),
+				sourceLanguage:
+					typeof newSettings?.sourceLanguage === "string"
+						? newSettings.sourceLanguage
+						: (prevSettings?.sourceLanguage ??
+							defaultAppSettingsData[group].sourceLanguage),
+				targetLanguage:
+					typeof newSettings?.targetLanguage === "string"
+						? newSettings.targetLanguage
+						: (prevSettings?.targetLanguage ??
+							defaultAppSettingsData[group].targetLanguage),
+				translateEngineOrder:
+					Array.isArray(newSettings?.translateEngineOrder) &&
+					newSettings!.translateEngineOrder.length > 0
+						? newSettings!.translateEngineOrder
+						: (prevSettings?.translateEngineOrder ??
+							defaultAppSettingsData[group].translateEngineOrder),
+			};
 			} else if (group === AppSettingsGroup.FunctionScreenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];
 				const prevSettings = appSettingsRef.current[group] as

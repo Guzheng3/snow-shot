@@ -8,6 +8,14 @@ import { translateText } from "@/commands/httpServices";
 import { AppSettingsGroup } from "@/types/appSettings";
 import { appError } from "@/utils/log";
 
+/** 可选翻译引擎（后端 TranslateEngine 的序列化名） */
+export const TRANSLATE_ENGINE_KEYS = [
+	"Transmart",
+	"ICibaTranslate",
+	"Microsoft",
+	"Yandex",
+] as const;
+
 export const useTranslationRequest = (options?: {
 	enableCacheConfig?: boolean;
 	onComplete?: (result: { content: string }[], requestId?: number) => void;
@@ -20,6 +28,9 @@ export const useTranslationRequest = (options?: {
 		useStateRef<string>("auto");
 	const [targetLanguage, setTargetLanguage, targetLanguageRef] =
 		useStateRef<string>("zh-CHS");
+	const [engineOrder, setEngineOrder, engineOrderRef] = useStateRef<string[]>(
+		[...TRANSLATE_ENGINE_KEYS],
+	);
 
 	useAppSettingsLoad(
 		useCallback(
@@ -41,8 +52,17 @@ export const useTranslationRequest = (options?: {
 						settings[AppSettingsGroup.FunctionTranslation].targetLanguage,
 					);
 				}
+				setEngineOrder(
+					settings[AppSettingsGroup.FunctionTranslation]
+						.translateEngineOrder ?? [...TRANSLATE_ENGINE_KEYS],
+				);
 			},
-			[setSourceLanguage, setTargetLanguage, options?.enableCacheConfig],
+			[
+				setSourceLanguage,
+				setTargetLanguage,
+				setEngineOrder,
+				options?.enableCacheConfig,
+			],
 		),
 		true,
 	);
@@ -60,7 +80,12 @@ export const useTranslationRequest = (options?: {
 
 			setStartTranslateLoading(true);
 			try {
-				const result = await translateText(text, sourceLanguage, targetLanguage);
+				const result = await translateText(
+					text,
+					sourceLanguage,
+					targetLanguage,
+					engineOrderRef.current ?? [...TRANSLATE_ENGINE_KEYS],
+				);
 				setStartTranslateLoading(false);
 
 				if (result.success) {
@@ -81,6 +106,7 @@ export const useTranslationRequest = (options?: {
 			sourceLanguageRef,
 			message,
 			targetLanguageRef,
+			engineOrderRef,
 			setTranslatedContent,
 		],
 	);
@@ -127,6 +153,18 @@ export const useTranslationRequest = (options?: {
 		return translatedContentRef.current;
 	}, [translatedContentRef]);
 
+	const updateEngineOrder = useCallback(
+		(newOrder: string[]) => {
+			updateAppSettings(
+				AppSettingsGroup.FunctionTranslation,
+				{ translateEngineOrder: newOrder },
+				true, true, true, true, false,
+			);
+			setEngineOrder(newOrder);
+		},
+		[updateAppSettings, setEngineOrder],
+	);
+
 	return {
 		updateSourceLanguage,
 		updateTargetLanguage,
@@ -136,5 +174,7 @@ export const useTranslationRequest = (options?: {
 		sourceLanguage,
 		targetLanguage,
 		getTranslatedContent,
+		engineOrder,
+		updateEngineOrder,
 	};
 };

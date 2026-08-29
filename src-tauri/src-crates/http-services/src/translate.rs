@@ -28,7 +28,6 @@ pub enum TranslateEngine {
     Transmart,
     ICibaTranslate,
     Yandex,
-    ICiba,
 }
 
 impl TranslateEngine {
@@ -38,17 +37,16 @@ impl TranslateEngine {
             Self::Transmart => "Transmart",
             Self::ICibaTranslate => "ICiba Translate",
             Self::Yandex => "Yandex",
-            Self::ICiba => "ICiba",
         }
     }
 
     pub fn default_order() -> Vec<TranslateEngine> {
+        // 国内可直连的服务优先，境外（需代理）靠后
         vec![
-            Self::Microsoft,
             Self::Transmart,
             Self::ICibaTranslate,
+            Self::Microsoft,
             Self::Yandex,
-            Self::ICiba,
         ]
     }
 }
@@ -85,8 +83,12 @@ impl TranslateService {
         text: &str,
         source: &str,
         target: &str,
+        engine_order: Option<&[TranslateEngine]>,
     ) -> TranslateResult {
-        let engines = TranslateEngine::default_order();
+        let engines: Vec<TranslateEngine> = match engine_order {
+            Some(order) => order.to_vec(),
+            None => TranslateEngine::default_order(),
+        };
 
         for engine in &engines {
             let result = match engine {
@@ -102,7 +104,6 @@ impl TranslateService {
                 TranslateEngine::Yandex => {
                     self.translate_yandex(text, source, target).await
                 }
-                TranslateEngine::ICiba => self.translate_iciba(text).await,
             };
 
             match result {
@@ -362,76 +363,6 @@ impl TranslateService {
             .ok_or("Yandex: no translation")?;
 
         Ok(translated.to_string())
-    }
-
-    // ==================== ICiba 词典 ====================
-    async fn translate_iciba(&self, text: &str) -> Result<String, String> {
-        let word = text.trim().to_lowercase();
-        if word.is_empty() {
-            return Err("ICiba: empty text".to_string());
-        }
-
-        let url = format!("https://www.iciba.com/word?w={}", word);
-
-        let resp = self
-            .client
-            .get(&url)
-            .header("User-Agent", "Mozilla/5.0")
-            .send()
-            .await
-            .map_err(|e| format!("ICiba request failed: {}", e))?;
-
-        let html = resp
-            .text()
-            .await
-            .map_err(|e| format!("ICiba read failed: {}", e))?;
-
-        let start_tag = r#"<script id="__NEXT_DATA__" type="application/json">"#;
-        let end_tag = "</script>";
-
-        let start = html.find(start_tag).ok_or("ICiba: __NEXT_DATA__ not found")?;
-        let start = start + start_tag.len();
-        let end = html[start..]
-            .find(end_tag)
-            .ok_or("ICiba: __NEXT_DATA__ end tag not found")?;
-
-        let json_str = &html[start..start + end];
-        let json: serde_json::Value = serde_json::from_str(json_str)
-            .map_err(|e| format!("ICiba JSON parse: {}", e))?;
-
-        let baes_info = &json["props"]["pageProps"]["initialReduxState"]["word"]["wordInfo"]
-            ["baesInfo"];
-
-        if let Some(means) = baes_info["translate"]["means"].as_array() {
-            let parts: Vec<String> = means
-                .iter()
-                .filter_map(|m| {
-                    let pos = m["part"].as_str().unwrap_or("");
-                    let meanings: Vec<&str> = m["means"]
-                        .as_array()?
-                        .iter()
-                        .filter_map(|v| v.as_str())
-                        .collect();
-                    if pos.is_empty() || meanings.is_empty() {
-                        None
-                    } else {
-                        Some(format!("{}. {}", pos, meanings.join("，")))
-                    }
-                })
-                .collect();
-            if !parts.is_empty() {
-                return Ok(parts.join("；"));
-            }
-        }
-
-        if let Some(trans) = baes_info["translate"]["means"].as_array() {
-            let words: Vec<&str> = trans.iter().filter_map(|t| t.as_str()).collect();
-            if !words.is_empty() {
-                return Ok(words.join("，"));
-            }
-        }
-
-        Err("ICiba: no translation found".to_string())
     }
 }
 
