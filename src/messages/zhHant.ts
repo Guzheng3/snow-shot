@@ -15,6 +15,8 @@ export const zhHant = {
 	"settings.systemSettings.screenshotSettings.ocrModel": "文字辨識模型",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Mobile":
+		"Rapid OCR V5 Mobile（體積小，速度快）",
 	"settings.screenshotSettings": "截圖設定",
 	"settings.findChildrenElements": "尋找視窗子元素",
 	"settings.performanceMode": "效能優先",

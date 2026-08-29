@@ -176,6 +176,7 @@ export enum ColorPickerShowMode {
 
 export enum OcrModel {
 	RapidOcrV5Server = "RapidOcrV5Server",
+	RapidOcrV5Mobile = "RapidOcrV5Mobile",
 }
 
 export enum KeyDisplayDirection {

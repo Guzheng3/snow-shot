@@ -51,6 +51,8 @@ export const en = {
 		"Text Recognition Model",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
+	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Mobile":
+		"Rapid OCR V5 Mobile (compact, fast)",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"settings.hotKeySettings.translation": "Translation",
 	"home.commonFunction": "Common Features",

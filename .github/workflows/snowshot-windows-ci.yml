@@ -10,6 +10,20 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: high
+            product_name: "Snow Shot"
+            artifact_name: snow-shot-windows-x64
+            # 高精度版：关闭 updater 增量包（避免签名私钥要求）
+            tauri_config: '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
+          - variant: quant
+            # 量化版：内置 PP-OCRv5 mobile 模型（体积更小），以产品名区分安装包
+            product_name: "Snow Shot Quant"
+            artifact_name: snow-shot-quant-windows-x64
+            tauri_config: '{"productName":"Snow Shot Quant","bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
     steps:
       # 拉代码。lfs:true 保险：若 lib/ 是 LFS 文件则拉真实内容（非 LFS 则无副作用）
       - name: Checkout repository
@@ -78,10 +92,13 @@ jobs:
           done
         shell: bash
 
-      # 创建 .env（联网功能开）
+      # 创建 .env（联网功能开）。量化版额外设置默认识别模型为 mobile
       - name: Create .env file
         run: |
           echo "PUBLIC_ONLINE_STATUS=true" > .env
+          if [ "${{ matrix.variant }}" = "quant" ]; then
+            echo "PUBLIC_OCR_MODEL_DEFAULT=RapidOcrV5Mobile" >> .env
+          fi
         shell: bash
 
 
@@ -115,12 +132,33 @@ jobs:
           Remove-Item -Path "onnxruntime-temp" -Recurse -Force
         shell: pwsh
 
+      # 量化版需要覆盖 OCR 模型：构建产物根目录只允许一套模型（bundle.resources 的 rapid_ocr/ 目标同名冲突），
+      # 因此先清空 rapid_ocr/ 再复制 mobile 模型进去，从而打进自己的安装包。
+      - name: Override OCR models for quant build (bare-exe compatibility)
+        if: matrix.variant == 'quant'
+        run: |
+          $quickOcrDir = "src-tauri\resources\rapid_ocr"
+          $mobileDir = "src-tauri\resources\rapid_ocr_mobile"
+          if (Test-Path $quickOcrDir) {
+            Remove-Item -Path "$quickOcrDir\*" -Recurse -Force -ErrorAction SilentlyContinue
+          } else {
+            New-Item -ItemType Directory -Force -Path $quickOcrDir | Out-Null
+          }
+          if (Test-Path $mobileDir) {
+            Copy-Item -Path "$mobileDir\*" -Destination $quickOcrDir -Recurse -Force
+            Write-Host "Copied mobile OCR models into rapid_ocr for quant build"
+          } else {
+            Write-Error "rapid_ocr_mobile directory not found"
+            exit 1
+          }
+        shell: pwsh
+
       # 构建 Tauri 应用（beforeBuildCommand=pnpm build 会自动先构建前端）
-      # TAURI_CONFIG 关闭 updater 增量包 → 不需要签名私钥
+      # TAURI_CONFIG 关闭 updater 增量包 → 不需要签名私钥；量化版在此同时覆盖 productName
       - name: Build the app (Windows x64)
         env:
           CI: false
-          TAURI_CONFIG: '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
+          TAURI_CONFIG: ${{ matrix.tauri_config }}
         run: pnpm tauri build --target x86_64-pc-windows-msvc
 
       # 裸 exe 兼容：resourceDir() 解析到 exe 同级目录，把 app-icons 复制一份到 exe 同级
@@ -161,7 +199,7 @@ jobs:
       - name: Upload bundle artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: snow-shot-windows-x64
+          name: ${{ matrix.artifact_name }}
           path: |
             src-tauri/target/**/release/bundle/
             src-tauri/target/**/release/snowshot.exe

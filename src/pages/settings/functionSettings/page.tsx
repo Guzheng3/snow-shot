@@ -590,6 +590,12 @@ export const FunctionSettingsPage = () => {
 				}),
 				value: OcrModel.RapidOcrV5Server,
 			},
+			{
+				label: intl.formatMessage({
+					id: "settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Mobile",
+				}),
+				value: OcrModel.RapidOcrV5Mobile,
+			},
 		];
 	}, [intl]);
 

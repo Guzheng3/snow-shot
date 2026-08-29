@@ -17,8 +17,8 @@ pub struct OcrService {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy, PartialOrd, Serialize, Deserialize)]
 pub enum OcrModel {
-    #[serde(other)]
     RapidOcrV5Server,
+    RapidOcrV5Mobile,
 }
 
 impl OcrService {
@@ -162,6 +162,11 @@ impl OcrService {
                 orc_plugin_path.join("ch_PP-OCRv5_server_det.onnx"),
                 orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
                 orc_plugin_path.join("ch_PP-OCRv5_rec_server.onnx"),
+            ),
+            OcrModel::RapidOcrV5Mobile => (
+                orc_plugin_path.join("ch_PP-OCRv5_det_mobile.onnx"),
+                orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
+                orc_plugin_path.join("ch_PP-OCRv5_rec_mobile.onnx"),
             ),
         };
 

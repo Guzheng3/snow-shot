@@ -719,11 +719,14 @@ const AppSettingsContextProviderCore: React.FC<{
 
 				settings = {
 					ocrModel:
-						newSettings?.ocrModel === OcrModel.RapidOcrV5Server
-							? OcrModel.RapidOcrV5Server
+						newSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
+						newSettings?.ocrModel === OcrModel.RapidOcrV5Mobile
+							? newSettings.ocrModel
 							: (prevSettings?.ocrModel ===
-								OcrModel.RapidOcrV5Server
-								? OcrModel.RapidOcrV5Server
+								OcrModel.RapidOcrV5Server ||
+								prevSettings?.ocrModel ===
+									OcrModel.RapidOcrV5Mobile
+								? prevSettings.ocrModel
 								: defaultAppSettingsData[group].ocrModel),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {

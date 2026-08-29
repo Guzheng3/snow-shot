@@ -130,7 +130,12 @@ export const defaultAppSettingsData: AppSettingsData = {
 		cacheTargetLanguage: "zh-CHS",
 	},
 	[AppSettingsGroup.FunctionOcr]: {
-		ocrModel: OcrModel.RapidOcrV5Server,
+		// 默认识别模型：量化版安装包通过 PUBLIC_OCR_MODEL_DEFAULT 指向 mobile；
+		// 否则（一般构建/高精度版）默认使用 server 高精度模型
+		ocrModel:
+			import.meta.env.PUBLIC_OCR_MODEL_DEFAULT === OcrModel.RapidOcrV5Mobile
+				? OcrModel.RapidOcrV5Mobile
+				: OcrModel.RapidOcrV5Server,
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {
 		findChildrenElements: true,
