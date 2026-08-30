@@ -51,10 +51,10 @@ export const en = {
 		"Text Recognition Model",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Mobile":
-		"Rapid OCR V5 Mobile (compact, fast)",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"settings.hotKeySettings.translation": "Translation",
+	"home.translation": "Translate",
+	"home.translationSelectText": "Translate selected text",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
 			"home.screenshot": "Screenshot",
@@ -212,5 +212,11 @@ export const en = {
 	"tools.translation.engine.transmart": "Tencent Translate",
 	"tools.translation.engine.icibaTranslate": "Kingsoft Translate",
 	"tools.translation.engine.microsoft": "Microsoft Translator",
-	"tools.translation.engine.yandex": "Yandex Translate",
+	"tools.translation.engine.yandex": "Yandex Translator",
+	"appearance.ocrResultWindow": "OCR / Translation Result Window",
+	"appearance.ocrResultWindow.borderEnabled": "Show resize border",
+	"appearance.ocrResultWindow.borderEnabled.tip":
+		"When disabled, the window has no persistent border; a brief highlight only appears when hovering on the edge.",
+	"appearance.ocrResultWindow.borderColor": "Border color",
+	"appearance.ocrResultWindow.borderWidth": "Border width",
 };

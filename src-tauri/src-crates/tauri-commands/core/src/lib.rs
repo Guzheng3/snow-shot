@@ -338,6 +338,15 @@ pub async fn create_ocr_result_window(
         label = Some(window.label().to_owned());
         window.set_always_on_top(true).unwrap();
         window.set_title("Snow Shot - OCR Result").unwrap();
+        // 复用热加载待机窗口：idle 窗口默认 resizable/maximizable/minimizable 都是 false，
+        // 必须在复用为 OCR 结果窗口时重新开启，否则最大化 / 最小化 / 拖拽调整大小全部无效
+        let _ = window.set_resizable(true);
+        let _ = window.set_maximizable(true);
+        let _ = window.set_minimizable(true);
+        let _ = window.set_min_size(Some(tauri::PhysicalSize::new(
+            (400.0 * monitor_scale_factor) as u32,
+            (560.0 * monitor_scale_factor) as u32,
+        )));
         window
             .set_position(tauri::PhysicalPosition::new(
                 window_x as i32,
@@ -406,8 +415,8 @@ pub async fn create_ocr_result_window(
         )
         .always_on_top(true)
         .resizable(true)
-        .maximizable(false)
-        .minimizable(false)
+        .maximizable(true)
+        .minimizable(true)
         .fullscreen(false)
         .title("Snow Shot - OCR Result")
         .position(window_x, window_y)
@@ -415,7 +424,7 @@ pub async fn create_ocr_result_window(
         .shadow(false)
         .transparent(true)
         .skip_taskbar(false)
-        .min_inner_size(400.0, 500.0)
+        .min_inner_size(400.0, 560.0)
         .inner_size(window_width, window_height)
         .build()
         .unwrap();

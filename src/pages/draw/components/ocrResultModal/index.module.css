@@ -523,33 +523,40 @@
 .resizeRight {
 	position: absolute;
 	pointer-events: auto;
+	transition: background 0.15s ease;
+}
+.resizeTop:hover,
+.resizeBottom:hover,
+.resizeLeft:hover,
+.resizeRight:hover {
+	background: rgba(47, 125, 246, 0.22);
 }
 .resizeTop {
 	top: 0;
-	left: 12px;
-	right: 12px;
-	height: 5px;
+	left: 16px;
+	right: 16px;
+	height: 6px;
 	cursor: n-resize;
 }
 .resizeBottom {
 	bottom: 0;
-	left: 12px;
-	right: 12px;
-	height: 5px;
+	left: 16px;
+	right: 16px;
+	height: 6px;
 	cursor: s-resize;
 }
 .resizeLeft {
 	left: 0;
-	top: 12px;
-	bottom: 12px;
-	width: 5px;
+	top: 16px;
+	bottom: 16px;
+	width: 6px;
 	cursor: w-resize;
 }
 .resizeRight {
 	right: 0;
-	top: 12px;
-	bottom: 12px;
-	width: 5px;
+	top: 16px;
+	bottom: 16px;
+	width: 6px;
 	cursor: e-resize;
 }
 .resizeTopLeft,
@@ -558,32 +565,39 @@
 .resizeBottomRight {
 	position: absolute;
 	pointer-events: auto;
+	transition: background 0.15s ease;
+}
+.resizeTopLeft:hover,
+.resizeTopRight:hover,
+.resizeBottomLeft:hover,
+.resizeBottomRight:hover {
+	background: rgba(47, 125, 246, 0.32);
 }
 .resizeTopLeft {
 	top: 0;
 	left: 0;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 	cursor: nw-resize;
 }
 .resizeTopRight {
 	top: 0;
 	right: 0;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 	cursor: ne-resize;
 }
 .resizeBottomLeft {
 	bottom: 0;
 	left: 0;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 	cursor: sw-resize;
 }
 .resizeBottomRight {
 	bottom: 0;
 	right: 0;
-	width: 14px;
-	height: 14px;
+	width: 16px;
+	height: 16px;
 	cursor: se-resize;
 }

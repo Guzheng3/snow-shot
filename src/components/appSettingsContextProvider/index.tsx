@@ -244,6 +244,22 @@ const AppSettingsContextProviderCore: React.FC<{
 						typeof newSettings?.browserLanguage === "string"
 							? newSettings.browserLanguage
 							: (prevSettings?.browserLanguage ?? ""),
+					ocrResultWindowBorderEnabled:
+						typeof newSettings?.ocrResultWindowBorderEnabled === "boolean"
+							? newSettings.ocrResultWindowBorderEnabled
+							: (prevSettings?.ocrResultWindowBorderEnabled ??
+								defaultAppSettingsData[group].ocrResultWindowBorderEnabled),
+					ocrResultWindowBorderColor:
+						typeof newSettings?.ocrResultWindowBorderColor === "string" &&
+						newSettings.ocrResultWindowBorderColor.length > 0
+							? newSettings.ocrResultWindowBorderColor
+							: (prevSettings?.ocrResultWindowBorderColor ??
+								defaultAppSettingsData[group].ocrResultWindowBorderColor),
+					ocrResultWindowBorderWidth:
+						typeof newSettings?.ocrResultWindowBorderWidth === "number"
+							? Math.min(Math.max(newSettings.ocrResultWindowBorderWidth, 0), 8)
+							: (prevSettings?.ocrResultWindowBorderWidth ??
+								defaultAppSettingsData[group].ocrResultWindowBorderWidth),
 				};
 
 				window.__APP_ACCEPT_LANGUAGE__ = settings.language.startsWith("en")
@@ -719,13 +735,9 @@ const AppSettingsContextProviderCore: React.FC<{
 
 				settings = {
 					ocrModel:
-						newSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
-						newSettings?.ocrModel === OcrModel.RapidOcrV5Mobile
+						newSettings?.ocrModel === OcrModel.RapidOcrV5Server
 							? newSettings.ocrModel
-							: (prevSettings?.ocrModel ===
-								OcrModel.RapidOcrV5Server ||
-								prevSettings?.ocrModel ===
-									OcrModel.RapidOcrV5Mobile
+							: (prevSettings?.ocrModel === OcrModel.RapidOcrV5Server
 								? prevSettings.ocrModel
 								: defaultAppSettingsData[group].ocrModel),
 				};

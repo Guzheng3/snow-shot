@@ -25,6 +25,8 @@ import { useIntl } from "react-intl";
 import { getCurrentMonitorInfo } from "@/commands/core";
 import { AntdContext } from "@/contexts/antdContext";
 import { useTranslationRequest } from "@/core/translations";
+import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
+import { AppSettingsGroup, type AppSettingsData } from "@/types/appSettings";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import { writeTextToClipboard } from "@/utils/clipboard";
 import { setWindowRect } from "@/utils/window";
@@ -70,8 +72,14 @@ type ResizeDirection = keyof typeof RESIZE_DIRECTIONS;
 /**
  * 无边框窗口的拖拽调整大小边框
  * 利用 Tauri v2 原生 startResizeDragging 实现，四边 + 四角共 8 个拖拽热区
+ * - borderEnabled=false: 不显示常驻边界线（仅保留热区的 hover 高亮）
+ * - borderColor/borderWidth: 常驻边界线样式（通过 box-shadow inset 注入容器）
  */
-const ResizeBorder: React.FC = () => {
+const ResizeBorder: React.FC<{
+	borderEnabled: boolean;
+	borderColor: string;
+	borderWidth: number;
+}> = ({ borderEnabled, borderColor, borderWidth }) => {
 	const handleResizeMouseDown = useCallback(
 		(e: React.MouseEvent, direction: ResizeDirection) => {
 			e.preventDefault();
@@ -86,8 +94,16 @@ const ResizeBorder: React.FC = () => {
 		[],
 	);
 
+	// box-shadow inset 注入四边；width=0 时不渲染常驻线但保留热区
+	const borderStyle: React.CSSProperties =
+		borderEnabled && borderWidth > 0
+			? {
+					boxShadow: `inset 0 0 0 ${borderWidth}px ${borderColor}`,
+				}
+			: {};
+
 	return (
-		<div className={styles.resizeBorder}>
+		<div className={styles.resizeBorder} style={borderStyle}>
 			<div
 				className={styles.resizeTop}
 				onMouseDown={(e) => handleResizeMouseDown(e, "top")}
@@ -518,6 +534,26 @@ export const OcrResultModal: React.FC<{
 			getCurrentWindow().isAlwaysOnTop().then(setPinned).catch(() => setPinned(true));
 		}
 	}, [open]);
+
+	// OCR / 翻译结果窗口：常驻拖拽边界线设置（来自"主题→OCR / 翻译结果窗口"）
+	const [ocrResultWindowBorderEnabled, setOcrResultWindowBorderEnabled] =
+		useState(true);
+	const [ocrResultWindowBorderColor, setOcrResultWindowBorderColor] =
+		useState("#00000020");
+	const [ocrResultWindowBorderWidth, setOcrResultWindowBorderWidth] =
+		useState(1);
+	useAppSettingsLoad(
+		useCallback(
+			(settings: AppSettingsData) => {
+				const common = settings[AppSettingsGroup.Common];
+				setOcrResultWindowBorderEnabled(common.ocrResultWindowBorderEnabled);
+				setOcrResultWindowBorderColor(common.ocrResultWindowBorderColor);
+				setOcrResultWindowBorderWidth(common.ocrResultWindowBorderWidth);
+			},
+			[],
+		),
+		true,
+	);
 	const togglePinned = useCallback(() => {
 		const win = getCurrentWindow();
 		const next = !pinned;
@@ -556,8 +592,19 @@ export const OcrResultModal: React.FC<{
 				const targetLogicalWidth = isDualColumn
 					? baseLogicalWidth * 2
 					: baseLogicalWidth;
+				// 双栏时窗口高度也增加：原文 / 译文并排时每列能显示的行数比单栏少，
+				// 保持 640 会让每列只能放下 6~8 行就触底滚动，整体显得很扁。
+				// 高度 +96 后双栏宽高比从 3:2 变为 3:2.2，更协调、每列能放下更多行。
+				const targetLogicalHeight = isDualColumn
+					? baseLogicalHeight + 96
+					: baseLogicalHeight;
 
-				const windowHeight = Math.round(baseLogicalHeight * scaleFactor);
+				const windowHeight = Math.min(
+					Math.round(targetLogicalHeight * scaleFactor),
+					// 高度同样受屏幕高度限制：高 DPI（1.5x / 2x）下双栏 736 逻辑
+					// 会换算成 1104 / 1472 物理像素，超出 1080p 屏高导致窗口跑到屏幕外
+					Math.round(monitorInfo.monitor_height * 0.94),
+				);
 				// 受当前显示器宽度限制（左右留边）
 				const maxWindowWidth = Math.round(monitorInfo.monitor_width * 0.94);
 				const windowWidth = Math.min(
@@ -614,8 +661,12 @@ export const OcrResultModal: React.FC<{
 
 	return (
 		<div className={styles.window}>
-			{/* 拖拽调整窗口大小边框（四边 + 四角） */}
-			<ResizeBorder />
+			{/* 拖拽调整窗口大小边框（四边 + 四角，常驻线样式由外观设置控制） */}
+			<ResizeBorder
+				borderEnabled={ocrResultWindowBorderEnabled}
+				borderColor={ocrResultWindowBorderColor}
+				borderWidth={ocrResultWindowBorderWidth}
+			/>
 
 			{/* 标题栏（PixPin 风格） */}
 			<div className={styles.title} data-tauri-drag-region>

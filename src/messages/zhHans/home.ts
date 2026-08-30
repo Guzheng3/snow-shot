@@ -1,5 +1,7 @@
 export const home = {
 	"home.translationFunction": "翻译",
+	"home.translation": "翻译",
+	"home.translationSelectText": "翻译选中文本",
 	"home.commonFunction": "常用功能",
 	"home.showMainWindow": "显示主界面",
 	"home.screenshotFunction": "截图",

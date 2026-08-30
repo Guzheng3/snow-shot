@@ -15,8 +15,6 @@ export const zhHant = {
 	"settings.systemSettings.screenshotSettings.ocrModel": "文字辨識模型",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
-	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Mobile":
-		"Rapid OCR V5 Mobile（體積小，速度快）",
 	"settings.screenshotSettings": "截圖設定",
 	"settings.findChildrenElements": "尋找視窗子元素",
 	"settings.performanceMode": "效能優先",
@@ -50,6 +48,8 @@ export const zhHant = {
 	"settings.systemSettings.commonSettings": "常用設定",
 	"settings.systemSettings.commonSettings.autoStart": "開機自動啟動",
 		"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
+	"home.translation": "翻譯",
+	"home.translationSelectText": "翻譯選取文字",
 	"home.commonFunction": "常用功能",
 	"home.screenshotFunction": "截圖功能",
 				"home.screenshot": "截圖",
@@ -187,4 +187,10 @@ export const zhHant = {
 	"tools.translation.engine.icibaTranslate": "金山翻譯",
 	"tools.translation.engine.microsoft": "微軟翻譯",
 	"tools.translation.engine.yandex": "Yandex 翻譯",
+	"appearance.ocrResultWindow": "OCR / 翻譯結果視窗",
+	"appearance.ocrResultWindow.borderEnabled": "顯示拖拽邊界線",
+	"appearance.ocrResultWindow.borderEnabled.tip":
+		"關閉後視窗四周不再有常駐的邊界線，僅在滑鼠懸停在邊緣時短暫出現高亮提示",
+	"appearance.ocrResultWindow.borderColor": "邊界線顏色",
+	"appearance.ocrResultWindow.borderWidth": "邊界線寬度",
 };

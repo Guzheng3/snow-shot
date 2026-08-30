@@ -36,6 +36,11 @@ export const defaultAppSettingsData: AppSettingsData = {
 		enableCompactLayout: false,
 		language: AppSettingsLanguage.ZHHans,
 		browserLanguage: "",
+		// OCR / 翻译结果窗口：默认显示一条 1px、半透明深灰的常驻边界线
+		// （PixPin 风格白底圆角，过于明显的边框会破坏视觉，所以走 #00000020）
+		ocrResultWindowBorderEnabled: true,
+		ocrResultWindowBorderColor: "#00000020",
+		ocrResultWindowBorderWidth: 1,
 	},
 	[AppSettingsGroup.ThemeSkin]: {
 		skinPath: "",
@@ -130,12 +135,8 @@ export const defaultAppSettingsData: AppSettingsData = {
 		cacheTargetLanguage: "zh-CHS",
 	},
 	[AppSettingsGroup.FunctionOcr]: {
-		// 默认识别模型：量化版安装包通过 PUBLIC_OCR_MODEL_DEFAULT 指向 mobile；
-		// 否则（一般构建/高精度版）默认使用 server 高精度模型
-		ocrModel:
-			import.meta.env.PUBLIC_OCR_MODEL_DEFAULT === OcrModel.RapidOcrV5Mobile
-				? OcrModel.RapidOcrV5Mobile
-				: OcrModel.RapidOcrV5Server,
+		// 默认识别模型：高精度 server 模型
+		ocrModel: OcrModel.RapidOcrV5Server,
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {
 		findChildrenElements: true,

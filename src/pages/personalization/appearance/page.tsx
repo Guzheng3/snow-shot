@@ -229,6 +229,106 @@ export const AppearancePage = () => {
 			</Form>
 
 			<GroupTitle
+				id="ocrResultWindow"
+				extra={
+					<ResetSettingsButton
+						title={
+							<FormattedMessage
+								id="appearance.ocrResultWindow"
+								key="ocrResultWindow"
+							/>
+						}
+						appSettingsGroup={AppSettingsGroup.Common}
+					/>
+				}
+			>
+				<FormattedMessage id="appearance.ocrResultWindow" />
+			</GroupTitle>
+
+			<Form
+				className="settings-form common-settings-form"
+				form={commonForm}
+				onValuesChange={(_, values) => {
+					if (typeof values.mainColor === "object") {
+						values.mainColor = (
+							values.mainColor as AggregationColor
+						).toHexString();
+					}
+					if (typeof values.ocrResultWindowBorderColor === "object") {
+						values.ocrResultWindowBorderColor = (
+							values.ocrResultWindowBorderColor as AggregationColor
+						).toHexString();
+					}
+
+					updateAppSettingsDebounce(
+						AppSettingsGroup.Common,
+						values,
+						true,
+						true,
+						true,
+						false,
+						false,
+					);
+				}}
+				layout="vertical"
+			>
+				<Spin spinning={appSettingsLoading}>
+					<Row gutter={token.marginLG}>
+						<Col span={12}>
+							<ProForm.Item
+								name="ocrResultWindowBorderEnabled"
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="appearance.ocrResultWindow.borderEnabled" />
+										}
+										tooltipTitle={
+											<FormattedMessage id="appearance.ocrResultWindow.borderEnabled.tip" />
+										}
+									/>
+								}
+							>
+								<Switch />
+							</ProForm.Item>
+						</Col>
+						<Col span={12}>
+							<ProForm.Item
+								name="ocrResultWindowBorderColor"
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="appearance.ocrResultWindow.borderColor" />
+										}
+									/>
+								}
+							>
+								<ColorPicker showText placement="bottom" />
+							</ProForm.Item>
+						</Col>
+						<Col span={12}>
+							<ProForm.Item
+								name="ocrResultWindowBorderWidth"
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="appearance.ocrResultWindow.borderWidth" />
+										}
+									/>
+								}
+							>
+								<Slider
+									min={0}
+									max={8}
+									step={1}
+									marks={{ 0: "0px", 8: "8px" }}
+								/>
+							</ProForm.Item>
+						</Col>
+					</Row>
+				</Spin>
+			</Form>
+
+			<GroupTitle
 				id="themeSkinSettings"
 				extra={
 					<ResetSettingsButton

@@ -176,7 +176,6 @@ export enum ColorPickerShowMode {
 
 export enum OcrModel {
 	RapidOcrV5Server = "RapidOcrV5Server",
-	RapidOcrV5Mobile = "RapidOcrV5Mobile",
 }
 
 export enum KeyDisplayDirection {
@@ -196,6 +195,12 @@ export type AppSettingsData = {
 		language: AppSettingsLanguage;
 		/** 浏览器语言，用于自动切换语言 */
 		browserLanguage: string;
+		/** OCR / 翻译结果窗口是否显示常驻拖拽边界线 */
+		ocrResultWindowBorderEnabled: boolean;
+		/** OCR / 翻译结果窗口常驻边界线颜色（hex / rgba） */
+		ocrResultWindowBorderColor: string;
+		/** OCR / 翻译结果窗口常驻边界线宽度（px） */
+		ocrResultWindowBorderWidth: number;
 	};
 	[AppSettingsGroup.ThemeSkin]: {
 		/** 皮肤路径 */

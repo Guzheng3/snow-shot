@@ -19,11 +19,6 @@ jobs:
             artifact_name: snow-shot-windows-x64
             # 高精度版：关闭 updater 增量包（避免签名私钥要求）
             tauri_config: '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
-          - variant: quant
-            # 量化版：内置 PP-OCRv5 mobile 模型（体积更小），以产品名区分安装包
-            product_name: "Snow Shot Quant"
-            artifact_name: snow-shot-quant-windows-x64
-            tauri_config: '{"productName":"Snow Shot Quant","bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
     steps:
       # 拉代码。lfs:true 保险：若 lib/ 是 LFS 文件则拉真实内容（非 LFS 则无副作用）
       - name: Checkout repository
@@ -92,13 +87,10 @@ jobs:
           done
         shell: bash
 
-      # 创建 .env（联网功能开）。量化版额外设置默认识别模型为 mobile
+      # 创建 .env（联网功能开）
       - name: Create .env file
         run: |
           echo "PUBLIC_ONLINE_STATUS=true" > .env
-          if [ "${{ matrix.variant }}" = "quant" ]; then
-            echo "PUBLIC_OCR_MODEL_DEFAULT=RapidOcrV5Mobile" >> .env
-          fi
         shell: bash
 
 
@@ -132,45 +124,8 @@ jobs:
           Remove-Item -Path "onnxruntime-temp" -Recurse -Force
         shell: pwsh
 
-      # 量化版需要覆盖 OCR 模型：构建产物根目录只允许一套模型（bundle.resources 的 rapid_ocr/ 目标同名冲突），
-      # 因此先清空 rapid_ocr/ 再复制 mobile 模型进去，从而打进自己的安装包。
-      # 注意：mobile 版复用 server 版共享的 cls 分类模型 ch_ppocr_mobile_v2.0_cls_mobile.onnx，
-      # 该文件在 mobile 目录中并不存在，须在清空目录前备份、覆盖后恢复，否则 OCR 会话因缺 cls 模型而初始化失败。
-      - name: Override OCR models for quant build (bare-exe compatibility)
-        if: matrix.variant == 'quant'
-        run: |
-          $quickOcrDir = "src-tauri\resources\rapid_ocr"
-          $mobileDir = "src-tauri\resources\rapid_ocr_mobile"
-          $clsName = "ch_ppocr_mobile_v2.0_cls_mobile.onnx"
-          $clsSource = Join-Path $quickOcrDir $clsName
-          $clsBackup = Join-Path $env:TEMP $clsName
-          # 备份共享的 cls 模型（若存在）
-          if (Test-Path $clsSource) {
-            Copy-Item -Path $clsSource -Destination $clsBackup -Force
-            Write-Host "Backed up shared cls model to temp"
-          }
-          # 清空 rapid_ocr/（整目录，确保只打进 mobile 一套模型）
-          if (Test-Path $quickOcrDir) {
-            Remove-Item -Path "$quickOcrDir\*" -Recurse -Force -ErrorAction SilentlyContinue
-          } else {
-            New-Item -ItemType Directory -Force -Path $quickOcrDir | Out-Null
-          }
-          if (Test-Path $mobileDir) {
-            Copy-Item -Path "$mobileDir\*" -Destination $quickOcrDir -Recurse -Force
-            # 恢复共享的 cls 模型
-            if (Test-Path $clsBackup) {
-              Copy-Item -Path $clsBackup -Destination (Join-Path $quickOcrDir $clsName) -Force
-              Remove-Item -Path $clsBackup -Force
-            }
-            Write-Host "Copied mobile OCR models into rapid_ocr for quant build"
-          } else {
-            Write-Error "rapid_ocr_mobile directory not found"
-            exit 1
-          }
-        shell: pwsh
-
       # 构建 Tauri 应用（beforeBuildCommand=pnpm build 会自动先构建前端）
-      # TAURI_CONFIG 关闭 updater 增量包 → 不需要签名私钥；量化版在此同时覆盖 productName
+      # TAURI_CONFIG 关闭 updater 增量包 → 不需要签名私钥
       - name: Build the app (Windows x64)
         env:
           CI: false

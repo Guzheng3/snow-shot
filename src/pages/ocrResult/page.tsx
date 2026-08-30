@@ -46,7 +46,7 @@ export const OcrResultPage: React.FC = () => {
 			max_y: windowY + windowHeight,
 		});
 		// 设置最小窗口尺寸（逻辑像素）
-		await appWindow.setMinSize(new LogicalSize(400, 500));
+		await appWindow.setMinSize(new LogicalSize(400, 560));
 		await showWindow();
 	}, []);
 
