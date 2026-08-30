@@ -16,6 +16,14 @@ export const TRANSLATE_ENGINE_KEYS = [
 	"Yandex",
 ] as const;
 
+/** 目标语言为 "auto"（自动）时，按源文本是中文还是外语决定真正的目标语言：
+ *  中文 → 英文；外语 → 简体中文。 */
+const resolveAutoTargetLanguage = (text: string): string => {
+	// 统计常见 CJK（汉字）字符比例，>0 即视为含中文
+	const cjkCount = (text.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) ?? []).length;
+	return cjkCount > 0 ? "en" : "zh-CHS";
+};
+
 export const useTranslationRequest = (options?: {
 	enableCacheConfig?: boolean;
 	onComplete?: (result: { content: string }[], requestId?: number) => void;
@@ -80,10 +88,15 @@ export const useTranslationRequest = (options?: {
 
 			setStartTranslateLoading(true);
 			try {
+				// 目标语言选了"自动"时，按原文语言智能翻转目标语言
+				const resolvedTargetLanguage =
+					targetLanguage === "auto"
+						? resolveAutoTargetLanguage(text)
+						: targetLanguage;
 				const result = await translateText(
 					text,
 					sourceLanguage,
-					targetLanguage,
+					resolvedTargetLanguage,
 					engineOrderRef.current ?? [...TRANSLATE_ENGINE_KEYS],
 				);
 				setStartTranslateLoading(false);

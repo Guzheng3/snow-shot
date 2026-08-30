@@ -43,7 +43,7 @@ export const defaultAppFunctionConfigs: Record<AppFunction, AppFunctionConfig> =
 			group: AppFunctionGroup.Translation,
 		},
 		[AppFunction.Translation]: {
-			shortcutKey: "",
+			shortcutKey: "Ctrl+T",
 			group: AppFunctionGroup.Translation,
 		},
 		[AppFunction.VideoRecord]: {

@@ -187,6 +187,7 @@ export const zhHant = {
 	"tools.translation.engine.icibaTranslate": "金山翻譯",
 	"tools.translation.engine.microsoft": "微軟翻譯",
 	"tools.translation.engine.yandex": "Yandex 翻譯",
+	"tools.translation.language.auto": "自動",
 	"appearance.ocrResultWindow": "OCR / 翻譯結果視窗",
 	"appearance.ocrResultWindow.borderEnabled": "顯示拖拽邊界線",
 	"appearance.ocrResultWindow.borderEnabled.tip":

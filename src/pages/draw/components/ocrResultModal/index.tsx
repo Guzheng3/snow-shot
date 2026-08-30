@@ -3,14 +3,13 @@ import {
 	CopyOutlined,
 	ExportOutlined,
 	LinkOutlined,
-	FullscreenOutlined,
 	MailOutlined,
 	MinusOutlined,
 	MobileOutlined,
 	PushpinOutlined,
 	QqOutlined,
-	RestOutlined,
 } from "@ant-design/icons";
+import { Select } from "antd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
 	useCallback,
@@ -25,6 +24,7 @@ import { useIntl } from "react-intl";
 import { getCurrentMonitorInfo } from "@/commands/core";
 import { AntdContext } from "@/contexts/antdContext";
 import { useTranslationRequest } from "@/core/translations";
+import { useLanguageOptions } from "@/components/translator";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { AppSettingsGroup, type AppSettingsData } from "@/types/appSettings";
 import type { OcrDetectResult } from "@/types/commands/ocr";
@@ -356,6 +356,7 @@ export const OcrResultModal: React.FC<{
 	onClose: () => void;
 }> = ({ open, ocrResult, mode = "ocr", onClose }) => {
 	const intl = useIntl();
+	const { targetLanguageOptions } = useLanguageOptions();
 	const { message } = useContext(AntdContext);
 	const isTranslateMode = mode === "translate";
 	const [layoutType, setLayoutType] = useState<LayoutType>("original");
@@ -397,7 +398,7 @@ export const OcrResultModal: React.FC<{
 		setCopiedItem("");
 	}, [editableText]);
 
-	const { requestTranslate, startTranslateLoading, targetLanguage } =
+	const { requestTranslate, startTranslateLoading, targetLanguage, updateTargetLanguage } =
 		useTranslationRequest({
 			onComplete: useCallback((result) => {
 				setTranslatedText(result.map((r) => r.content).join("\n"));
@@ -461,6 +462,17 @@ export const OcrResultModal: React.FC<{
 			return next;
 		});
 	}, [editableText, requestTranslate]);
+
+	// 切换目标语言：持久化后立即按新语言重新翻译（若已有可翻译原文）
+	const handleTargetLanguageChange = useCallback(
+		(value: string) => {
+			updateTargetLanguage(value);
+			if (editableText) {
+				requestTranslate(editableText.split("\n"));
+			}
+		},
+		[updateTargetLanguage, editableText, requestTranslate],
+	);
 
 	const handleLayoutChange = (type: LayoutType) => {
 		setLayoutType(type);
@@ -560,14 +572,6 @@ export const OcrResultModal: React.FC<{
 		setPinned(next);
 		win.setAlwaysOnTop(next);
 	}, [pinned]);
-	const [maximized, setMaximized] = useState(false);
-	const maxWindow = useCallback(() => {
-		const win = getCurrentWindow();
-		win.isMaximized().then((max) => {
-			setMaximized(!max);
-			max ? win.unmaximize() : win.maximize();
-		});
-	}, []);
 
 	// 是否处于双栏布局（原文/译文对照 或 翻译弹开）：双栏时窗口加宽一倍并保持居中
 	const isDualColumn =
@@ -682,26 +686,19 @@ export const OcrResultModal: React.FC<{
 						<PushpinOutlined />
 					</button>
 					<button
-						className={styles.titleBtn}
-						title="最小化"
-						onClick={minWindow}
-					>
-						<MinusOutlined />
-					</button>
-					<button
-						className={styles.titleBtn}
-						title={maximized ? "还原" : "最大化"}
-						onClick={maxWindow}
-					>
-						{maximized ? <RestOutlined /> : <FullscreenOutlined />}
-					</button>
-					<button
-						className={`${styles.titleBtn} ${styles.closeBtn}`}
-						title="关闭"
-						onClick={onClose}
-					>
-						<CloseOutlined />
-					</button>
+					className={styles.titleBtn}
+					title="最小化"
+					onClick={minWindow}
+				>
+					<MinusOutlined />
+				</button>
+				<button
+					className={`${styles.titleBtn} ${styles.closeBtn}`}
+					title="关闭"
+					onClick={onClose}
+				>
+					<CloseOutlined />
+				</button>
 				</span>
 			</div>
 
@@ -746,9 +743,16 @@ export const OcrResultModal: React.FC<{
 						识别：{languageLabel(sourceLanguage, intl)}
 					</span>
 					{(isTranslateMode || translateOpen) && (
-						<span className={styles.langTag}>
-							译至：{languageLabel(targetLanguage, intl)}
-						</span>
+						<Select
+							className={styles.langSelect}
+							value={targetLanguage}
+							onChange={handleTargetLanguageChange}
+							options={targetLanguageOptions}
+							placeholder="译至"
+							popupMatchSelectWidth={false}
+							suffixIcon={null}
+							bordered={false}
+						/>
 					)}
 				</div>
 

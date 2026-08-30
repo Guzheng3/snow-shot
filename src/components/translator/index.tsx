@@ -120,6 +120,10 @@ export const useLanguageOptions = () => {
 	const targetLanguageOptions = useMemo(() => {
 		const languageList = [
 			{
+				code: "auto",
+				label: intl.formatMessage({ id: "tools.translation.language.auto" }),
+			},
+			{
 				code: "en",
 				label: intl.formatMessage({ id: "tools.translation.language.english" }),
 			},

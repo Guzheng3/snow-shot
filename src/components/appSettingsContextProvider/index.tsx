@@ -653,10 +653,13 @@ const AppSettingsContextProviderCore: React.FC<{
 					>;
 
 					let keyEventSettingsKey =
-						typeof keyEventSettings[key]?.shortcutKey === "string"
-							? keyEventSettings[key].shortcutKey
-							: (prevSettings?.[key]?.shortcutKey ??
-								defaultAppFunctionConfigs[key].shortcutKey);
+					typeof keyEventSettings[key]?.shortcutKey === "string" &&
+					keyEventSettings[key].shortcutKey.trim() !== ""
+						? keyEventSettings[key].shortcutKey
+						: (prevSettings?.[key]?.shortcutKey &&
+								prevSettings[key].shortcutKey.trim() !== ""
+							? prevSettings[key].shortcutKey
+							: defaultAppFunctionConfigs[key].shortcutKey);
 
 					// 格式化处理下
 					keyEventSettingsKey = keyEventSettingsKey

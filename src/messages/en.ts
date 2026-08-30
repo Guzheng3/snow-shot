@@ -213,6 +213,7 @@ export const en = {
 	"tools.translation.engine.icibaTranslate": "Kingsoft Translate",
 	"tools.translation.engine.microsoft": "Microsoft Translator",
 	"tools.translation.engine.yandex": "Yandex Translator",
+	"tools.translation.language.auto": "Auto",
 	"appearance.ocrResultWindow": "OCR / Translation Result Window",
 	"appearance.ocrResultWindow.borderEnabled": "Show resize border",
 	"appearance.ocrResultWindow.borderEnabled.tip":
