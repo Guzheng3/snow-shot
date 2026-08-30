@@ -707,38 +707,62 @@ export const OcrResultModal: React.FC<{
 					/* 翻译模式：原文 ↔ 译文 逐行对照（点击某行，另一侧对应展示） */
 					<div className={styles.compareGrid}>
 						<div
-							className={styles.compareCol}
+							className={styles.dualCol}
 							ref={sourceCompareRootRef}
 						>
-							<div className={styles.compareColHeader}>
-								原文
-								<span className={styles.tag}>
-									{languageLabel(sourceLanguage, intl)}
+							<div className={styles.dualColHeader}>
+								<span className={styles.dualColTitle}>原文</span>
+								<span className={styles.dualColHeaderRight}>
+									<span className={styles.tag}>
+										{languageLabel(sourceLanguage, intl)}
+									</span>
+									<button
+										className={styles.headerActionBtn}
+										title="复制原文"
+										onClick={handleCopy}
+										disabled={!editableText}
+									>
+										<CopyOutlined />
+										<span>复制</span>
+									</button>
 								</span>
 							</div>
-							<div className={styles.compareRows}>
-								{sourceLines.map((line, i) => (
-									<div
-										key={i}
-										data-pair={i}
-										className={`${styles.compareRow} ${
-											activePair === i ? styles.active : ""
-										}`}
-										onClick={() => onPairClick(i, "source")}
-									>
-										{line || "\u00A0"}
-									</div>
-								))}
+							<div className={styles.dualColBody}>
+								<div className={styles.compareRows}>
+									{sourceLines.map((line, i) => (
+										<div
+											key={i}
+											data-pair={i}
+											className={`${styles.compareRow} ${
+												activePair === i ? styles.active : ""
+											}`}
+											onClick={() => onPairClick(i, "source")}
+										>
+											{line || "\u00A0"}
+										</div>
+									))}
+								</div>
 							</div>
 						</div>
 						<div
-							className={styles.compareCol}
+							className={styles.dualCol}
 							ref={translateCompareRootRef}
 						>
-							<div className={styles.compareColHeader}>
-								译文
-								<span className={styles.tag}>
-									{languageLabel(targetLanguage, intl)}
+							<div className={styles.dualColHeader}>
+								<span className={styles.dualColTitle}>译文</span>
+								<span className={styles.dualColHeaderRight}>
+									<span className={styles.tag}>
+										{languageLabel(targetLanguage, intl)}
+									</span>
+									<button
+										className={styles.headerActionBtn}
+										title="复制译文"
+										onClick={handleCopyTranslated}
+										disabled={!translatedText}
+									>
+										<CopyOutlined />
+										<span>复制</span>
+									</button>
 								</span>
 							</div>
 							{startTranslateLoading ? (
@@ -746,19 +770,21 @@ export const OcrResultModal: React.FC<{
 									翻译中…
 								</div>
 							) : (
-								<div className={styles.compareRows}>
-									{translatedSegments.map((line, i) => (
-										<div
-											key={i}
-											data-pair={i}
-											className={`${styles.compareRow} ${
-												activePair === i ? styles.active : ""
-											}`}
-											onClick={() => onPairClick(i, "translate")}
-										>
-											{line || "\u00A0"}
-										</div>
-									))}
+								<div className={styles.dualColBody}>
+									<div className={styles.compareRows}>
+										{translatedSegments.map((line, i) => (
+											<div
+												key={i}
+												data-pair={i}
+												className={`${styles.compareRow} ${
+													activePair === i ? styles.active : ""
+												}`}
+												onClick={() => onPairClick(i, "translate")}
+											>
+												{line || "\u00A0"}
+											</div>
+										))}
+									</div>
 								</div>
 							)}
 						</div>
@@ -781,7 +807,70 @@ export const OcrResultModal: React.FC<{
 								: translatedText || "（暂无译文，请检查网络或翻译引擎配置）"}
 						</div>
 					</div>
+				) : translateOpen ? (
+					/* OCR 双栏：原文(可编辑) ↔ 译文，与翻译对照双栏完全对称 */
+					<div className={styles.compareGrid}>
+						<div className={styles.dualCol}>
+							<div className={styles.dualColHeader}>
+								<span className={styles.dualColTitle}>原文</span>
+								<span className={styles.dualColHeaderRight}>
+									<span className={styles.tag}>
+										{languageLabel(sourceLanguage, intl)}
+									</span>
+									<button
+										className={styles.headerActionBtn}
+										title="复制原文"
+										onClick={handleCopy}
+										disabled={!editableText || copying}
+									>
+										<CopyOutlined />
+										<span>{copying ? "复制中…" : "复制"}</span>
+									</button>
+								</span>
+							</div>
+							<div className={styles.dualColBody}>
+								<textarea
+									className={styles.editorTextarea}
+									value={editableText}
+									onChange={(e) => setEditableText(e.target.value)}
+									placeholder="识别结果为空"
+									spellCheck={false}
+								/>
+							</div>
+						</div>
+						<div className={styles.dualCol}>
+							<div className={styles.dualColHeader}>
+								<span className={styles.dualColTitle}>译文</span>
+								<span className={styles.dualColHeaderRight}>
+									<span className={styles.tag}>
+										{languageLabel(targetLanguage, intl)}
+									</span>
+									<button
+										className={styles.headerActionBtn}
+										title="复制译文"
+										onClick={handleCopyTranslated}
+										disabled={!translatedText}
+									>
+										<CopyOutlined />
+										<span>复制</span>
+									</button>
+								</span>
+							</div>
+							{startTranslateLoading ? (
+								<div className={styles.empty} style={{ minHeight: 200 }}>
+									翻译中…
+								</div>
+							) : (
+								<div className={styles.dualColBody}>
+									<div className={styles.compareValue}>
+										{translatedText || "（暂无译文，请检查网络或翻译引擎配置）"}
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
 				) : (
+					/* OCR 单栏：仅原文（可编辑） */
 					<div className={styles.ocrResult}>
 						<div className={styles.ocrCol}>
 							<button
@@ -801,22 +890,6 @@ export const OcrResultModal: React.FC<{
 								spellCheck={false}
 							/>
 						</div>
-						{translateOpen && (
-							<div className={styles.translateCol}>
-								<button
-									className={styles.copyCorner}
-									title="复制翻译"
-									onClick={handleCopyTranslated}
-									disabled={!translatedText}
-								>
-									<CopyOutlined />
-									<span>复制</span>
-								</button>
-								<div className={styles.ocrText}>
-									{startTranslateLoading ? "翻译中…" : translatedText}
-								</div>
-							</div>
-						)}
 					</div>
 				)}
 
