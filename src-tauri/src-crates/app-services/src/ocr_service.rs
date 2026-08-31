@@ -13,11 +13,18 @@ pub struct OcrService {
     cls_model: Option<(PathBuf, Option<Vec<u8>>)>,
     /// 识别模型的字符字典文件路径（PP-OCRv5 不内嵌 character 元数据，需外部字典）
     rec_keys_path: Option<PathBuf>,
+    /// 当前选中的识别模型（本地/云端），供命令层决定走本地会话还是云端通道
+    model: Option<OcrModel>,
+    /// 云端 PaddleOCR 鉴权 token（由前端设置页填写）
+    paddle_cloud_token: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy, PartialOrd, Serialize, Deserialize)]
 pub enum OcrModel {
     RapidOcrV5Server,
+    /// 云端 PaddleOCR v6 识别（不内置模型，需配置 token），此枚举值仅作标识，
+    /// 实际识别由 tauri-commands/ocr 层的云端通道处理，不在这里初始化本地模型
+    PaddleCloudV6,
 }
 
 impl OcrService {
@@ -29,6 +36,8 @@ impl OcrService {
             rec_model: None,
             cls_model: None,
             rec_keys_path: None,
+            model: None,
+            paddle_cloud_token: None,
         }
     }
 
@@ -162,6 +171,16 @@ impl OcrService {
                 orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
                 orc_plugin_path.join("ch_PP-OCRv5_rec_server.onnx"),
             ),
+            // 云端 PaddleOCR v6 不内置模型，无需加载本地 ONNX，仅记录模型标识
+            OcrModel::PaddleCloudV6 => {
+                self.model = Some(model);
+                self.det_model = None;
+                self.cls_model = None;
+                self.rec_model = None;
+                self.rec_keys_path = None;
+                self.ocr_core.take();
+                return Ok(());
+            }
         };
 
         let (det_model_config, cls_model_config, rec_model_config) = if ocr_model_write_to_memory {
@@ -187,6 +206,7 @@ impl OcrService {
         self.rec_model = rec_model_config;
         self.rec_keys_path = Some(orc_plugin_path.join("ppocrv5_dict.txt"));
         self.hot_start = hot_start;
+        self.model = Some(model);
 
         if self.hot_start {
             self.init_session().await?;
@@ -214,5 +234,20 @@ impl OcrService {
         }
 
         Ok(self.ocr_core.as_mut().unwrap())
+    }
+
+    /// 当前是否走云端 PaddleOCR 通道
+    pub fn is_cloud(&self) -> bool {
+        matches!(self.model, Some(OcrModel::PaddleCloudV6))
+    }
+
+    /// 记录云端鉴权 token
+    pub fn set_cloud_token(&mut self, token: String) {
+        self.paddle_cloud_token = Some(token);
+    }
+
+    /// 取云端鉴权 token
+    pub fn cloud_token(&self) -> Option<&str> {
+        self.paddle_cloud_token.as_deref()
     }
 }

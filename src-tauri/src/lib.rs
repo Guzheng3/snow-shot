@@ -269,6 +269,7 @@ pub fn run() {
             ocr::ocr_detect_with_shared_buffer,
             ocr::ocr_init,
             ocr::ocr_release,
+            ocr::ocr_set_cloud_token,
             translate::translate_text,
             core::exit_app,
             core::start_free_drag,

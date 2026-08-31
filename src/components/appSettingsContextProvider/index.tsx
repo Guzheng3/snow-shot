@@ -736,13 +736,22 @@ const AppSettingsContextProviderCore: React.FC<{
 					| AppSettingsData[typeof group]
 					| undefined;
 
+				const isValidModel =
+					newSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
+					newSettings?.ocrModel === OcrModel.PaddleCloudV6;
+
 				settings = {
-					ocrModel:
-						newSettings?.ocrModel === OcrModel.RapidOcrV5Server
-							? newSettings.ocrModel
-							: (prevSettings?.ocrModel === OcrModel.RapidOcrV5Server
-								? prevSettings.ocrModel
-								: defaultAppSettingsData[group].ocrModel),
+					ocrModel: isValidModel
+						? newSettings.ocrModel
+						: (prevSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
+								prevSettings?.ocrModel === OcrModel.PaddleCloudV6
+							? prevSettings.ocrModel
+							: defaultAppSettingsData[group].ocrModel),
+					ocrCloudToken:
+						typeof newSettings?.ocrCloudToken === "string"
+							? newSettings.ocrCloudToken
+							: (prevSettings?.ocrCloudToken ??
+								defaultAppSettingsData[group].ocrCloudToken),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];

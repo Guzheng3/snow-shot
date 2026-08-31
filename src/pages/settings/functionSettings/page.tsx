@@ -590,6 +590,12 @@ export const FunctionSettingsPage = () => {
 				}),
 				value: OcrModel.RapidOcrV5Server,
 			},
+			{
+				label: intl.formatMessage({
+					id: "settings.systemSettings.screenshotSettings.ocrModel.paddleCloudV6",
+				}),
+				value: OcrModel.PaddleCloudV6,
+			},
 		];
 	}, [intl]);
 
@@ -1212,6 +1218,19 @@ export const FunctionSettingsPage = () => {
 									}
 									name="ocrModel"
 									options={ocrModelOptions}
+								/>
+							</Col>
+							<Col span={12}>
+								<ProFormText.Password
+									name="ocrCloudToken"
+									label={
+										<IconLabel
+											label={
+												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel.cloudToken" />
+											}
+										/>
+									}
+									placeholder=""
 								/>
 							</Col>
 						</Row>

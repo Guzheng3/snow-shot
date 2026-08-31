@@ -137,6 +137,8 @@ export const defaultAppSettingsData: AppSettingsData = {
 	[AppSettingsGroup.FunctionOcr]: {
 		// 默认识别模型：高精度 server 模型
 		ocrModel: OcrModel.RapidOcrV5Server,
+		// 云端 PaddleOCR 识别 token，默认空
+		ocrCloudToken: "",
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {
 		findChildrenElements: true,

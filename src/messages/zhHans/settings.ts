@@ -423,6 +423,10 @@ export const settings = {
 	"settings.systemSettings.screenshotSettings.ocrModel": "文本识别模型",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
+	"settings.systemSettings.screenshotSettings.ocrModel.paddleCloudV6":
+		"云端 PaddleOCR V6",
+	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
+		"云端 PaddleOCR Token",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
 	"settings.systemSettings.screenshotSettings.ocrHotStart.tip":
 		"预加载文本识别模型，提高文本识别的识别速度，但会提高内存占用",

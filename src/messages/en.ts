@@ -51,6 +51,10 @@ export const en = {
 		"Text Recognition Model",
 	"settings.systemSettings.screenshotSettings.ocrModel.rapidOcrV5Server":
 		"Rapid OCR V5 Server",
+	"settings.systemSettings.screenshotSettings.ocrModel.paddleCloudV6":
+		"Cloud PaddleOCR V6",
+	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
+		"PaddleOCR Cloud Token",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"settings.hotKeySettings.translation": "Translation",
 	"home.translation": "Translate",

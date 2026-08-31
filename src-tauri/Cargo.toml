@@ -61,7 +61,7 @@ objc2-foundation = { version = "0.3.1" }
 uiautomation = "0.24.0"
 macos-accessibility-client = "0.0.1"
 dashmap = "6.1.0"
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", features = ["json", "multipart"] }
 futures-lite = "2.6.1"
 tokio-util = "0.7.16"
 futures-util = "0.3"

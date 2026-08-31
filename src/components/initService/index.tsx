@@ -11,7 +11,7 @@ import {
 	setRunLog,
 } from "@/commands/core";
 import { hotLoadPageInit } from "@/commands/hotLoadPage";
-import { ocrInit } from "@/commands/ocr";
+import { ocrInit, ocrSetCloudToken } from "@/commands/ocr";
 import { videoRecordInit } from "@/commands/videoRecord";
 import {
 	PLUGIN_ID_FFMPEG,
@@ -107,6 +107,8 @@ export const InitService = () => {
 			(prevAppSettings &&
 				(appSettings[AppSettingsGroup.FunctionOcr].ocrModel !==
 					prevAppSettings[AppSettingsGroup.FunctionOcr].ocrModel ||
+					appSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken !==
+						prevAppSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken ||
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart !==
 						prevAppSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart ||
 					appSettings[AppSettingsGroup.SystemScreenshot]
@@ -116,6 +118,10 @@ export const InitService = () => {
 		) {
 			try {
 				const rapidOcrResourceDir = await getBuiltinOcrModelDir();
+				// 同步云端 token（云端识别时鉴权使用）
+				await ocrSetCloudToken(
+					appSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken,
+				);
 				ocrInit(
 					rapidOcrResourceDir,
 					appSettings[AppSettingsGroup.FunctionOcr].ocrModel,

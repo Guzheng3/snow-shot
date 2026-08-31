@@ -44,3 +44,7 @@ export const ocrInit = async (
 export const ocrRelease = async (): Promise<void> => {
 	await invoke<void>("ocr_release");
 };
+
+export const ocrSetCloudToken = async (token: string): Promise<void> => {
+	await invoke<void>("ocr_set_cloud_token", { token });
+};

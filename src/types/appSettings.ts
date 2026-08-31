@@ -176,6 +176,7 @@ export enum ColorPickerShowMode {
 
 export enum OcrModel {
 	RapidOcrV5Server = "RapidOcrV5Server",
+	PaddleCloudV6 = "PaddleCloudV6",
 }
 
 export enum KeyDisplayDirection {
@@ -347,6 +348,8 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
+		/** 云端 PaddleOCR 识别 token（选用云端模型时必填） */
+		ocrCloudToken: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */

@@ -9,6 +9,9 @@ use std::io::Cursor;
 use std::path::PathBuf;
 use tokio::sync::Mutex;
 
+mod cloud;
+use cloud::ocr_detect_cloud;
+
 pub async fn ocr_init(
     orc_plugin_path: PathBuf,
     ocr_service: tauri::State<'_, Mutex<OcrService>>,
@@ -22,6 +25,16 @@ pub async fn ocr_init(
         .init_models(orc_plugin_path, model, hot_start, ocr_model_write_to_memory)
         .await?;
 
+    Ok(())
+}
+
+/// 配置云端 PaddleOCR token（供云端识别通道鉴权）
+pub async fn ocr_set_cloud_token(
+    ocr_service: tauri::State<'_, Mutex<OcrService>>,
+    token: String,
+) -> Result<(), String> {
+    let mut ocr_service = ocr_service.lock().await;
+    ocr_service.set_cloud_token(token);
     Ok(())
 }
 
@@ -121,6 +134,21 @@ pub async fn ocr_detect_core(
     detect_angle: bool,
 ) -> Result<OcrDetectResult, String> {
     let mut ocr_service = ocr_service.lock().await;
+
+    // 云端 PaddleOCR 通道：不初始化本地会话，直接把截图上传云端识别
+    if ocr_service.is_cloud() {
+        let token = ocr_service
+            .cloud_token()
+            .ok_or("[ocr_detect_core] cloud token not configured, please fill it in the settings page")?
+            .to_string();
+        // 把动态图编码为 PNG bytes 用于 multipart 上传
+        let mut cursor = Cursor::new(Vec::new());
+        image
+            .write_to(&mut cursor, image::ImageFormat::Png)
+            .map_err(|e| format!("[ocr_detect_core] encode image failed: {}", e))?;
+        return ocr_detect_cloud(cursor.into_inner(), &token, scale_factor).await;
+    }
+
     let mut image = image;
     // 当前识别图相对原始输入图的整体缩放倍数，识别后需把 box 坐标映射回原图，保证前端叠加不偏移
     let mut total_scale: f32 = 1.0;
