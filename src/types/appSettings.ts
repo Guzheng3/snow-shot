@@ -348,8 +348,10 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** 云端 PaddleOCR 识别 token（选用云端模型时必填） */
+		/** 云端 PaddleOCR 识别 token（使用云端模型时鉴权） */
 		ocrCloudToken: string;
+		/** 本地 OCR 模型目录（用户导入的压缩包解压后所在目录，云端失败时兜底） */
+		ocrModelDir: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {
 		/** 优化 AI 翻译的排版 */

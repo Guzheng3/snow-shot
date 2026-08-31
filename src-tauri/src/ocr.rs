@@ -63,3 +63,16 @@ pub async fn ocr_set_cloud_token(
 ) -> Result<(), String> {
     snow_shot_tauri_commands_ocr::ocr_set_cloud_token(ocr_instance, token).await
 }
+
+#[command]
+pub async fn ocr_import_model_archive(
+    app: tauri::AppHandle,
+    file_cache_service: tauri::State<
+        '_,
+        std::sync::Arc<snow_shot_app_services::file_cache_service::FileCacheService>,
+    >,
+    archive_path: PathBuf,
+) -> Result<PathBuf, String> {
+    snow_shot_tauri_commands_ocr::ocr_import_model_archive(app, file_cache_service, archive_path)
+        .await
+}

@@ -19,6 +19,10 @@ export const zhHant = {
 		"雲端 PaddleOCR V6",
 	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
 		"雲端 PaddleOCR Token",
+	"settings.systemSettings.screenshotSettings.ocrModelDir":
+		"本地 OCR 模型目錄",
+	"settings.systemSettings.screenshotSettings.ocrModelImport":
+		"匯入 OCR 模型壓縮檔",
 	"settings.screenshotSettings": "截圖設定",
 	"settings.findChildrenElements": "尋找視窗子元素",
 	"settings.performanceMode": "效能優先",

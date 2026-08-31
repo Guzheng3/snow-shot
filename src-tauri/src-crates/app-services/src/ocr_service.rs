@@ -17,6 +17,10 @@ pub struct OcrService {
     model: Option<OcrModel>,
     /// 云端 PaddleOCR 鉴权 token（由前端设置页填写）
     paddle_cloud_token: Option<String>,
+    /// 是否导入了可用的本地模型目录（作为云端失败时的兜底）
+    local_model_configured: bool,
+    /// 模型文件是否写入内存（仅本地模型热启动时生效）
+    ocr_model_write_to_memory: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Copy, PartialOrd, Serialize, Deserialize)]
@@ -38,6 +42,8 @@ impl OcrService {
             rec_keys_path: None,
             model: None,
             paddle_cloud_token: None,
+            local_model_configured: false,
+            ocr_model_write_to_memory: false,
         }
     }
 
@@ -164,57 +170,88 @@ impl OcrService {
             ocr_model_write_to_memory
         );
 
-        // 加载模型到内存
-        let (det_model_path, cls_model_path, rec_model_path) = match model {
-            OcrModel::RapidOcrV5Server => (
-                orc_plugin_path.join("ch_PP-OCRv5_server_det.onnx"),
-                orc_plugin_path.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
-                orc_plugin_path.join("ch_PP-OCRv5_rec_server.onnx"),
-            ),
-            // 云端 PaddleOCR v6 不内置模型，无需加载本地 ONNX，仅记录模型标识
-            OcrModel::PaddleCloudV6 => {
-                self.model = Some(model);
-                self.det_model = None;
-                self.cls_model = None;
-                self.rec_model = None;
-                self.rec_keys_path = None;
-                self.ocr_core.take();
-                return Ok(());
-            }
-        };
-
-        let (det_model_config, cls_model_config, rec_model_config) = if ocr_model_write_to_memory {
-            let (det_result, cls_result, rec_result) = self
-                .read_model_data(&det_model_path, &cls_model_path, &rec_model_path)
-                .await?;
-
-            (
-                Some((det_model_path, Some(det_result))),
-                Some((cls_model_path, Some(cls_result))),
-                Some((rec_model_path, Some(rec_result))),
-            )
-        } else {
-            (
-                Some((det_model_path, None)),
-                Some((cls_model_path, None)),
-                Some((rec_model_path, None)),
-            )
-        };
-
-        self.det_model = det_model_config;
-        self.cls_model = cls_model_config;
-        self.rec_model = rec_model_config;
-        self.rec_keys_path = Some(orc_plugin_path.join("ppocrv5_dict.txt"));
         self.hot_start = hot_start;
+        self.ocr_model_write_to_memory = ocr_model_write_to_memory;
         self.model = Some(model);
+        self.local_model_configured = false;
+        self.det_model = None;
+        self.cls_model = None;
+        self.rec_model = None;
+        self.rec_keys_path = None;
+        self.ocr_core.take();
 
-        if self.hot_start {
-            self.init_session().await?;
+        // 解析本地模型文件（不存在则视为未导入，云端模型仍可工作）
+        if let Some((det_path, cls_path, rec_path, dict_path)) =
+            Self::resolve_model_paths(&orc_plugin_path)
+        {
+            self.local_model_configured = true;
+            self.rec_keys_path = Some(dict_path);
+
+            match model {
+                // 本地模型：按需加载模型数据
+                OcrModel::RapidOcrV5Server => {
+                    if ocr_model_write_to_memory {
+                        let (det_data, cls_data, rec_data) = self
+                            .read_model_data(&det_path, &cls_path, &rec_path)
+                            .await?;
+                        self.det_model = Some((det_path, Some(det_data)));
+                        self.cls_model = Some((cls_path, Some(cls_data)));
+                        self.rec_model = Some((rec_path, Some(rec_data)));
+                    } else {
+                        self.det_model = Some((det_path, None));
+                        self.cls_model = Some((cls_path, None));
+                        self.rec_model = Some((rec_path, None));
+                    }
+
+                    if self.hot_start {
+                        self.init_session().await?;
+                    }
+                }
+                // 云端优先：本地模型仅作兜底，记录文件路径但不预加载到内存
+                OcrModel::PaddleCloudV6 => {
+                    self.det_model = Some((det_path, None));
+                    self.cls_model = Some((cls_path, None));
+                    self.rec_model = Some((rec_path, None));
+                }
+            }
         } else {
-            self.ocr_core.take();
+            log::info!(
+                "[OcrService::init_models] no local models found at {:?}",
+                orc_plugin_path
+            );
         }
 
         Ok(())
+    }
+
+    /// 解析本地模型目录下的 4 个必需文件（det/cls/rec + 字典），全部存在才返回
+    fn resolve_model_paths(dir: &Path) -> Option<(PathBuf, PathBuf, PathBuf, PathBuf)> {
+        let det = dir.join("ch_PP-OCRv5_server_det.onnx");
+        let cls = dir.join("ch_ppocr_mobile_v2.0_cls_mobile.onnx");
+        let rec = dir.join("ch_PP-OCRv5_rec_server.onnx");
+        let dict = dir.join("ppocrv5_dict.txt");
+        if det.exists() && cls.exists() && rec.exists() && dict.exists() {
+            Some((det, cls, rec, dict))
+        } else {
+            None
+        }
+    }
+
+    pub fn model(&self) -> Option<OcrModel> {
+        self.model
+    }
+
+    /// 是否导入了可用的本地模型（作为云端失败时的兜底）
+    pub fn has_local_models(&self) -> bool {
+        self.local_model_configured
+    }
+
+    /// 是否已配置有效的云端鉴权 token
+    pub fn has_cloud_token(&self) -> bool {
+        match &self.paddle_cloud_token {
+            Some(token) => !token.trim().is_empty(),
+            None => false,
+        }
     }
 
     /// 释放 onnx session，并初始化新的 session
@@ -233,7 +270,9 @@ impl OcrService {
             self.init_session().await?;
         }
 
-        Ok(self.ocr_core.as_mut().unwrap())
+        self.ocr_core
+            .as_mut()
+            .ok_or_else(|| "[OcrService::get_session] OCR session is not initialized".to_string())
     }
 
     /// 当前是否走云端 PaddleOCR 通道

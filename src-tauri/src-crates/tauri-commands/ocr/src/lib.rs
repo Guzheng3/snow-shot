@@ -7,10 +7,14 @@ use serde::Serialize;
 use snow_shot_app_services::ocr_service::{OcrModel, OcrService};
 use std::io::Cursor;
 use std::path::PathBuf;
+use tauri::Emitter as _;
 use tokio::sync::Mutex;
 
 mod cloud;
 use cloud::ocr_detect_cloud;
+
+mod import;
+pub use import::ocr_import_model_archive;
 
 pub async fn ocr_init(
     orc_plugin_path: PathBuf,
@@ -127,28 +131,59 @@ fn convert_rgba_to_rgb(image: &[u8]) -> Vec<u8> {
     rgb_data
 }
 
+/// 云端失败且无本地模型时，向前端发送“导入本地模型包”提示
+fn emit_need_import(app: &tauri::AppHandle) -> Result<OcrDetectResult, String> {
+    let _ = app.emit("ocr:local-model-required", ());
+    Err(
+        "OCR 暂时不可用：在线服务不可达（网络异常或云端调用失败），且尚未导入本地 OCR 模型包，请在设置中导入本地 OCR 模型。"
+            .to_string(),
+    )
+}
+
 pub async fn ocr_detect_core(
     ocr_service: tauri::State<'_, Mutex<OcrService>>,
+    app: tauri::AppHandle,
     image: image::DynamicImage,
     scale_factor: f32,
     detect_angle: bool,
 ) -> Result<OcrDetectResult, String> {
     let mut ocr_service = ocr_service.lock().await;
 
-    // 云端 PaddleOCR 通道：不初始化本地会话，直接把截图上传云端识别
-    if ocr_service.is_cloud() {
+    // 云端优先：默认使用在线 PaddleOCR v6，仅当网络不通或 v6 调用失败时回退本地/提示导入
+    let model = ocr_service.model();
+    let cloud_first = model != Some(OcrModel::RapidOcrV5Server);
+
+    if cloud_first && ocr_service.has_cloud_token() {
         let token = ocr_service
             .cloud_token()
-            .ok_or("[ocr_detect_core] cloud token not configured, please fill it in the settings page")?
+            .expect("[ocr_detect_core] cloud token checked")
             .to_string();
         // 把动态图编码为 PNG bytes 用于 multipart 上传
         let mut cursor = Cursor::new(Vec::new());
         image
             .write_to(&mut cursor, image::ImageFormat::Png)
             .map_err(|e| format!("[ocr_detect_core] encode image failed: {}", e))?;
-        return ocr_detect_cloud(cursor.into_inner(), &token, scale_factor).await;
+        let bytes = cursor.into_inner();
+
+        match ocr_detect_cloud(bytes, &token, scale_factor).await {
+            Ok(result) => return Ok(result),
+            Err(cloud_err) => {
+                log::warn!(
+                    "[ocr_detect_core] cloud ocr failed, fallback local: {}",
+                    cloud_err
+                );
+                // 未导入本地模型时提示导入
+                if !ocr_service.has_local_models() {
+                    return emit_need_import(&app);
+                }
+            }
+        }
     }
 
+    // 本地识别（云端失败回退 / 显式选择本地模型）
+    if !ocr_service.has_local_models() {
+        return emit_need_import(&app);
+    }
     let mut image = image;
     // 当前识别图相对原始输入图的整体缩放倍数，识别后需把 box 坐标映射回原图，保证前端叠加不偏移
     let mut total_scale: f32 = 1.0;
@@ -225,6 +260,7 @@ pub async fn ocr_detect_core(
 }
 
 pub async fn ocr_detect(
+    app: tauri::AppHandle,
     ocr_service: tauri::State<'_, Mutex<OcrService>>,
     request: tauri::ipc::Request<'_>,
 ) -> Result<OcrDetectResult, String> {
@@ -256,11 +292,12 @@ pub async fn ocr_detect(
         None => return Err("[ocr_detect] Missing detect angle".to_string()),
     };
 
-    ocr_detect_core(ocr_service, image, scale_factor, detect_angle).await
+    ocr_detect_core(ocr_service, app, image, scale_factor, detect_angle).await
 }
 
 #[cfg(target_os = "windows")]
 pub async fn ocr_detect_with_shared_buffer(
+    app: tauri::AppHandle,
     ocr_service: tauri::State<'_, Mutex<OcrService>>,
     shared_buffer_service: tauri::State<'_, std::sync::Arc<snow_shot_webview::SharedBufferService>>,
     channel_id: String,
@@ -299,6 +336,7 @@ pub async fn ocr_detect_with_shared_buffer(
 
     ocr_detect_core(
         ocr_service,
+        app,
         image::DynamicImage::ImageRgba8(
             match image::RgbaImage::from_raw(image_width, image_height, image_data) {
                 Some(image) => image,

@@ -427,6 +427,10 @@ export const settings = {
 		"云端 PaddleOCR V6",
 	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
 		"云端 PaddleOCR Token",
+	"settings.systemSettings.screenshotSettings.ocrModelDir":
+		"本地 OCR 模型目录",
+	"settings.systemSettings.screenshotSettings.ocrModelImport":
+		"导入 OCR 模型压缩包",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
 	"settings.systemSettings.screenshotSettings.ocrHotStart.tip":
 		"预加载文本识别模型，提高文本识别的识别速度，但会提高内存占用",

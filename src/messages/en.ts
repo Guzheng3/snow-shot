@@ -55,6 +55,10 @@ export const en = {
 		"Cloud PaddleOCR V6",
 	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
 		"PaddleOCR Cloud Token",
+	"settings.systemSettings.screenshotSettings.ocrModelDir":
+		"Local OCR Model Directory",
+	"settings.systemSettings.screenshotSettings.ocrModelImport":
+		"Import OCR Model Archive",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
 	"settings.hotKeySettings.translation": "Translation",
 	"home.translation": "Translate",

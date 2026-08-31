@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { App as AntdApp } from "antd";
+import { listen } from "@tauri-apps/api/event";
 import { initUiElements } from "@/commands";
-import { getBuiltinOcrModelDir } from "@/commands/file";
 import { installFont, isFontInstalled } from "@/commands/font";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import {
@@ -13,6 +13,7 @@ import {
 import { hotLoadPageInit } from "@/commands/hotLoadPage";
 import { ocrInit, ocrSetCloudToken } from "@/commands/ocr";
 import { videoRecordInit } from "@/commands/videoRecord";
+import { importOcrModelArchive } from "@/functions/ocrModel";
 import {
 	PLUGIN_ID_FFMPEG,
 } from "@/constants/pluginService";
@@ -109,6 +110,8 @@ export const InitService = () => {
 					prevAppSettings[AppSettingsGroup.FunctionOcr].ocrModel ||
 					appSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken !==
 						prevAppSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken ||
+					appSettings[AppSettingsGroup.FunctionOcr].ocrModelDir !==
+						prevAppSettings[AppSettingsGroup.FunctionOcr].ocrModelDir ||
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart !==
 						prevAppSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart ||
 					appSettings[AppSettingsGroup.SystemScreenshot]
@@ -117,7 +120,9 @@ export const InitService = () => {
 							.ocrModelWriteToMemory))
 		) {
 			try {
-				const rapidOcrResourceDir = await getBuiltinOcrModelDir();
+				// OCR 模型目录来自用户导入的压缩包（云端失败时兜底）
+				const rapidOcrResourceDir =
+					appSettings[AppSettingsGroup.FunctionOcr].ocrModelDir;
 				// 同步云端 token（云端识别时鉴权使用）
 				await ocrSetCloudToken(
 					appSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken,
@@ -242,6 +247,46 @@ export const InitService = () => {
 			}
 		}
 	}, [isReadyStatus, pluginConfigRef]);
+
+	// 云端 OCR 失败且未导入本地模型时，后端会广播该事件，提示用户导入本地模型包
+	const hasInitOcrImportPrompt = useRef(false);
+	useEffect(() => {
+		if (hasInitOcrImportPrompt.current) {
+			return;
+		}
+		hasInitOcrImportPrompt.current = true;
+
+		let unlisten: (() => void) | undefined;
+		listen("ocr:local-model-required", () => {
+			modal.warning({
+				title: "提示",
+				content:
+					"在线 OCR 不可用（网络异常或云端服务失败），且尚未导入本地 OCR 模型包。是否立即导入本地 OCR 模型？",
+				okText: "去导入",
+				cancelText: "取消",
+				onOk: async () => {
+					try {
+						await importOcrModelArchive(updateAppSettings);
+						message.success("OCR 模型导入成功");
+					} catch (e) {
+						message.error(`OCR 模型导入失败: ${e}`);
+					}
+				},
+			});
+		})
+			.then((unlistenFn) => {
+				unlisten = unlistenFn;
+			})
+			.catch((e) => {
+				appWarn(
+					`[InitService] listen ocr:local-model-required failed: ${e}`,
+				);
+			});
+
+		return () => {
+			unlisten?.();
+		};
+	}, [modal, message, updateAppSettings]);
 
 	return null;
 };

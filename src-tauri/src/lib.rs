@@ -270,6 +270,7 @@ pub fn run() {
             ocr::ocr_init,
             ocr::ocr_release,
             ocr::ocr_set_cloud_token,
+            ocr::ocr_import_model_archive,
             translate::translate_text,
             core::exit_app,
             core::start_free_drag,

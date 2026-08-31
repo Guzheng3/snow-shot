@@ -10,11 +10,14 @@ import ProForm, {
 } from "@ant-design/pro-form";
 import {
 	Alert,
+	App as AntdApp,
+	Button,
 	Col,
 	ColorPicker,
 	Divider,
 	Flex,
 	Form,
+	Input,
 	Row,
 	Select,
 	Spin,
@@ -68,12 +71,29 @@ import {
 	getVideoRecordSaveDirectory,
 } from "@/utils/file";
 import { TranslationConfig } from "./components/translationConfig";
+import { importOcrModelArchive } from "@/functions/ocrModel";
 
 export const FunctionSettingsPage = () => {
 	const intl = useIntl();
 	const { token } = theme.useToken();
+	const { message } = AntdApp.useApp();
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
+	const [importingOcrModel, setImportingOcrModel] = useState(false);
+
+	const handleImportOcrModel = useCallback(async () => {
+		setImportingOcrModel(true);
+		try {
+			const modelDir = await importOcrModelArchive(updateAppSettings);
+			if (modelDir) {
+				message.success("OCR 模型导入成功");
+			}
+		} catch (e) {
+			message.error(`OCR 模型导入失败: ${e}`);
+		} finally {
+			setImportingOcrModel(false);
+		}
+	}, [message, updateAppSettings]);
 	const [functionDrawForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
@@ -1232,6 +1252,35 @@ export const FunctionSettingsPage = () => {
 									}
 									placeholder=""
 								/>
+							</Col>
+						</Row>
+						<Row gutter={token.marginLG}>
+							<Col span={16}>
+								<Form.Item
+									name="ocrModelDir"
+									label={
+										<IconLabel
+											label={
+												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelDir" />
+											}
+										/>
+									}
+								>
+									<Input
+										disabled
+										placeholder="未导入（云端失败时可回退本地）"
+									/>
+								</Form.Item>
+							</Col>
+							<Col span={8}>
+								<Button
+									block
+									loading={importingOcrModel}
+									onClick={handleImportOcrModel}
+									type="primary"
+								>
+									<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModelImport" />
+								</Button>
 							</Col>
 						</Row>
 					</ProForm>

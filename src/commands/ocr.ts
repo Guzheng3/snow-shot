@@ -48,3 +48,9 @@ export const ocrRelease = async (): Promise<void> => {
 export const ocrSetCloudToken = async (token: string): Promise<void> => {
 	await invoke<void>("ocr_set_cloud_token", { token });
 };
+
+export const ocrImportModelArchive = async (
+	archivePath: string,
+): Promise<string> => {
+	return await invoke<string>("ocr_import_model_archive", { archivePath });
+};
