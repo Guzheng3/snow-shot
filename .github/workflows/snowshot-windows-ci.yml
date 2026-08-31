@@ -131,14 +131,23 @@ jobs:
           Remove-Item -Path "onnxruntime-temp" -Recurse -Force
         shell: pwsh
 
-      # 云端版：不内置模型 → 移除 tauri.conf.json 中的 rapid_ocr 资源映射，避免 ONNX 模型打进安装包（须在 tauri build 前执行）
+      # 云端版：不内置模型 → 从 tauri.conf.json 的 bundle.resources 移除 rapid_ocr 键，
+      # 避免 ONNX 模型打进安装包（须在 tauri build 前执行）。
+      # 用 JSON 结构删除而非正则删行，避免遗留成尾逗号导致配置解析失败。
       - name: Strip rapid_ocr from bundle resources (cloud variant)
         if: matrix.include_models == 'false'
         run: |
-          $c = Get-Content "src-tauri/tauri.conf.json" -Raw
-          $c = $c -replace '"resources/rapid_ocr/":\s*"rapid_ocr/",?\r?\n', ''
-          Set-Content "src-tauri/tauri.conf.json" -Value $c -Encoding UTF8
-          Write-Host "Stripped rapid_ocr from tauri.conf.json for cloud variant"
+          $path = "src-tauri/tauri.conf.json"
+          $conf = Get-Content $path -Raw | ConvertFrom-Json
+          if (($conf.bundle.resources | Get-Member -MemberType NoteProperty).Name -contains 'resources/rapid_ocr/') {
+            $conf.bundle.resources.PSObject.Properties.Remove('resources/rapid_ocr/')
+            $json = $conf | ConvertTo-Json -Depth 20
+            $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+            [System.IO.File]::WriteAllText((Join-Path (Get-Location) $path), $json, $utf8NoBom)
+            Write-Host "Stripped rapid_ocr from tauri.conf.json for cloud variant"
+          } else {
+            Write-Host "rapid_ocr not present in resources, skip"
+          }
         shell: pwsh
 
       # 构建 Tauri 应用（beforeBuildCommand=pnpm build 会自动先构建前端）
