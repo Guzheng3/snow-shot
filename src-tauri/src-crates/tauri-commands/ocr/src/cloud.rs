@@ -47,10 +47,18 @@ fn extract_texts(value: &Value) -> (Vec<String>, bool) {
     (Vec::new(), false)
 }
 
-/// 从 jsonl 结果中递归定位坐标框数组（兼容 `recTextBoxes` / `recognizeTextBoxes` / `boxes`）。
+/// 从 jsonl 结果中递归定位坐标框数组（兼容云端 v2 返回的 `dt_polys` / `rec_polys`，
+/// 以及通用的 `recTextBoxes` / `recognizeTextBoxes` / `boxes` / `bboxes`）。
 /// 返回每个框的 4 个角点（[[x, y], ...]）。
 fn extract_boxes(value: &Value) -> (Vec<Vec<Vec<f64>>>, bool) {
-    const BOX_KEYS: &[&str] = &["recTextBoxes", "recognizeTextBoxes", "boxes", "bboxes"];
+    const BOX_KEYS: &[&str] = &[
+        "dt_polys",
+        "rec_polys",
+        "recTextBoxes",
+        "recognizeTextBoxes",
+        "boxes",
+        "bboxes",
+    ];
     if let Some(obj) = value.as_object() {
         for key in BOX_KEYS {
             if let Some(arr) = obj.get(*key) {
@@ -244,11 +252,9 @@ async fn submit_job(
     bytes: Vec<u8>,
     filename: &str,
 ) -> Result<String, String> {
-    let optional_payload = serde_json::json!({
-        "useDocOrientationClassify": false,
-        "useDocUnwarping": false,
-        "useTextlineOrientation": false,
-    });
+    // 云端接口对 optionalPayload 做严格校验，任何不支持的字段都会触发 HTTP 400
+    // "请求参数错误，请检查 optionalPayload 参数格式或内容"，因此此处置为空对象
+    let optional_payload = serde_json::json!({});
 
     let part = reqwest::multipart::Part::bytes(bytes)
         .file_name(filename.to_string())
