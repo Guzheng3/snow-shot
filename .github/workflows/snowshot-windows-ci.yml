@@ -17,7 +17,14 @@ jobs:
           - variant: high
             product_name: "Snow Shot"
             artifact_name: snow-shot-windows-x64
-            # 高精度版：关闭 updater 增量包（避免签名私钥要求）
+            # 高精度版：内置 ONNX 模型，离线可用
+            include_models: "true"
+            tauri_config: '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
+          - variant: cloud
+            product_name: "Snow Shot"
+            artifact_name: snow-shot-cloud-x64
+            # 云端版：不内置 ONNX 模型（体积小），仅走云端 PaddleOCR，需在设置页填 token
+            include_models: "false"
             tauri_config: '{"bundle":{"createUpdaterArtifacts":false},"plugins":{"updater":{"pubkey":""}}}'
     steps:
       # 拉代码。lfs:true 保险：若 lib/ 是 LFS 文件则拉真实内容（非 LFS 则无副作用）
@@ -124,6 +131,16 @@ jobs:
           Remove-Item -Path "onnxruntime-temp" -Recurse -Force
         shell: pwsh
 
+      # 云端版：不内置模型 → 移除 tauri.conf.json 中的 rapid_ocr 资源映射，避免 ONNX 模型打进安装包（须在 tauri build 前执行）
+      - name: Strip rapid_ocr from bundle resources (cloud variant)
+        if: matrix.include_models == 'false'
+        run: |
+          $c = Get-Content "src-tauri/tauri.conf.json" -Raw
+          $c = $c -replace '"resources/rapid_ocr/":\s*"rapid_ocr/",?\r?\n', ''
+          Set-Content "src-tauri/tauri.conf.json" -Value $c -Encoding UTF8
+          Write-Host "Stripped rapid_ocr from tauri.conf.json for cloud variant"
+        shell: pwsh
+
       # 构建 Tauri 应用（beforeBuildCommand=pnpm build 会自动先构建前端）
       # TAURI_CONFIG 关闭 updater 增量包 → 不需要签名私钥
       - name: Build the app (Windows x64)
@@ -146,15 +163,16 @@ jobs:
         shell: pwsh
 
       # 裸 exe 兼容：把 OCR 模型（rapid_ocr）与内置字体（fonts）也复制到 exe 同级。
+      # 内置模型版复制 rapid_ocr；云端版不复制（不内置模型）。
       # resourceDir() 对裸 exe 解析到 exe 所在目录，模型/字体缺失将导致 OCR 无法识别、字体安装失败。
       - name: Copy rapid_ocr & fonts next to exe (bare-exe compatibility)
         run: |
           $releaseDir = "src-tauri\target\x86_64-pc-windows-msvc\release"
-          if (Test-Path "src-tauri\resources\rapid_ocr") {
+          if ("${{ matrix.include_models }}" -eq "true" -and (Test-Path "src-tauri\resources\rapid_ocr")) {
             Copy-Item -Path "src-tauri\resources\rapid_ocr" -Destination "$releaseDir\rapid_ocr" -Recurse -Force
             Write-Host "Copied rapid_ocr next to exe"
           } else {
-            Write-Host "src-tauri/resources/rapid_ocr not found, skip"
+            Write-Host "Skip rapid_ocr copy (cloud variant or dir missing)"
           }
           if (Test-Path "src-tauri\resources\fonts") {
             Copy-Item -Path "src-tauri\resources\fonts" -Destination "$releaseDir\fonts" -Recurse -Force
