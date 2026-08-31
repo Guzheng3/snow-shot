@@ -374,7 +374,7 @@ pub async fn ocr_detect_cloud(
     scale_factor: f32,
 ) -> Result<OcrDetectResult, String> {
     let client = reqwest::Client::new();
-    let filename = format!("snow_shot_ocr.png");
+    let filename = "snow_shot_ocr.png".to_string();
 
     let job_id = submit_job(&client, token, image_bytes, &filename).await?;
     log::info!("[cloud_ocr] job submitted: {}", job_id);
