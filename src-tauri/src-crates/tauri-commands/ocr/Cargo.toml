@@ -12,7 +12,9 @@ log = { workspace = true }
 rayon = { workspace = true }
 reqwest = { workspace = true }
 serde_json = { workspace = true }
-zip = "4.6.1"
+# 禁用默认特性（默认含 lzma/bzip2/zstd 等压缩后端），仅启用 deflate，
+# 避免 liblzma-sys 与 ffmpeg-sidecar->xz2->lzma-sys 的 links="lzma" 冲突
+zip = { version = "4.6.1", default-features = false, features = ["deflate"] }
 
 snow-shot-app-services = { workspace = true }
 
