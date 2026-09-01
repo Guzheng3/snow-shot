@@ -26,15 +26,17 @@ pub async fn ocr_init(
 
 #[command]
 pub async fn ocr_detect(
+    app: tauri::AppHandle,
     ocr_instance: tauri::State<'_, Mutex<OcrService>>,
     request: tauri::ipc::Request<'_>,
 ) -> Result<OcrDetectResult, String> {
-    snow_shot_tauri_commands_ocr::ocr_detect(ocr_instance, request).await
+    snow_shot_tauri_commands_ocr::ocr_detect(app, ocr_instance, request).await
 }
 
 #[cfg(target_os = "windows")]
 #[command]
 pub async fn ocr_detect_with_shared_buffer(
+    app: tauri::AppHandle,
     ocr_instance: tauri::State<'_, Mutex<OcrService>>,
     shared_buffer_service: tauri::State<'_, std::sync::Arc<snow_shot_webview::SharedBufferService>>,
     channel_id: String,
@@ -42,6 +44,7 @@ pub async fn ocr_detect_with_shared_buffer(
     detect_angle: bool,
 ) -> Result<OcrDetectResult, String> {
     snow_shot_tauri_commands_ocr::ocr_detect_with_shared_buffer(
+        app,
         ocr_instance,
         shared_buffer_service,
         channel_id,
