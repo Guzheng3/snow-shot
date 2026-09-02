@@ -150,7 +150,7 @@ export const defaultAppSettingsData: AppSettingsData = {
 		copyImageFileToClipboard: false,
 		focusedWindowCopyToClipboard: true,
 		fullScreenCopyToClipboard: true,
-		fastSave: false,
+		fastSave: true,
 		/** 保存到云端 */
 		saveToCloud: false,
 		/** 云端保存协议 */
