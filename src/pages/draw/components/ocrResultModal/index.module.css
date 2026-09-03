@@ -1,4 +1,13 @@
 /* ===== PixPin 风格 OCR 识别窗口（浅色）===== */
+/* 入场淡入动画：窗口背景透明，对根容器做 opacity 动画即整窗淡入 */
+@keyframes ocrWindowFadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
 .window {
 	display: flex;
 	flex-direction: column;
@@ -8,6 +17,7 @@
 	color: #1f2937;
 	overflow: hidden;
 	user-select: none;
+	animation: ocrWindowFadeIn 0.16s ease-out;
 }
 
 /* ===== 标题栏 ===== */

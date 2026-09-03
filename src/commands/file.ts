@@ -60,11 +60,6 @@ export const getAppConfigDir = async () => {
 	return result;
 };
 
-export const getBuiltinOcrModelDir = async () => {
-	const result = await invoke<string>("get_builtin_ocr_model_dir");
-	return result;
-};
-
 export const getAppConfigBaseDir = async () => {
 	const result = await invoke<string>("get_app_config_base_dir");
 	return result;
