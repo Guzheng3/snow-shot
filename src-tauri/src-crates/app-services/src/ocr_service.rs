@@ -6,9 +6,6 @@ use paddle_ocr_rs::ocr_lite::OcrLite;
 use serde::{Deserialize, Serialize};
 
 pub struct OcrService {
-    /// 内置云端 PaddleOCR 默认 token（设置页未填写时使用）
-    pub const BUILTIN_CLOUD_TOKEN: &'static str = "099689de1f93189ec7bedf02ed3d2b7e32b8594d";
-
     hot_start: bool,
     ocr_core: Option<OcrLite>,
     det_model: Option<(PathBuf, Option<Vec<u8>>)>,
@@ -35,6 +32,9 @@ pub enum OcrModel {
 }
 
 impl OcrService {
+    /// 内置云端 PaddleOCR 默认 token（设置页未填写时使用）
+    pub const BUILTIN_CLOUD_TOKEN: &'static str = "099689de1f93189ec7bedf02ed3d2b7e32b8594d";
+
     pub fn new() -> Self {
         Self {
             hot_start: false,
