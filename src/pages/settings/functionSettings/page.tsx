@@ -71,6 +71,7 @@ import {
 	getVideoRecordSaveDirectory,
 } from "@/utils/file";
 import { TranslationConfig } from "./components/translationConfig";
+import { getBuiltinOcrModelDir } from "@/commands/file";
 import { importOcrModelArchive } from "@/functions/ocrModel";
 
 export const FunctionSettingsPage = () => {
@@ -79,7 +80,21 @@ export const FunctionSettingsPage = () => {
 	const { message } = AntdApp.useApp();
 
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
+
+	// 插件版（无内置模型资源）时展示"导入本地 OCR 模型压缩包"入口
+	const [builtinOcrModelAvailable, setBuiltinOcrModelAvailable] = useState(true);
 	const [importingOcrModel, setImportingOcrModel] = useState(false);
+
+	useEffect(() => {
+		getBuiltinOcrModelDir()
+			.then((dir) => {
+				setBuiltinOcrModelAvailable(!!dir);
+			})
+			.catch(() => {
+				// 检测失败按插件版处理，展示导入入口
+				setBuiltinOcrModelAvailable(false);
+			});
+	}, []);
 
 	const handleImportOcrModel = useCallback(async () => {
 		setImportingOcrModel(true);
@@ -94,6 +109,7 @@ export const FunctionSettingsPage = () => {
 			setImportingOcrModel(false);
 		}
 	}, [message, updateAppSettings]);
+
 	const [functionDrawForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
@@ -1241,19 +1257,20 @@ export const FunctionSettingsPage = () => {
 								/>
 							</Col>
 							<Col span={12}>
-								<ProFormText.Password
-									name="ocrCloudToken"
-									label={
-										<IconLabel
-											label={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel.cloudToken" />
-											}
-										/>
-									}
-									placeholder=""
-								/>
-							</Col>
-						</Row>
+							<ProFormText.Password
+								name="ocrCloudToken"
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel.cloudToken" />
+										}
+									/>
+								}
+								placeholder=""
+							/>
+						</Col>
+					</Row>
+					{!builtinOcrModelAvailable && (
 						<Row gutter={token.marginLG}>
 							<Col span={16}>
 								<Form.Item
@@ -1283,7 +1300,8 @@ export const FunctionSettingsPage = () => {
 								</Button>
 							</Col>
 						</Row>
-					</ProForm>
+					)}
+				</ProForm>
 				</Spin>
 			</>
 

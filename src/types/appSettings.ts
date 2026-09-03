@@ -348,9 +348,9 @@ export type AppSettingsData = {
 	[AppSettingsGroup.FunctionOcr]: {
 		/** 文本识别模型 */
 		ocrModel: OcrModel;
-		/** 云端 PaddleOCR 识别 token（使用云端模型时鉴权） */
+		/** 云端 PaddleOCR 识别 token（使用云端模型时鉴权，留空使用内置 token） */
 		ocrCloudToken: string;
-		/** 本地 OCR 模型目录（用户导入的压缩包解压后所在目录，云端失败时兜底） */
+		/** 本地 OCR 模型目录（插件版导入压缩包后的目录，云端失败/选择本地时使用） */
 		ocrModelDir: string;
 	};
 	[AppSettingsGroup.FunctionTranslation]: {

@@ -69,3 +69,8 @@ export const isPortableApp = async () => {
 	const result = await invoke<boolean>("is_portable_app");
 	return result;
 };
+
+export const getBuiltinOcrModelDir = async () => {
+	const result = await invoke<string | null>("get_builtin_ocr_model_dir");
+	return result;
+};

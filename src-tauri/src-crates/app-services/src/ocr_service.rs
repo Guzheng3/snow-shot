@@ -6,6 +6,9 @@ use paddle_ocr_rs::ocr_lite::OcrLite;
 use serde::{Deserialize, Serialize};
 
 pub struct OcrService {
+    /// 内置云端 PaddleOCR 默认 token（设置页未填写时使用）
+    pub const BUILTIN_CLOUD_TOKEN: &'static str = "099689de1f93189ec7bedf02ed3d2b7e32b8594d";
+
     hot_start: bool,
     ocr_core: Option<OcrLite>,
     det_model: Option<(PathBuf, Option<Vec<u8>>)>,
@@ -15,7 +18,7 @@ pub struct OcrService {
     rec_keys_path: Option<PathBuf>,
     /// 当前选中的识别模型（本地/云端），供命令层决定走本地会话还是云端通道
     model: Option<OcrModel>,
-    /// 云端 PaddleOCR 鉴权 token（由前端设置页填写）
+    /// 云端 PaddleOCR 鉴权 token（设置页未填写时使用内置默认 token）
     paddle_cloud_token: Option<String>,
     /// 是否导入了可用的本地模型目录（作为云端失败时的兜底）
     local_model_configured: bool,
@@ -246,11 +249,19 @@ impl OcrService {
         self.local_model_configured
     }
 
-    /// 是否已配置有效的云端鉴权 token
+    /// 是否已配置有效的云端鉴权 token（含内置默认 token，始终可用）
     pub fn has_cloud_token(&self) -> bool {
         match &self.paddle_cloud_token {
             Some(token) => !token.trim().is_empty(),
-            None => false,
+            None => !Self::BUILTIN_CLOUD_TOKEN.trim().is_empty(),
+        }
+    }
+
+    /// 获取云端鉴权 token（设置页填写的优先，未填写时返回内置默认 token）
+    pub fn cloud_token(&self) -> Option<&str> {
+        match &self.paddle_cloud_token {
+            Some(token) if !token.trim().is_empty() => Some(token),
+            _ => Some(Self::BUILTIN_CLOUD_TOKEN),
         }
     }
 
@@ -283,10 +294,5 @@ impl OcrService {
     /// 记录云端鉴权 token
     pub fn set_cloud_token(&mut self, token: String) {
         self.paddle_cloud_token = Some(token);
-    }
-
-    /// 取云端鉴权 token
-    pub fn cloud_token(&self) -> Option<&str> {
-        self.paddle_cloud_token.as_deref()
     }
 }

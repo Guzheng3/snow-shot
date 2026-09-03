@@ -752,6 +752,11 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.ocrCloudToken
 							: (prevSettings?.ocrCloudToken ??
 								defaultAppSettingsData[group].ocrCloudToken),
+					ocrModelDir:
+						typeof newSettings?.ocrModelDir === "string"
+							? newSettings.ocrModelDir
+							: (prevSettings?.ocrModelDir ??
+								defaultAppSettingsData[group].ocrModelDir),
 				};
 			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
 				newSettings = newSettings as AppSettingsData[typeof group];

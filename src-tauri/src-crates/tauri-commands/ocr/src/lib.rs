@@ -131,11 +131,11 @@ fn convert_rgba_to_rgb(image: &[u8]) -> Vec<u8> {
     rgb_data
 }
 
-/// 云端失败且无本地模型时，向前端发送“导入本地模型包”提示
-fn emit_need_import(app: &tauri::AppHandle) -> Result<OcrDetectResult, String> {
+/// 云端失败且无本地模型（插件版未导入模型包）时，向前端广播"导入本地模型包"提示并返回错误
+fn err_no_local_model(app: &tauri::AppHandle) -> Result<OcrDetectResult, String> {
     let _ = app.emit("ocr:local-model-required", ());
     Err(
-        "OCR 暂时不可用：在线服务不可达（网络异常或云端调用失败），且尚未导入本地 OCR 模型包，请在设置中导入本地 OCR 模型。"
+        "OCR 暂时不可用：在线服务不可达（网络异常或云端调用失败），且当前版本未内置本地 OCR 模型，请在设置中导入本地 OCR 模型压缩包。"
             .to_string(),
     )
 }
@@ -149,9 +149,10 @@ pub async fn ocr_detect_core(
 ) -> Result<OcrDetectResult, String> {
     let mut ocr_service = ocr_service.lock().await;
 
-    // 云端优先：默认使用在线 PaddleOCR v6，仅当网络不通或 v6 调用失败时回退本地/提示导入
+    // 云端优先：选择云端模型，或未配置本地模型（插件版未导入压缩包）时也走云端兜底
     let model = ocr_service.model();
-    let cloud_first = model != Some(OcrModel::RapidOcrV5Server);
+    let cloud_first =
+        model != Some(OcrModel::RapidOcrV5Server) || !ocr_service.has_local_models();
 
     if cloud_first && ocr_service.has_cloud_token() {
         let token = ocr_service
@@ -172,9 +173,9 @@ pub async fn ocr_detect_core(
                     "[ocr_detect_core] cloud ocr failed, fallback local: {}",
                     cloud_err
                 );
-                // 未导入本地模型时提示导入
+                // 无本地模型（插件版未导入）时返回错误并提示导入
                 if !ocr_service.has_local_models() {
-                    return emit_need_import(&app);
+                    return err_no_local_model(&app);
                 }
             }
         }
@@ -182,7 +183,7 @@ pub async fn ocr_detect_core(
 
     // 本地识别（云端失败回退 / 显式选择本地模型）
     if !ocr_service.has_local_models() {
-        return emit_need_import(&app);
+        return err_no_local_model(&app);
     }
     let mut image = image;
     // 当前识别图相对原始输入图的整体缩放倍数，识别后需把 box 坐标映射回原图，保证前端叠加不偏移

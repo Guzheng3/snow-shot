@@ -135,11 +135,11 @@ export const defaultAppSettingsData: AppSettingsData = {
 		cacheTargetLanguage: "zh-CHS",
 	},
 	[AppSettingsGroup.FunctionOcr]: {
-		// 默认使用在线 OCR（PaddleCloudV6），仅当网络不通或云端调用失败时回退本地
-		ocrModel: OcrModel.PaddleCloudV6,
-		// 云端 PaddleOCR 识别 token，默认空（为空时云端不可用则提示导入本地包）
+		// 默认使用内置本地模型（离线可用）；插件版（无内置资源）首次启动会自动切换为云端
+		ocrModel: OcrModel.RapidOcrV5Server,
+		// 云端 PaddleOCR 识别 token，默认空（后端留空时使用内置 token）
 		ocrCloudToken: "",
-		// 本地 OCR 模型目录，默认空（未导入，云端失败时需要导入）
+		// 本地 OCR 模型目录，默认空（插件版通过导入压缩包填充）
 		ocrModelDir: "",
 	},
 	[AppSettingsGroup.FunctionScreenshot]: {

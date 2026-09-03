@@ -13,7 +13,9 @@ import {
 import { hotLoadPageInit } from "@/commands/hotLoadPage";
 import { ocrInit, ocrSetCloudToken } from "@/commands/ocr";
 import { videoRecordInit } from "@/commands/videoRecord";
+import { getBuiltinOcrModelDir } from "@/commands/file";
 import { importOcrModelArchive } from "@/functions/ocrModel";
+import { OcrModel } from "@/types/appSettings";
 import {
 	PLUGIN_ID_FFMPEG,
 } from "@/constants/pluginService";
@@ -120,16 +122,39 @@ export const InitService = () => {
 							.ocrModelWriteToMemory))
 		) {
 			try {
-				// OCR 模型目录来自用户导入的压缩包（云端失败时兜底）
-				const rapidOcrResourceDir =
+				// 内置版：模型目录来自随包资源；插件版：无内置资源时回落到用户导入的目录
+				const builtinOcrModelDir = await getBuiltinOcrModelDir();
+				const importedOcrModelDir =
 					appSettings[AppSettingsGroup.FunctionOcr].ocrModelDir;
-				// 同步云端 token（云端识别时鉴权使用）
+				const rapidOcrResourceDir =
+					builtinOcrModelDir ?? importedOcrModelDir;
+
+				// 插件版首次启动（无内置资源、未导入压缩包）时把默认的本地模型
+				// 自动切换为云端，避免每次识别都走云端兜底
+				let ocrModel = appSettings[AppSettingsGroup.FunctionOcr].ocrModel;
+				if (
+					!builtinOcrModelDir &&
+					!importedOcrModelDir &&
+					ocrModel === OcrModel.RapidOcrV5Server
+				) {
+					ocrModel = OcrModel.PaddleCloudV6;
+					updateAppSettings(
+						AppSettingsGroup.FunctionOcr,
+						{ ocrModel },
+						false,
+						true,
+						true,
+						false,
+					);
+				}
+
+				// 同步云端 token（云端识别时鉴权使用，留空由后端使用内置 token）
 				await ocrSetCloudToken(
 					appSettings[AppSettingsGroup.FunctionOcr].ocrCloudToken,
 				);
 				ocrInit(
 					rapidOcrResourceDir,
-					appSettings[AppSettingsGroup.FunctionOcr].ocrModel,
+					ocrModel,
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrHotStart,
 					appSettings[AppSettingsGroup.SystemScreenshot].ocrModelWriteToMemory,
 				);
@@ -248,7 +273,7 @@ export const InitService = () => {
 		}
 	}, [isReadyStatus, pluginConfigRef]);
 
-	// 云端 OCR 失败且未导入本地模型时，后端会广播该事件，提示用户导入本地模型包
+	// 云端 OCR 失败且无本地模型（插件版未导入压缩包）时，后端广播该事件，提示用户导入本地模型包
 	const hasInitOcrImportPrompt = useRef(false);
 	useEffect(() => {
 		if (hasInitOcrImportPrompt.current) {
