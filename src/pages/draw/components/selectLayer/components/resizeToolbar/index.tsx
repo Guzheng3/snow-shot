@@ -16,6 +16,7 @@ import {
 	RadiusIcon,
 	ShadowIcon,
 } from "@/components/icons";
+import { defaultAppSettingsData } from "@/constants/appSettings";
 import { useCallbackRender } from "@/hooks/useCallbackRender";
 import { useStateRef } from "@/hooks/useStateRef";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -25,6 +26,7 @@ import {
 	CaptureEventPublisher,
 	ScreenshotTypePublisher,
 } from "@/pages/draw/extra";
+import { AppSettingsGroup } from "@/types/appSettings";
 import type { ElementRect } from "@/types/commands/screenshot";
 import { DrawState } from "@/types/draw";
 import { MousePosition } from "@/utils/mousePosition";
@@ -83,7 +85,9 @@ export const ResizeToolbar: React.FC<{
 			max_x: 0,
 			max_y: 0,
 		});
-	const [radius, setRadius, radiusRef] = useStateRef(0);
+	const [radius, setRadius, radiusRef] = useStateRef(
+		defaultAppSettingsData[AppSettingsGroup.Cache].selectRectRadius,
+	);
 	const [shadowConfig, setShadowConfig, shadowConfigRef] = useStateRef({
 		shadowWidth: 0,
 		shadowColor: "#00000000",

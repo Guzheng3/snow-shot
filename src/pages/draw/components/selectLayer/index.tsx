@@ -22,6 +22,7 @@ import {
 } from "@/commands";
 import { DrawStatePublisher } from "@/components/drawCore/extra";
 import type { ImageLayerActionType } from "@/components/imageLayer";
+import { defaultAppSettingsData } from "@/constants/appSettings";
 import { AppContext } from "@/contexts/appContext";
 import {
 	AppSettingsActionContext,
@@ -129,7 +130,9 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 		setEnableTabFindChildrenElements,
 		enableTabFindChildrenElementsRef,
 	] = useStateRef(false);
-	const [selectRectRadiusCache, setSelectRectRadiusCache] = useState(0);
+	const [selectRectRadiusCache, setSelectRectRadiusCache] = useState(
+		defaultAppSettingsData[AppSettingsGroup.Cache].selectRectRadius,
+	);
 	const [selectRectShadowConfigCache, setSelectRectShadowConfigCache] =
 		useState({
 			shadowWidth: 0,
@@ -221,7 +224,9 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 
 	const layerContainerElementRef = useRef<HTMLDivElement | null>(null);
 	const selectLayerCanvasRef = useRef<HTMLCanvasElement | null>(null);
-	const selectRectRadiusRef = useRef(0); // 选区圆角
+	const selectRectRadiusRef = useRef(
+		defaultAppSettingsData[AppSettingsGroup.Cache].selectRectRadius,
+	); // 选区圆角
 	const selectRectShadowConfigRef = useRef({
 		shadowWidth: 0,
 		shadowColor: "#00000000",

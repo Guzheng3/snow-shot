@@ -535,7 +535,7 @@ export const ResizeModal: React.FC<{
 									label={intl.formatMessage({ id: "draw.radius" })}
 									min={0}
 									max={256}
-									fieldProps={{ precision: 0 }}
+									fieldProps={{ precision: 2 }}
 									rules={[{ type: "number" }]}
 								/>
 							</Col>
@@ -701,7 +701,7 @@ export const ResizeModal: React.FC<{
 										label={intl.formatMessage({ id: "draw.radius" })}
 										min={0}
 										max={256}
-										fieldProps={{ precision: 0 }}
+										fieldProps={{ precision: 2 }}
 										rules={[{ type: "number" }]}
 									/>
 								</Col>

@@ -31,6 +31,7 @@ import { DarkModeIcon, LanguageIcon } from "@/components/icons";
 import { PathInput } from "@/components/pathInput";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { getDefaultIconPath } from "@/components/trayIconLoader";
+import { defaultAppSettingsData } from "@/constants/appSettings";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
@@ -62,7 +63,9 @@ export const GeneralSettingsPage = () => {
 		Form.useForm<AppSettingsData[AppSettingsGroup.CommonTrayIcon]>();
 
 	const [appSettingsLoading, setAppSettingsLoading] = useStateRef(true);
-	const [selectRectRadius, setSelectRectRadius] = useState(20);
+	const [selectRectRadius, setSelectRectRadius] = useState(
+		defaultAppSettingsData[AppSettingsGroup.Cache].selectRectRadius,
+	);
 	useAppSettingsLoad(
 		useCallback(
 			(settings: AppSettingsData, preSettings?: AppSettingsData) => {
@@ -103,9 +106,7 @@ export const GeneralSettingsPage = () => {
 					);
 				}
 
-				setSelectRectRadius(
-					settings[AppSettingsGroup.Cache].selectRectRadius,
-				);
+				setSelectRectRadius(settings[AppSettingsGroup.Cache].selectRectRadius);
 			},
 			[
 				commonForm,
@@ -603,7 +604,7 @@ export const GeneralSettingsPage = () => {
 								label={
 									<IconLabel
 										label={"截图圆角（px）"}
-										tooltipTitle={"截图选区四角的圆角半径，出厂默认 20"}
+										tooltipTitle={"截图选区四角的圆角半径，出厂默认 13.14px"}
 									/>
 								}
 								required={false}
@@ -611,7 +612,7 @@ export const GeneralSettingsPage = () => {
 								<Slider
 									min={0}
 									max={100}
-									step={1}
+									step={0.01}
 									value={selectRectRadius}
 									onChange={(v) => {
 										setSelectRectRadius(v);
@@ -625,7 +626,6 @@ export const GeneralSettingsPage = () => {
 									}}
 								/>
 							</ProForm.Item>
-
 						</Col>
 					</Row>
 
