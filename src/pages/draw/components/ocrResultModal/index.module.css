@@ -178,7 +178,7 @@
 }
 /* ===== OCR 双栏（原文可编辑 + 译文）：与翻译对照 .compareGrid 完全对称的结构 ===== */
 .dualCol {
-	flex: 1 1 auto;
+	flex: 1 1 0;
 	min-width: 0;
 	min-height: 0;
 	display: flex;
