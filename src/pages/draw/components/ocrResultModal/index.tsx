@@ -9,51 +9,23 @@ import {
 	PushpinOutlined,
 	QqOutlined,
 } from "@ant-design/icons";
-import { Select } from "antd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import {
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
-	useMemo,
-	useRef,
 	useState,
-	type ReactNode,
 } from "react";
-import { useIntl } from "react-intl";
 import { getCurrentMonitorInfo } from "@/commands/core";
 import { AntdContext } from "@/contexts/antdContext";
-import { useTranslationRequest } from "@/core/translations";
-import { useLanguageOptions } from "@/components/translator";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
-import { AppSettingsGroup, type AppSettingsData } from "@/types/appSettings";
+import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import { writeTextToClipboard } from "@/utils/clipboard";
 import { setWindowRect } from "@/utils/window";
-import { openUrl } from "@tauri-apps/plugin-opener";
-import { alignTranslatedBySourceProportion } from "@/pages/fixedContent/components/ocrResult/extra";
 import styles from "./index.module.css";
-
-/** 已选语言（auto / en / zh-CHS 等）映射为展示标签 */
-const languageLabel = (code: string, intl: ReturnType<typeof useIntl>) => {
-	if (code === "auto") {
-		return intl.formatMessage({ id: "tools.translation.language.auto" });
-	}
-	if (code === "zh-CHS") {
-		return intl.formatMessage({
-			id: "tools.translation.language.simplifiedChinese",
-		});
-	}
-	if (code === "zh-CHT") {
-		return intl.formatMessage({
-			id: "tools.translation.language.traditionalChinese",
-		});
-	}
-	if (code === "en") {
-		return intl.formatMessage({ id: "tools.translation.language.english" });
-	}
-	return code;
-};
 
 /** Tauri v2 ResizeDirection 枚举值 */
 const RESIZE_DIRECTIONS = {
@@ -87,9 +59,11 @@ const ResizeBorder: React.FC<{
 			const win = getCurrentWindow() as unknown as {
 				startResizeDragging: (dir: string) => Promise<void>;
 			};
-			win.startResizeDragging(RESIZE_DIRECTIONS[direction]).catch((err: unknown) => {
-				console.warn("[ResizeBorder] startResizeDragging failed:", err);
-			});
+			win
+				.startResizeDragging(RESIZE_DIRECTIONS[direction])
+				.catch((err: unknown) => {
+					console.warn("[ResizeBorder] startResizeDragging failed:", err);
+				});
 		},
 		[],
 	);
@@ -236,7 +210,7 @@ const semanticLayout = (result: OcrDetectResult): string => {
 	// 中文直接拼接；相邻英文/数字用空格分隔
 	const sentenceEndPattern = /[。！？!?…；;：:"“”''）)】》」』]$/;
 	const paragraphStartPattern =
-		/^[（(【\[《“"「『]|^[0-9一二三四五六七八九十]+[、.．]|^[A-Za-z0-9#*•·-]/;
+		/^[（(【[《“"「『]|^[0-9一二三四五六七八九十]+[、.．]|^[A-Za-z0-9#*•·-]/;
 
 	const mergeParagraph = (lines: string[]): string => {
 		const merged: string[] = [];
@@ -257,10 +231,8 @@ const semanticLayout = (result: OcrDetectResult): string => {
 				const prevLastChar = prev[prev.length - 1];
 				const currFirstChar = trimmed[0];
 				const needSpace =
-					/[A-Za-z0-9]/.test(prevLastChar) &&
-					/[A-Za-z0-9]/.test(currFirstChar);
-				merged[merged.length - 1] =
-					prev + (needSpace ? " " : "") + trimmed;
+					/[A-Za-z0-9]/.test(prevLastChar) && /[A-Za-z0-9]/.test(currFirstChar);
+				merged[merged.length - 1] = prev + (needSpace ? " " : "") + trimmed;
 			} else {
 				merged.push(trimmed);
 			}
@@ -280,9 +252,9 @@ const extractLinks = (text: string): ExtractedLinks => {
 
 	// URL：http(s):// 或 www. 开头，直到空白/引号/尖括号
 	const urlPattern = /(?:https?:\/\/|www\.)[^\s<>"'“”‘’]+/gi;
-	let m: RegExpExecArray | null;
+	let m: RegExpExecArray | null = urlPattern.exec(text);
 	let cleaned = text;
-	while ((m = urlPattern.exec(text)) !== null) {
+	while (m !== null) {
 		let url = m[0];
 		// 去掉尾部常见标点（. , ; : ！？)】]）等）
 		url = url.replace(/[.,;:!?。，；：！？）)】】》》」』"'“”‘’]+$/, "");
@@ -291,14 +263,17 @@ const extractLinks = (text: string): ExtractedLinks => {
 		}
 		// 挖掉 URL（含认证段），避免其内部被误当邮箱
 		cleaned = cleaned.replace(m[0], " ");
+		m = urlPattern.exec(text);
 	}
 
 	// 邮箱（在挖掉 URL 后的文本中提取）
 	const emailPattern = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
-	while ((m = emailPattern.exec(cleaned)) !== null) {
+	m = emailPattern.exec(cleaned);
+	while (m !== null) {
 		emailSet.add(m[0]);
 		// 挖掉邮箱，避免其内部被误当手机号/QQ
 		cleaned = cleaned.replace(m[0], " ");
+		m = emailPattern.exec(cleaned);
 	}
 
 	const phoneSet = new Set<string>();
@@ -306,21 +281,33 @@ const extractLinks = (text: string): ExtractedLinks => {
 
 	// 手机号：1[3-9] 开头 11 位（中国大陆）
 	const phonePattern = /(?<![0-9])1[3-9][0-9]{9}(?![0-9])/g;
-	while ((m = phonePattern.exec(cleaned)) !== null) {
+	m = phonePattern.exec(cleaned);
+	while (m !== null) {
 		phoneSet.add(m[0]);
 		cleaned = cleaned.replace(m[0], " ");
+		m = phonePattern.exec(cleaned);
 	}
 
 	// QQ 号：5-11 位独立数字段（排除手机号、排除 0 开头、排除长数字内截取）
 	const qqPattern = /(?<![0-9])([1-9][0-9]{4,10})(?![0-9])/g;
-	while ((m = qqPattern.exec(cleaned)) !== null) {
+	m = qqPattern.exec(cleaned);
+	while (m !== null) {
 		const num = m[1];
 		// 11 位且 1[3-9] 开头 = 手机号，跳过
-		if (num.length === 11 && /^1[3-9]/.test(num)) continue;
+		if (num.length === 11 && /^1[3-9]/.test(num)) {
+			m = qqPattern.exec(cleaned);
+			continue;
+		}
 		qqSet.add(num);
+		m = qqPattern.exec(cleaned);
 	}
 
-	return { urls: [...urlSet], emails: [...emailSet], phones: [...phoneSet], qqs: [...qqSet] };
+	return {
+		urls: [...urlSet],
+		emails: [...emailSet],
+		phones: [...phoneSet],
+		qqs: [...qqSet],
+	};
 };
 
 /**
@@ -351,14 +338,9 @@ const ITEM_ORDER: ("urls" | "emails" | "phones" | "qqs")[] = [
 export const OcrResultModal: React.FC<{
 	open: boolean;
 	ocrResult: OcrDetectResult | undefined;
-	/** ocr —— 纯识别（默认展示原文）；translate —— 工具栏翻译（默认只展示译文，可打开原文对照） */
-	mode?: "ocr" | "translate";
 	onClose: () => void;
-}> = ({ open, ocrResult, mode = "ocr", onClose }) => {
-	const intl = useIntl();
-	const { targetLanguageOptions } = useLanguageOptions();
+}> = ({ open, ocrResult, onClose }) => {
 	const { message } = useContext(AntdContext);
-	const isTranslateMode = mode === "translate";
 	const [layoutType, setLayoutType] = useState<LayoutType>("original");
 	const [editableText, setEditableText] = useState("");
 	const [copying, setCopying] = useState(false);
@@ -369,110 +351,20 @@ export const OcrResultModal: React.FC<{
 		qqs: [],
 	});
 	const [copiedItem, setCopiedItem] = useState("");
-	const [translateOpen, setTranslateOpen] = useState(false);
-	const [translatedText, setTranslatedText] = useState("");
-	// 翻译模式下默认隐藏原文，展示译文；可通过"原文对照"打开
-	const [showOcrText, setShowOcrText] = useState(!isTranslateMode);
-	// 原文/译文对照模式：当前激活的行索引（点击对应展示）
-	const [activePair, setActivePair] = useState(-1);
-	const autoTranslatedTextRef = useRef<string | undefined>(undefined);
-	const sourceCompareRootRef = useRef<HTMLDivElement | null>(null);
-	const translateCompareRootRef = useRef<HTMLDivElement | null>(null);
 
 	// 每次 OCR 结果变化时，重置为语义智能排版（按几何位置聚类行与段落，更贴近阅读顺序）
 	useEffect(() => {
 		if (open && ocrResult) {
 			setLayoutType("semantic");
 			setEditableText(semanticLayout(ocrResult));
-			// 翻译模式下默认隐藏原文
-			setShowOcrText(!isTranslateMode);
-			setTranslatedText("");
-			setActivePair(-1);
-			setTranslateOpen(false);
 		}
-	}, [open, ocrResult, isTranslateMode]);
+	}, [open, ocrResult]);
 
 	// 编辑内容变化 → 实时重新提取链接/邮箱（编辑后成为链接也会自动显示）
 	useEffect(() => {
 		setExtracted(extractLinks(editableText));
 		setCopiedItem("");
 	}, [editableText]);
-
-	const { requestTranslate, startTranslateLoading, targetLanguage, updateTargetLanguage } =
-		useTranslationRequest({
-			onComplete: useCallback((result) => {
-				setTranslatedText(result.map((r) => r.content).join("\n"));
-			}, []),
-		});
-
-	// 翻译模式下，打开窗口即自动翻译（与工具栏"翻译"走同一套 requestTranslate/翻译引擎）
-	useEffect(() => {
-		if (isTranslateMode && open && editableText) {
-			if (autoTranslatedTextRef.current !== editableText) {
-				autoTranslatedTextRef.current = editableText;
-				requestTranslate(editableText.split("\n"));
-			}
-		}
-	}, [isTranslateMode, open, editableText, requestTranslate]);
-
-	// 原文/译文逐行对照的源数据：源文本按行，译文按源文本长度占比切分对齐
-	const sourceLines = useMemo(() => editableText.split("\n"), [editableText]);
-	const translatedSegments = useMemo(
-		() =>
-			translatedText
-				? alignTranslatedBySourceProportion(
-						sourceLines,
-						translatedText.split("\n"),
-					)
-				: [],
-		[translatedText, sourceLines],
-	);
-
-	const toggleOcrText = useCallback(() => {
-		setActivePair(-1);
-		setShowOcrText((prev) => !prev);
-	}, []);
-
-	// 点击原文/译文某一行，在另一列滚动到对应行并高亮（对应显示）
-	const onPairClick = useCallback(
-		(index: number, from: "source" | "translate") => {
-			setActivePair((prev) => (prev === index ? -1 : index));
-			const targetRoot =
-				from === "source"
-					? translateCompareRootRef.current
-					: sourceCompareRootRef.current;
-			targetRoot
-				?.querySelector<HTMLElement>(`[data-pair="${index}"]`)
-				?.scrollIntoView({ block: "nearest" });
-		},
-		[],
-	);
-
-	const sourceLanguage = useMemo(
-		() => ocrResult?.lang ?? "auto",
-		[ocrResult],
-	);
-
-	const onToggleTranslate = useCallback(() => {
-		setTranslateOpen((prev) => {
-			const next = !prev;
-			if (next && editableText) {
-				requestTranslate(editableText.split("\n"));
-			}
-			return next;
-		});
-	}, [editableText, requestTranslate]);
-
-	// 切换目标语言：持久化后立即按新语言重新翻译（若已有可翻译原文）
-	const handleTargetLanguageChange = useCallback(
-		(value: string) => {
-			updateTargetLanguage(value);
-			if (editableText) {
-				requestTranslate(editableText.split("\n"));
-			}
-		},
-		[updateTargetLanguage, editableText, requestTranslate],
-	);
 
 	const handleLayoutChange = (type: LayoutType) => {
 		setLayoutType(type);
@@ -499,18 +391,6 @@ export const OcrResultModal: React.FC<{
 			setCopying(false);
 		}
 	};
-
-	const handleCopyTranslated = useCallback(async () => {
-		if (!translatedText) {
-			return;
-		}
-		try {
-			await writeTextToClipboard(translatedText);
-			message.success("翻译已复制到剪贴板");
-		} catch {
-			message.error("复制失败");
-		}
-	}, [translatedText, message]);
 
 	const handleCopyItem = async (
 		value: string,
@@ -543,11 +423,14 @@ export const OcrResultModal: React.FC<{
 	// 窗口默认置顶创建，进入时同步置顶按钮初始状态
 	useEffect(() => {
 		if (open) {
-			getCurrentWindow().isAlwaysOnTop().then(setPinned).catch(() => setPinned(true));
+			getCurrentWindow()
+				.isAlwaysOnTop()
+				.then(setPinned)
+				.catch(() => setPinned(true));
 		}
 	}, [open]);
 
-	// OCR / 翻译结果窗口：常驻拖拽边界线设置（来自"主题→OCR / 翻译结果窗口"）
+	// OCR 结果窗口：常驻拖拽边界线设置（来自"主题→OCR 结果窗口"）
 	const [ocrResultWindowBorderEnabled, setOcrResultWindowBorderEnabled] =
 		useState(true);
 	const [ocrResultWindowBorderColor, setOcrResultWindowBorderColor] =
@@ -555,15 +438,12 @@ export const OcrResultModal: React.FC<{
 	const [ocrResultWindowBorderWidth, setOcrResultWindowBorderWidth] =
 		useState(1);
 	useAppSettingsLoad(
-		useCallback(
-			(settings: AppSettingsData) => {
-				const common = settings[AppSettingsGroup.Common];
-				setOcrResultWindowBorderEnabled(common.ocrResultWindowBorderEnabled);
-				setOcrResultWindowBorderColor(common.ocrResultWindowBorderColor);
-				setOcrResultWindowBorderWidth(common.ocrResultWindowBorderWidth);
-			},
-			[],
-		),
+		useCallback((settings: AppSettingsData) => {
+			const common = settings[AppSettingsGroup.Common];
+			setOcrResultWindowBorderEnabled(common.ocrResultWindowBorderEnabled);
+			setOcrResultWindowBorderColor(common.ocrResultWindowBorderColor);
+			setOcrResultWindowBorderWidth(common.ocrResultWindowBorderWidth);
+		}, []),
 		true,
 	);
 	const togglePinned = useCallback(() => {
@@ -573,10 +453,7 @@ export const OcrResultModal: React.FC<{
 		win.setAlwaysOnTop(next);
 	}, [pinned]);
 
-	// 是否处于双栏布局（原文/译文对照 或 翻译弹开）：双栏时窗口加宽一倍并保持居中
-	const isDualColumn =
-		(!isTranslateMode && translateOpen) || (isTranslateMode && showOcrText);
-
+	// 打开时按基准尺寸居中定位到当前显示器
 	useEffect(() => {
 		if (!open) {
 			return;
@@ -592,31 +469,18 @@ export const OcrResultModal: React.FC<{
 				// 基准逻辑尺寸（与 ocrResult/page.tsx 保持一致）
 				const baseLogicalWidth = 480;
 				const baseLogicalHeight = 640;
-				// 双栏时窗口宽度扩一倍
-				const targetLogicalWidth = isDualColumn
-					? baseLogicalWidth * 2
-					: baseLogicalWidth;
-				// 双栏时窗口高度也增加：原文 / 译文并排时每列能显示的行数比单栏少，
-				// 保持 640 会让每列只能放下 6~8 行就触底滚动，整体显得很扁。
-				// 高度 +96 后双栏宽高比从 3:2 变为 3:2.2，更协调、每列能放下更多行。
-				const targetLogicalHeight = isDualColumn
-					? baseLogicalHeight + 96
-					: baseLogicalHeight;
 
 				const windowHeight = Math.min(
-					Math.round(targetLogicalHeight * scaleFactor),
-					// 高度同样受屏幕高度限制：高 DPI（1.5x / 2x）下双栏 736 逻辑
-					// 会换算成 1104 / 1472 物理像素，超出 1080p 屏高导致窗口跑到屏幕外
+					Math.round(baseLogicalHeight * scaleFactor),
 					Math.round(monitorInfo.monitor_height * 0.94),
 				);
-				// 受当前显示器宽度限制（左右留边）
 				const maxWindowWidth = Math.round(monitorInfo.monitor_width * 0.94);
 				const windowWidth = Math.min(
-					Math.round(targetLogicalWidth * scaleFactor),
+					Math.round(baseLogicalWidth * scaleFactor),
 					maxWindowWidth,
 				);
 
-				// 以当前窗口中心为锚点扩展/收缩，保证切换前后居中
+				// 以当前窗口中心为锚点扩展/收缩，保证居中
 				const [pos, size] = await Promise.all([
 					appWindow.outerPosition(),
 					appWindow.outerSize(),
@@ -638,10 +502,7 @@ export const OcrResultModal: React.FC<{
 					max_y: minY + windowHeight,
 				});
 			} catch (error) {
-				console.warn(
-					"[OcrResultModal] resizeWindowForLayout failed:",
-					error,
-				);
+				console.warn("[OcrResultModal] resizeWindowForLayout failed:", error);
 			}
 		};
 
@@ -650,7 +511,7 @@ export const OcrResultModal: React.FC<{
 		return () => {
 			cancelled = true;
 		};
-	}, [open, isDualColumn]);
+	}, [open]);
 
 	if (!open) {
 		return null;
@@ -679,6 +540,7 @@ export const OcrResultModal: React.FC<{
 				<span className={styles.spacer} />
 				<span className={styles.titleActions}>
 					<button
+						type="button"
 						className={`${styles.titleBtn} ${pinned ? styles.pinned : ""}`}
 						title={pinned ? "取消置顶" : "置顶"}
 						onClick={togglePinned}
@@ -686,19 +548,21 @@ export const OcrResultModal: React.FC<{
 						<PushpinOutlined />
 					</button>
 					<button
-					className={styles.titleBtn}
-					title="最小化"
-					onClick={minWindow}
-				>
-					<MinusOutlined />
-				</button>
-				<button
-					className={`${styles.titleBtn} ${styles.closeBtn}`}
-					title="关闭"
-					onClick={onClose}
-				>
-					<CloseOutlined />
-				</button>
+						type="button"
+						className={styles.titleBtn}
+						title="最小化"
+						onClick={minWindow}
+					>
+						<MinusOutlined />
+					</button>
+					<button
+						type="button"
+						className={`${styles.titleBtn} ${styles.closeBtn}`}
+						title="关闭"
+						onClick={onClose}
+					>
+						<CloseOutlined />
+					</button>
 				</span>
 			</div>
 
@@ -706,6 +570,7 @@ export const OcrResultModal: React.FC<{
 			<div className={styles.body}>
 				<div className={styles.actions}>
 					<button
+						type="button"
 						className={`${styles.actionBtn} ${
 							layoutType === "semantic" ? styles.active : ""
 						}`}
@@ -718,217 +583,16 @@ export const OcrResultModal: React.FC<{
 					>
 						<span>{layoutType === "semantic" ? "语义排版" : "原图排版"}</span>
 					</button>
-					{isTranslateMode ? (
-						<button
-							className={`${styles.actionBtn} ${
-								showOcrText ? styles.active : ""
-							}`}
-							title={showOcrText ? "隐藏原文，只显示译文" : "打开原文对照"}
-							onClick={toggleOcrText}
-						>
-							<span>{showOcrText ? "隐藏原文" : "原文对照"}</span>
-						</button>
-					) : (
-						<button
-							className={`${styles.actionBtn} ${
-								translateOpen ? styles.active : ""
-							}`}
-							title="翻译"
-							onClick={onToggleTranslate}
-						>
-							<span>翻译</span>
-						</button>
-					)}
-					<span className={styles.langTag}>
-						识别：{languageLabel(sourceLanguage, intl)}
-					</span>
-					{(isTranslateMode || translateOpen) && (
-						<Select
-							className={styles.langSelect}
-							value={targetLanguage}
-							onChange={handleTargetLanguageChange}
-							options={targetLanguageOptions}
-							placeholder="译至"
-							popupMatchSelectWidth={false}
-							suffixIcon={null}
-							bordered={false}
-						/>
-					)}
 				</div>
 
 				{blockCount === 0 ? (
 					<div className={styles.empty}>识别结果为空</div>
-				) : isTranslateMode && showOcrText ? (
-					/* 翻译模式：原文 ↔ 译文 逐行对照（点击某行，另一侧对应展示） */
-					<div className={styles.compareGrid}>
-						<div
-							className={styles.dualCol}
-							ref={sourceCompareRootRef}
-						>
-							<div className={styles.dualColHeader}>
-								<span className={styles.dualColTitle}>原文</span>
-								<span className={styles.dualColHeaderRight}>
-									<span className={styles.tag}>
-										{languageLabel(sourceLanguage, intl)}
-									</span>
-									<button
-										className={styles.headerActionBtn}
-										title="复制原文"
-										onClick={handleCopy}
-										disabled={!editableText}
-									>
-										<CopyOutlined />
-										<span>复制</span>
-									</button>
-								</span>
-							</div>
-							<div className={styles.dualColBody}>
-								<div className={styles.compareRows}>
-									{sourceLines.map((line, i) => (
-										<div
-											key={i}
-											data-pair={i}
-											className={`${styles.compareRow} ${
-												activePair === i ? styles.active : ""
-											}`}
-											onClick={() => onPairClick(i, "source")}
-										>
-											{line || "\u00A0"}
-										</div>
-									))}
-								</div>
-							</div>
-						</div>
-						<div
-							className={styles.dualCol}
-							ref={translateCompareRootRef}
-						>
-							<div className={styles.dualColHeader}>
-								<span className={styles.dualColTitle}>译文</span>
-								<span className={styles.dualColHeaderRight}>
-									<span className={styles.tag}>
-										{languageLabel(targetLanguage, intl)}
-									</span>
-									<button
-										className={styles.headerActionBtn}
-										title="复制译文"
-										onClick={handleCopyTranslated}
-										disabled={!translatedText}
-									>
-										<CopyOutlined />
-										<span>复制</span>
-									</button>
-								</span>
-							</div>
-							{startTranslateLoading ? (
-								<div className={styles.empty} style={{ minHeight: 200 }}>
-									翻译中…
-								</div>
-							) : (
-								<div className={styles.dualColBody}>
-									<div className={styles.compareRows}>
-										{translatedSegments.map((line, i) => (
-											<div
-												key={i}
-												data-pair={i}
-												className={`${styles.compareRow} ${
-													activePair === i ? styles.active : ""
-												}`}
-												onClick={() => onPairClick(i, "translate")}
-											>
-												{line || "\u00A0"}
-											</div>
-										))}
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-				) : isTranslateMode ? (
-					/* 翻译模式：默认只展示译文 */
-					<div className={styles.translateOnly}>
-						<button
-							className={styles.copyCorner}
-							title="复制翻译"
-							onClick={handleCopyTranslated}
-							disabled={!translatedText}
-						>
-							<CopyOutlined />
-							<span>复制</span>
-						</button>
-						<div className={styles.ocrText}>
-							{startTranslateLoading
-								? "翻译中…"
-								: translatedText || "（暂无译文，请检查网络或翻译引擎配置）"}
-						</div>
-					</div>
-				) : translateOpen ? (
-					/* OCR 双栏：原文(可编辑) ↔ 译文，与翻译对照双栏完全对称 */
-					<div className={styles.compareGrid}>
-						<div className={styles.dualCol}>
-							<div className={styles.dualColHeader}>
-								<span className={styles.dualColTitle}>原文</span>
-								<span className={styles.dualColHeaderRight}>
-									<span className={styles.tag}>
-										{languageLabel(sourceLanguage, intl)}
-									</span>
-									<button
-										className={styles.headerActionBtn}
-										title="复制原文"
-										onClick={handleCopy}
-										disabled={!editableText || copying}
-									>
-										<CopyOutlined />
-										<span>{copying ? "复制中…" : "复制"}</span>
-									</button>
-								</span>
-							</div>
-							<div className={styles.dualColBody}>
-								<textarea
-									className={styles.editorTextarea}
-									value={editableText}
-									onChange={(e) => setEditableText(e.target.value)}
-									placeholder="识别结果为空"
-									spellCheck={false}
-								/>
-							</div>
-						</div>
-						<div className={styles.dualCol}>
-							<div className={styles.dualColHeader}>
-								<span className={styles.dualColTitle}>译文</span>
-								<span className={styles.dualColHeaderRight}>
-									<span className={styles.tag}>
-										{languageLabel(targetLanguage, intl)}
-									</span>
-									<button
-										className={styles.headerActionBtn}
-										title="复制译文"
-										onClick={handleCopyTranslated}
-										disabled={!translatedText}
-									>
-										<CopyOutlined />
-										<span>复制</span>
-									</button>
-								</span>
-							</div>
-							{startTranslateLoading ? (
-								<div className={styles.empty} style={{ minHeight: 200 }}>
-									翻译中…
-								</div>
-							) : (
-								<div className={styles.dualColBody}>
-									<div className={styles.compareValue}>
-										{translatedText || "（暂无译文，请检查网络或翻译引擎配置）"}
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
 				) : (
 					/* OCR 单栏：仅原文（可编辑） */
 					<div className={styles.ocrResult}>
 						<div className={styles.ocrCol}>
 							<button
+								type="button"
 								className={styles.copyCorner}
 								title="复制文本"
 								onClick={handleCopy}
@@ -962,12 +626,8 @@ export const OcrResultModal: React.FC<{
 										title={key === "urls" ? "点击在浏览器打开" : "点击复制"}
 										onClick={() => handleItemClick(key, value)}
 									>
-										<span className={styles.extractIcon}>
-											{meta.icon}
-										</span>
-										<span className={styles.extractLabel}>
-											{meta.label}
-										</span>
+										<span className={styles.extractIcon}>{meta.icon}</span>
+										<span className={styles.extractLabel}>{meta.label}</span>
 										<span
 											className={`${styles.extractValue} ${
 												key === "urls" ? styles.link : ""
@@ -977,6 +637,7 @@ export const OcrResultModal: React.FC<{
 										</span>
 										{key === "urls" && (
 											<button
+												type="button"
 												className={styles.extractAction}
 												title="在浏览器打开"
 												onClick={(e) => {
@@ -1003,6 +664,7 @@ export const OcrResultModal: React.FC<{
 					</span>
 					<div className={styles.footerActions}>
 						<button
+							type="button"
 							className={styles.minWinBtn}
 							title="最小化到状态栏"
 							onClick={minWindow}
@@ -1010,7 +672,11 @@ export const OcrResultModal: React.FC<{
 							<MinusOutlined />
 							<span>最小化</span>
 						</button>
-						<button className={styles.closeWinBtn} onClick={onClose}>
+						<button
+							type="button"
+							className={styles.closeWinBtn}
+							onClick={onClose}
+						>
 							关闭窗口
 						</button>
 					</div>

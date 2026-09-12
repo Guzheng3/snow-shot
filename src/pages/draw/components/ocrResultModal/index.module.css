@@ -138,30 +138,8 @@
 	background: #eaf2ff;
 	color: #2065c9;
 }
-.langTag {
-	font-size: 12.5px;
-	color: #9aa0a8;
-	background: #f4f5f7;
-	padding: 5px 10px;
-	border-radius: 7px;
-	white-space: nowrap;
-}
-/* 顶栏"译至"语言下拉：无边框紧凑样式，与 langTag 观感一致但可点选 */
-.langSelect {
-	min-width: 96px;
-}
-.langSelect :global(.ant-select-selector) {
-	font-size: 12.5px;
-	background: #f4f5f7 !important;
-	border-radius: 7px;
-	height: auto;
-}
-.langSelect :global(.ant-select-selection-item) {
-	line-height: 26px;
-	color: #344054;
-}
 
-/* ===== 识别结果（单栏 / 双栏）===== */
+/* ===== 识别结果（单栏）===== */
 .ocrResult {
 	flex: 1 1 auto;
 	display: flex;
@@ -175,104 +153,6 @@
 	min-width: 0;
 	min-height: 0;
 	display: flex;
-}
-/* ===== OCR 双栏（原文可编辑 + 译文）：与翻译对照 .compareGrid 完全对称的结构 ===== */
-.dualCol {
-	flex: 1 1 0;
-	min-width: 0;
-	min-height: 0;
-	display: flex;
-	flex-direction: column;
-	background: #f4f5f7;
-	border-radius: 12px;
-	padding: 12px 16px 14px;
-	overflow: hidden;
-}
-.dualColHeader {
-	flex: 0 0 auto;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	font-size: 12.5px;
-	font-weight: 600;
-	color: #9aa0a8;
-	margin-bottom: 8px;
-}
-.dualColHeader .tag {
-	background: #eef2ff;
-	color: #2f7df6;
-	padding: 1px 7px;
-	border-radius: 6px;
-}
-.dualColTitle {
-	font-size: 12.5px;
-	font-weight: 600;
-	color: #17233b;
-}
-.dualColHeaderRight {
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-}
-.headerActionBtn {
-	display: inline-flex;
-	align-items: center;
-	gap: 5px;
-	border: 0;
-	background: #ffffff;
-	color: #2f7df6;
-	font-family: inherit;
-	font-size: 12px;
-	line-height: 1;
-	padding: 4px 9px;
-	border-radius: 12px;
-	cursor: pointer;
-	box-shadow: 0 1px 4px rgba(16, 24, 40, 0.06);
-}
-.headerActionBtn:hover {
-	background: #eaf2ff;
-}
-.headerActionBtn:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
-}
-.dualColBody {
-	flex: 1 1 auto;
-	min-height: 0;
-	overflow-y: auto;
-	scrollbar-width: thin;
-	scrollbar-color: #c8ceda transparent;
-}
-.dualColBody::-webkit-scrollbar {
-	width: 8px;
-}
-.dualColBody::-webkit-scrollbar-thumb {
-	background: #c8ceda;
-	border-radius: 4px;
-}
-.editorTextarea {
-	width: 100%;
-	height: 100%;
-	display: block;
-	border: none;
-	outline: none;
-	resize: none;
-	background: transparent;
-	color: #17233b;
-	font-size: 15px;
-	line-height: 1.65;
-	font-family: inherit;
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-.compareValue {
-	font-size: 15px;
-	line-height: 1.65;
-	color: #17233b;
-	white-space: pre-wrap;
-	word-break: break-word;
-	user-select: text;
 }
 
 .copyCorner {
@@ -336,57 +216,6 @@
 .ocrText::-webkit-scrollbar-thumb {
 	background: #c8ceda;
 	border-radius: 4px;
-}
-
-/* ===== 双栏网格（OCR 双栏 / 翻译对照 共用）===== */
-.compareGrid {
-	flex: 1 1 auto;
-	display: flex;
-	gap: 16px;
-	align-items: stretch;
-	min-height: 0;
-}
-/* 对照行列表：放在 .dualColBody 内，列自身负责滚动 */
-.compareRows {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-.compareRow {
-	position: relative;
-	font-size: 15px;
-	line-height: 1.65;
-	color: #17233b;
-	padding: 8px 12px;
-	border-radius: 8px;
-	border: 1px solid transparent;
-	cursor: pointer;
-	transition: background 0.12s ease, border-color 0.12s ease;
-	white-space: pre-wrap;
-	word-break: break-word;
-	user-select: text;
-}
-.compareRow:hover {
-	background: #e9edf6;
-}
-.compareRow.active,
-.compareRow.mirrorActive {
-	background: #eaf2ff;
-	border-color: #2f7df6;
-	color: #1256c8;
-}
-.compareRow.mirrorActive {
-	background: #f3f7ff;
-}
-
-/* ===== 翻译模式：仅译文 ===== */
-.translateOnly {
-	flex: 1 1 auto;
-	min-height: 0;
-	display: flex;
-}
-.translateOnly .ocrText {
-	flex: 1 1 auto;
 }
 
 /* ===== 提取区 ===== */

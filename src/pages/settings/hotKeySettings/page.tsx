@@ -11,11 +11,10 @@ import {
 	defaultCommonKeyEventSettings,
 } from "@/constants/commonKeyEvent";
 import {
-		defaultDrawToolbarKeyEventComponentConfig,
-		defaultDrawToolbarKeyEventSettings,
-	} from "@/constants/drawToolbarKeyEvent";
-	import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
+	defaultDrawToolbarKeyEventComponentConfig,
+	defaultDrawToolbarKeyEventSettings,
+} from "@/constants/drawToolbarKeyEvent";
+import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
@@ -68,8 +67,6 @@ export const HotKeySettingsPage = () => {
 	);
 
 	const [currentPlatform] = usePlatform();
-
-	const { isReadyStatus } = usePluginServiceContext();
 
 	const drawToolbarKeyEventFormItemList = useMemo(() => {
 		return Object.keys(defaultDrawToolbarKeyEventSettings)
@@ -129,11 +126,10 @@ export const HotKeySettingsPage = () => {
 					</Col>
 				);
 			});
-	}, [currentPlatform, drawToolbarKeyEvent, isReadyStatus, updateAppSettings]);
+	}, [currentPlatform, drawToolbarKeyEvent, updateAppSettings]);
 
 	const keyEventFormItemList = useMemo(() => {
 		const groupFormItemMap: Record<CommonKeyEventGroup, React.ReactNode[]> = {
-			[CommonKeyEventGroup.Translation]: [],
 			[CommonKeyEventGroup.FixedContent]: [],
 		};
 
@@ -193,52 +189,51 @@ export const HotKeySettingsPage = () => {
 				className="settings-form common-settings-form"
 				form={commonKeyEventForm}
 			>
-				{keyEventFormItemListKeys
-										.map((configGroup, index) => {
-						return (
-							<div key={configGroup}>
-								<GroupTitle
-									id={configGroup}
-									extra={
-										<ResetSettingsButton
-											title={
-												<FormattedMessage
-													id={`settings.hotKeySettings.${configGroup}`}
-													key={configGroup}
-												/>
-											}
-											appSettingsGroup={AppSettingsGroup.CommonKeyEvent}
-											filter={(settings) => {
-												return Object.keys(settings).reduce(
-													(acc, key) => {
-														if (
-															commonKeyEvent[key as CommonKeyEventKey].group ===
-															configGroup
-														) {
-															acc[key] = settings[key];
-														}
-														return acc;
-													},
-													{} as Record<string, unknown>,
-												);
-											}}
-										/>
-									}
-								>
-									<FormattedMessage
-										id={`settings.hotKeySettings.${configGroup}`}
+				{keyEventFormItemListKeys.map((configGroup, index) => {
+					return (
+						<div key={configGroup}>
+							<GroupTitle
+								id={configGroup}
+								extra={
+									<ResetSettingsButton
+										title={
+											<FormattedMessage
+												id={`settings.hotKeySettings.${configGroup}`}
+												key={configGroup}
+											/>
+										}
+										appSettingsGroup={AppSettingsGroup.CommonKeyEvent}
+										filter={(settings) => {
+											return Object.keys(settings).reduce(
+												(acc, key) => {
+													if (
+														commonKeyEvent[key as CommonKeyEventKey].group ===
+														configGroup
+													) {
+														acc[key] = settings[key];
+													}
+													return acc;
+												},
+												{} as Record<string, unknown>,
+											);
+										}}
 									/>
-								</GroupTitle>
-								<Spin spinning={appSettingsLoading}>
-									<Row gutter={token.marginLG}>
-										{keyEventFormItemList[configGroup as CommonKeyEventGroup]}
-									</Row>
-								</Spin>
+								}
+							>
+								<FormattedMessage
+									id={`settings.hotKeySettings.${configGroup}`}
+								/>
+							</GroupTitle>
+							<Spin spinning={appSettingsLoading}>
+								<Row gutter={token.marginLG}>
+									{keyEventFormItemList[configGroup as CommonKeyEventGroup]}
+								</Row>
+							</Spin>
 
-								{index !== keyEventFormItemListKeys.length - 1 && <Divider />}
-							</div>
-						);
-					})}
+							{index !== keyEventFormItemListKeys.length - 1 && <Divider />}
+						</div>
+					);
+				})}
 			</Form>
 
 			<Divider />

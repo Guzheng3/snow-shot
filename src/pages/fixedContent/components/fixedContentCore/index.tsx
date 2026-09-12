@@ -33,7 +33,6 @@ import {
 	startFreeDrag,
 } from "@/commands/core";
 import { showMainWindow } from "@/commands/videoRecord";
-import { OcrTranslateIcon } from "@/components/icons";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
@@ -81,7 +80,7 @@ import {
 	covertOcrResultToText,
 	OcrResult,
 	type OcrResultActionType,
-	OcrResultType,
+	type OcrResultType,
 } from "../ocrResult";
 import { renderToCanvasAction } from "./actions";
 import {
@@ -268,23 +267,12 @@ const FixedContentCoreInner: React.FC<{
 	const [contentOpacity, setContentOpacity, contentOpacityRef] = useStateRef(1);
 	const [isAlwaysOnTop, setIsAlwaysOnTop] = useStateRef(true);
 	const dragRegionMouseDownMousePositionRef = useRef<MousePosition>(undefined);
-	const [currentOcrResult, setCurrentOcrResult] = useState<
+	const [, setCurrentOcrResult] = useState<
 		(AppOcrResult & { ocrResultType: OcrResultType }) | undefined
 	>(undefined);
-	const [ocrResult, setOcrResult] = useState<AppOcrResult | undefined>(
+	const [_ocrResult, setOcrResult] = useState<AppOcrResult | undefined>(
 		undefined,
 	);
-	const [translatorOcrResult, setTranslatorOcrResult] = useState<
-		AppOcrResult | undefined
-	>(undefined);
-	const [translateLoading, setTranslateLoading] = useState(false);
-	const enableOcrTranslate = useMemo(() => {
-		return (
-			getSelectTextMode(fixedContentType) === "ocr" &&
-			ocrResult &&
-			enableSelectText
-		);
-	}, [fixedContentType, enableSelectText, ocrResult]);
 
 	const [textContent, setTextContent, textContentRef] = useStateRef<
 		| {
@@ -805,14 +793,6 @@ const FixedContentCoreInner: React.FC<{
 								});
 							},
 						);
-						params.allOcrResult.translatedResult?.result.text_blocks.forEach(
-							(textBlock) => {
-								textBlock.box_points.forEach((point) => {
-									point.x += selectRectParams.shadowWidth;
-									point.y += selectRectParams.shadowWidth;
-								});
-							},
-						);
 					}
 
 					ocrResultActionRef.current.init({
@@ -1258,20 +1238,6 @@ const FixedContentCoreInner: React.FC<{
 		switchDrawCore,
 	]);
 
-	const switchOcrTranslate = useCallback(async () => {
-		if (ocrResult) {
-			if (translatorOcrResult) {
-				ocrResultActionRef.current?.switchOcrResult(
-					currentOcrResult?.ocrResultType === OcrResultType.Translated
-						? OcrResultType.Ocr
-						: OcrResultType.Translated,
-				);
-			} else {
-				ocrResultActionRef.current?.startTranslate();
-			}
-		}
-	}, [ocrResult, translatorOcrResult, currentOcrResult?.ocrResultType]);
-
 	const switchAlwaysOnTop = useCallback(async () => {
 		setIsAlwaysOnTop((isAlwaysOnTop) => !isAlwaysOnTop);
 	}, [setIsAlwaysOnTop]);
@@ -1697,23 +1663,6 @@ const FixedContentCoreInner: React.FC<{
 
 		const mainMenu = await Menu.new({
 			items: [
-				...(enableOcrTranslate
-					? [
-							{
-								id: `${appWindow.label}-ocrTranslateTool`,
-								text: intl.formatMessage({
-									id: "draw.ocrTranslateTool",
-								}),
-								action: switchOcrTranslate,
-								checked:
-									currentOcrResult?.ocrResultType ===
-									OcrResultType.Translated,
-							},
-							{
-								item: "Separator",
-							},
-						]
-					: []),
 				{
 					id: `${appWindow.label}-copyTool`,
 					text: intl.formatMessage({ id: "draw.copyTool" }),
@@ -1951,9 +1900,6 @@ const FixedContentCoreInner: React.FC<{
 		scaleRef,
 		setscrollAction,
 		applyProcessImageConfigToImageLayerAction,
-		currentOcrResult?.ocrResultType,
-		enableOcrTranslate,
-		switchOcrTranslate,
 		enableSaveToCloud,
 		onSaveToCloud,
 		enableTrayIcon,
@@ -2478,10 +2424,8 @@ const FixedContentCoreInner: React.FC<{
 						),
 					}}
 					onOcrResultChange={setOcrResult}
-				onTranslatedResultChange={setTranslatorOcrResult}
-				onCurrentOcrResultChange={setCurrentOcrResult}
-				onTranslateLoading={setTranslateLoading}
-			/>
+					onCurrentOcrResultChange={setCurrentOcrResult}
+				/>
 
 				{htmlContent && (
 					<iframe
@@ -2678,66 +2622,41 @@ const FixedContentCoreInner: React.FC<{
 						zIndex: zIndexs.FixedToScreen_CloseButton,
 						// iframe 无法点击 close 按钮
 						display:
-							isThumbnail ||
-							enableDraw ||
-							(enableSelectText && !enableOcrTranslate)
+							isThumbnail || enableDraw || enableSelectText
 								? "none"
 								: undefined,
 						pointerEvents: "auto",
 					}}
 				>
-					{enableOcrTranslate ? (
-						<Button
-							icon={<OcrTranslateIcon style={{ fontSize: "1.2em" }} />}
-							loading={translateLoading}
-							style={{
-								backgroundColor:
-									currentOcrResult?.ocrResultType === OcrResultType.Translated
-										? token.colorPrimary
-										: token.colorBgMask,
-								transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
-							}}
-							className="fixed-image-translation-button"
-							type="primary"
-							shape="circle"
-							variant="solid"
-							onClick={() => {
-								switchOcrTranslate();
-							}}
-						/>
-					) : (
-						<>
-							<Button
-								icon={<EditOutlined />}
-								style={{
-									backgroundColor: token.colorBgMask,
-									transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
-								}}
-								className="fixed-image-edit-button"
-								type="primary"
-								shape="circle"
-								variant="solid"
-								onClick={() => {
-									switchDraw();
-								}}
-							/>
+					<Button
+						icon={<EditOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-edit-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						onClick={() => {
+							switchDraw();
+						}}
+					/>
 
-							<Button
-								icon={<CloseOutlined />}
-								style={{
-									backgroundColor: token.colorBgMask,
-									transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
-								}}
-								className="fixed-image-close-button"
-								type="primary"
-								shape="circle"
-								variant="solid"
-								onClick={() => {
-									closeWindowComplete();
-								}}
-							/>
-						</>
-					)}
+					<Button
+						icon={<CloseOutlined />}
+						style={{
+							backgroundColor: token.colorBgMask,
+							transition: `background-color ${token.motionDurationFast} ${token.motionEaseInOut}`,
+						}}
+						className="fixed-image-close-button"
+						type="primary"
+						shape="circle"
+						variant="solid"
+						onClick={() => {
+							closeWindowComplete();
+						}}
+					/>
 				</Space>
 
 				<div className="scale-info" style={{ opacity: showScaleInfo ? 1 : 0 }}>
@@ -2770,8 +2689,7 @@ const FixedContentCoreInner: React.FC<{
                 }
 
                 
-                :global(.fixed-image-container .fixed-image-button-group .fixed-image-edit-button):hover,
-                :global(.fixed-image-container .fixed-image-button-group .fixed-image-translation-button):hover {
+                :global(.fixed-image-container .fixed-image-button-group .fixed-image-edit-button):hover {
                     background-color: ${token.colorPrimary} !important;
                 }
 

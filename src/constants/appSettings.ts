@@ -123,17 +123,6 @@ export const defaultAppSettingsData: AppSettingsData = {
 	[AppSettingsGroup.SystemNetwork]: {
 		enableProxy: false,
 	},
-	[AppSettingsGroup.FunctionTranslation]: {
-		optimizeAiTranslationLayout: true,
-		sourceLanguage: "auto",
-		targetLanguage: "zh-CHS",
-		// 腾讯 → 金山翻译 → 微软 → Yandex；国内可直连的优先
-		translateEngineOrder: ["Transmart", "ICibaTranslate", "Microsoft", "Yandex"],
-	},
-	[AppSettingsGroup.FunctionTranslationCache]: {
-		cacheSourceLanguage: "auto",
-		cacheTargetLanguage: "zh-CHS",
-	},
 	[AppSettingsGroup.FunctionOcr]: {
 		// 默认使用内置本地模型（离线可用）；插件版（无内置资源）首次启动会自动切换为云端
 		ocrModel: OcrModel.RapidOcrV5Server,

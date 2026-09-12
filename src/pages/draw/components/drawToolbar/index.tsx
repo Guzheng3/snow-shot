@@ -31,7 +31,6 @@ import {
 	FastSaveIcon,
 	FixedIcon,
 	OcrDetectIcon,
-	OcrTranslateIcon,
 	PenIcon,
 	SaveIcon,
 	SaveToCloudIcon,
@@ -40,7 +39,10 @@ import {
 	TextIcon,
 } from "@/components/icons";
 import { AntdContext } from "@/contexts/antdContext";
-import { AppSettingsActionContext, AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
+import {
+	AppSettingsActionContext,
+	AppSettingsPublisher,
+} from "@/contexts/appSettingsActionContext";
 import { createPublisher } from "@/hooks/useStatePublisher";
 import { useStateRef } from "@/hooks/useStateRef";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
@@ -50,7 +52,6 @@ import {
 	CanHiddenToolSet,
 } from "@/types/appSettings";
 import { DrawToolbarKeyEventKey } from "@/types/components/drawToolbar";
-import { defaultDrawToolbarKeyEventComponentConfig } from "@/constants/drawToolbarKeyEvent";
 import { DrawState } from "@/types/draw";
 import { getExcalidrawCanvas } from "@/utils/excalidraw";
 import { appWarn } from "@/utils/log";
@@ -483,9 +484,6 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 				case DrawState.OcrDetect:
 					onOcrDetect(next);
 					break;
-				case DrawState.OcrTranslate:
-					onOcrDetect(next);
-					break;
 				case DrawState.VideoRecord:
 				case DrawState.ScanQrcode:
 				case DrawState.ExtraTools:
@@ -729,8 +727,7 @@ const DrawToolbarCore: React.FC<DrawToolbarProps> = ({
 		[],
 	);
 
-
-return (
+	return (
 		<div
 			className="draw-toolbar-container"
 			onMouseDown={handleMouseDown}
@@ -864,14 +861,17 @@ return (
 							/>
 
 							{/* 橡皮擦：点击弹出模式选择（笔画擦 / 一键清屏） */}
-														<ToolbarPopover
+							<ToolbarPopover
 								trigger="hover"
 								content={
 									<Flex vertical gap={2} style={{ minWidth: 150, padding: 2 }}>
 										<Button
 											type="text"
 											block
-											style={{ justifyContent: "flex-start", textAlign: "left" }}
+											style={{
+												justifyContent: "flex-start",
+												textAlign: "left",
+											}}
 											icon={<EraserIcon />}
 											onClick={() => {
 												onToolClick(DrawState.Eraser);
@@ -882,7 +882,10 @@ return (
 										<Button
 											type="text"
 											block
-											style={{ justifyContent: "flex-start", textAlign: "left" }}
+											style={{
+												justifyContent: "flex-start",
+												textAlign: "left",
+											}}
 											icon={<DeleteOutlined />}
 											onClick={() => {
 												clearAllAnnotations();
@@ -899,7 +902,9 @@ return (
 									icon={<EraserIcon style={{ fontSize: "0.9em" }} />}
 									drawState={DrawState.Eraser}
 									disable={disableNormalScreenshotTool}
-									onClick={() => { onToolClick(DrawState.Eraser); }}
+									onClick={() => {
+										onToolClick(DrawState.Eraser);
+									}}
 								/>
 							</ToolbarPopover>
 
@@ -946,37 +951,15 @@ return (
 
 							{/* OCR */}
 							<ToolButton
-								hidden={
-									customToolbarToolHiddenMap?.[DrawState.OcrDetect]
-								}
+								hidden={customToolbarToolHiddenMap?.[DrawState.OcrDetect]}
 								componentKey={DrawToolbarKeyEventKey.OcrDetectTool}
 								icon={<OcrDetectIcon style={{ fontSize: "0.88em" }} />}
 								drawState={DrawState.OcrDetect}
-								disable={
-								disableNormalScreenshotTool
-							}
+								disable={disableNormalScreenshotTool}
 								onClick={() => {
 									onToolClick(DrawState.OcrDetect);
 								}}
 							/>
-
-
-							{/* 文本识别翻译 */}
-							<ToolButton
-								hidden={
-									customToolbarToolHiddenMap?.[DrawState.OcrTranslate]
-								}
-								componentKey={DrawToolbarKeyEventKey.OcrTranslateTool}
-								icon={<OcrTranslateIcon style={{ fontSize: "0.88em" }} />}
-								drawState={DrawState.OcrTranslate}
-								disable={
-								disableNormalScreenshotTool
-							}
-								onClick={() => {
-									onToolClick(DrawState.OcrTranslate);
-								}}
-							/>
-
 
 							{/* 滚动截图 */}
 							<ToolButton

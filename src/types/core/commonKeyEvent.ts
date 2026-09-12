@@ -1,6 +1,5 @@
 export enum CommonKeyEventGroup {
 	FixedContent = "fixedContent",
-	Translation = "translation",
 }
 
 export type CommonKeyEventValue = {
@@ -14,8 +13,6 @@ export type CommonKeyEventComponentValue = CommonKeyEventValue & {
 };
 
 export enum CommonKeyEventKey {
-	CopyAndHide = "copyAndHide",
-	Copy = "copy",
 	FixedContentEnableDraw = "fixedContentEnableDraw",
 	FixedContentSwitchThumbnail = "fixedContentSwitchThumbnail",
 	FixedContentAlwaysOnTop = "fixedContentAlwaysOnTop",

@@ -5,7 +5,6 @@ pub mod global_state;
 pub mod hot_load_page;
 pub mod http_services;
 pub mod listen_key;
-pub mod translate;
 pub mod ocr;
 pub mod plugin;
 pub mod screenshot;
@@ -32,7 +31,6 @@ use snow_shot_app_services::free_drag_window_service;
 use snow_shot_app_services::hot_load_page_service;
 use snow_shot_app_services::listen_key_service;
 use snow_shot_app_services::ocr_service::OcrService;
-use snow_shot_http_services::TranslateService;
 use snow_shot_app_services::resize_window_service;
 use snow_shot_app_services::video_record_service;
 use snow_shot_app_shared::EnigoManager;
@@ -48,7 +46,6 @@ pub static PROFILER: std::sync::LazyLock<Mutex<Option<dhat::Profiler>>> =
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let ocr_instance = Mutex::new(OcrService::new());
-    let translate_service = TranslateService::new();
     let video_record_service = Mutex::new(video_record_service::VideoRecordService::new());
     let hot_load_page_service = Arc::new(hot_load_page_service::HotLoadPageService::new());
     let enigo_instance = Mutex::new(EnigoManager::new());
@@ -220,7 +217,6 @@ pub fn run() {
         })
         .manage(ui_elements)
         .manage(ocr_instance)
-        .manage(translate_service)
         .manage(enigo_instance)
         .manage(scroll_screenshot_service)
         .manage(scroll_screenshot_image_service)
@@ -270,7 +266,6 @@ pub fn run() {
             ocr::ocr_release,
             ocr::ocr_set_cloud_token,
             ocr::ocr_import_model_archive,
-            translate::translate_text,
             core::exit_app,
             core::start_free_drag,
             core::start_resize_window,

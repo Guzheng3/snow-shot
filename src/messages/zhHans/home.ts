@@ -1,7 +1,4 @@
 export const home = {
-	"home.translationFunction": "翻译",
-	"home.translation": "翻译",
-	"home.translationSelectText": "翻译选中文本",
 	"home.commonFunction": "常用功能",
 	"home.showMainWindow": "显示主界面",
 	"home.screenshotFunction": "截图",
@@ -22,7 +19,7 @@ export const home = {
 	"home.openImageSaveFolder": "图片保存目录",
 	"home.openCaptureHistory": "截图历史",
 	"home.fullScreenDraw": "全屏画布（启用/取消画布鼠标穿透）",
-			"home.screenshot": "截图",
+	"home.screenshot": "截图",
 	"home.screenshotAfter": "截图{text}",
 	"home.shortcut": "快捷键",
 	"home.shortcut.registered": "注册成功",

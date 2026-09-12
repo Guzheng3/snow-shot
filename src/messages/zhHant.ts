@@ -6,7 +6,7 @@ export const zhHant = {
 	"menu.settings.hotKeySettings": "熱鍵設定",
 	"menu.settings.systemSettings": "系統設定",
 	"menu.tools": "工具箱",
-		"settings.commonSettings": "常用設定",
+	"settings.commonSettings": "常用設定",
 	"settings.language": "語言",
 	"settings.darkMode": "主題",
 	"settings.controlNode": "選取範圍控制樣式",
@@ -19,8 +19,7 @@ export const zhHant = {
 		"雲端 PaddleOCR V6",
 	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
 		"雲端 PaddleOCR Token",
-	"settings.systemSettings.screenshotSettings.ocrModelDir":
-		"本地 OCR 模型目錄",
+	"settings.systemSettings.screenshotSettings.ocrModelDir": "本地 OCR 模型目錄",
 	"settings.systemSettings.screenshotSettings.ocrModelImport":
 		"匯入 OCR 模型壓縮檔",
 	"settings.screenshotSettings": "截圖設定",
@@ -29,10 +28,10 @@ export const zhHant = {
 	"settings.performanceMode.tip1":
 		"啟用效能優先模式後，會嘗試降低一定繪圖品質提升效能（軟體快速迭代中，請保持開啟）",
 	"settings.drawingHotKey": "繪圖熱鍵",
-	"settings.hotKeySettings.statusBarTip": "截圖快捷鍵提示顯示項（勾選 = 截圖時顯示）",
+	"settings.hotKeySettings.statusBarTip":
+		"截圖快捷鍵提示顯示項（勾選 = 截圖時顯示）",
 	"settings.hotKeySettings.showInToolbar": "顯示在工具列",
 	"settings.hotKeySettings.showInHotKeyTip": "截圖時顯示快捷鍵提示",
-	"settings.hotKeySettings.translation": "翻譯",
 	"settings.addKeyConfig": "新增按鍵配置",
 	"settings.pleasePressTheKey": "請按按鍵",
 	"settings.keyConfig": '"{title}"按鍵配置',
@@ -55,12 +54,10 @@ export const zhHant = {
 	"settings.drawLineSmoothIterations.tip": "迭代次數越多，線條越平滑",
 	"settings.systemSettings.commonSettings": "常用設定",
 	"settings.systemSettings.commonSettings.autoStart": "開機自動啟動",
-		"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
-	"home.translation": "翻譯",
-	"home.translationSelectText": "翻譯選取文字",
+	"settings.hotKeySettings.keyEventTooltip": "{message}（{key}）",
 	"home.commonFunction": "常用功能",
 	"home.screenshotFunction": "截圖功能",
-				"home.screenshot": "截圖",
+	"home.screenshot": "截圖",
 	"home.shortcut": "快速鍵",
 	"home.shortcut.registered": "註冊成功",
 	"home.shortcut.unregistered": "註冊中斷，可能是快捷鍵被重複設定",
@@ -120,7 +117,6 @@ export const zhHant = {
 	"draw.saveTool": "儲存為檔案",
 	"draw.close": "關閉",
 	"draw.ocrDetectTool": "文字辨識",
-	"draw.ocrTranslateTool": "文字辨識翻譯",
 	"draw.fixedTool": "固定在螢幕",
 	"draw.lockWidthHeightPicker": "切換鎖定寬高",
 	"draw.lockAnglePicker": "切換鎖定角度",
@@ -148,7 +144,7 @@ export const zhHant = {
 	"draw.shadowColor": "陰影顏色",
 	"draw.resizeModal": "調整大小",
 	"draw.confirm": "確定",
-										"settings.systemSettings.networkSettings": "網路設定",
+	"settings.systemSettings.networkSettings": "網路設定",
 	"settings.systemSettings.networkSettings.proxy": "系統代理",
 	"about.title": "Snow Shot",
 	"about.subtitle": "以簡潔優雅作為理念設計的工具軟體 ❄️",
@@ -181,21 +177,6 @@ export const zhHant = {
 	"common.permission.error.description":
 		"請在開啟應用正常運行所必要的「錄屏與系統錄音」和「輔助功能」權限",
 	"common.permission.error.goToSettings": "前往授權",
-	"settings.functionSettings.translationSettings": "翻譯設定",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
-		"優化 AI 翻譯排版",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
-		"根據 AI 翻譯結果優化版面，使文字排版更整齊",
-	"settings.functionSettings.translationSettings.engineOrder": "翻譯引擎優先級",
-	"settings.functionSettings.translationSettings.engineOrder.tip":
-		"翻譯時依自上而下的順序依次嘗試，越靠前越優先",
-	"settings.functionSettings.translationSettings.engineOrder.moveUp": "上移",
-	"settings.functionSettings.translationSettings.engineOrder.moveDown": "下移",
-	"tools.translation.engine.transmart": "騰訊翻譯",
-	"tools.translation.engine.icibaTranslate": "金山翻譯",
-	"tools.translation.engine.microsoft": "微軟翻譯",
-	"tools.translation.engine.yandex": "Yandex 翻譯",
-	"tools.translation.language.auto": "自動",
 	"appearance.ocrResultWindow": "OCR / 翻譯結果視窗",
 	"appearance.ocrResultWindow.borderEnabled": "顯示拖拽邊界線",
 	"appearance.ocrResultWindow.borderEnabled.tip":

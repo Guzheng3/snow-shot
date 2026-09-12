@@ -3,7 +3,6 @@
 import ProForm, {
 	ProFormDependency,
 	ProFormDigit,
-	ProFormList,
 	ProFormSelect,
 	ProFormSwitch,
 	ProFormText,
@@ -15,13 +14,11 @@ import {
 	Col,
 	ColorPicker,
 	Divider,
-	Flex,
 	Form,
 	Input,
 	Row,
 	Select,
 	Spin,
-	Switch,
 	Typography,
 	theme,
 } from "antd";
@@ -35,6 +32,7 @@ import {
 	useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { getBuiltinOcrModelDir } from "@/commands/file";
 import { videoRecordGetMicrophoneDeviceNames } from "@/commands/videoRecord";
 import { ContentWrap } from "@/components/contentWrap";
 import { DirectoryInput } from "@/components/directoryInput";
@@ -42,11 +40,10 @@ import { GroupTitle, SubGroupTitle } from "@/components/groupTitle";
 import { IconLabel } from "@/components/iconLable";
 import { ResetSettingsButton } from "@/components/resetSettingsButton";
 import { FOCUS_WINDOW_APP_NAME_ENV_VARIABLE } from "@/constants/components/chat";
-import {
-	PLUGIN_ID_FFMPEG,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AppSettingsActionContext } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
+import { importOcrModelArchive } from "@/functions/ocrModel";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { usePlatform } from "@/hooks/usePlatform";
 import {
@@ -70,9 +67,6 @@ import {
 	getImageSaveDirectory,
 	getVideoRecordSaveDirectory,
 } from "@/utils/file";
-import { TranslationConfig } from "./components/translationConfig";
-import { getBuiltinOcrModelDir } from "@/commands/file";
-import { importOcrModelArchive } from "@/functions/ocrModel";
 
 export const FunctionSettingsPage = () => {
 	const intl = useIntl();
@@ -82,7 +76,8 @@ export const FunctionSettingsPage = () => {
 	const { updateAppSettings } = useContext(AppSettingsActionContext);
 
 	// 插件版（无内置模型资源）时展示"导入本地 OCR 模型压缩包"入口
-	const [builtinOcrModelAvailable, setBuiltinOcrModelAvailable] = useState(true);
+	const [builtinOcrModelAvailable, setBuiltinOcrModelAvailable] =
+		useState(true);
 	const [importingOcrModel, setImportingOcrModel] = useState(false);
 
 	useEffect(() => {
@@ -114,8 +109,6 @@ export const FunctionSettingsPage = () => {
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionDraw]>();
 	const [trayIconForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionTrayIcon]>();
-	const [translationForm] =
-		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionTranslation]>();
 	const [screenshotForm] =
 		Form.useForm<AppSettingsData[AppSettingsGroup.FunctionScreenshot]>();
 	const [outputForm] =
@@ -137,16 +130,6 @@ export const FunctionSettingsPage = () => {
 		useCallback(
 			(settings: AppSettingsData, preSettings?: AppSettingsData) => {
 				setAppSettingsLoading(false);
-
-				if (
-					preSettings === undefined ||
-					preSettings[AppSettingsGroup.FunctionTranslation] !==
-						settings[AppSettingsGroup.FunctionTranslation]
-				) {
-					translationForm.setFieldsValue(
-						settings[AppSettingsGroup.FunctionTranslation],
-					);
-				}
 
 				if (
 					preSettings === undefined ||
@@ -254,7 +237,6 @@ export const FunctionSettingsPage = () => {
 				}
 			},
 			[
-				translationForm,
 				functionDrawForm,
 				screenshotForm,
 				outputForm,
@@ -1208,55 +1190,54 @@ export const FunctionSettingsPage = () => {
 				</ProForm>
 			</Spin>
 
-			<>
-				<Divider />
+			<Divider />
 
-				<GroupTitle
-					id="ocrSettings"
-					extra={
-						<ResetSettingsButton
-							title={
-								<FormattedMessage id="settings.functionSettings.ocrSettings" />
-							}
-							appSettingsGroup={AppSettingsGroup.FunctionOcr}
-						/>
-					}
+			<GroupTitle
+				id="ocrSettings"
+				extra={
+					<ResetSettingsButton
+						title={
+							<FormattedMessage id="settings.functionSettings.ocrSettings" />
+						}
+						appSettingsGroup={AppSettingsGroup.FunctionOcr}
+					/>
+				}
+			>
+				<FormattedMessage id="settings.functionSettings.ocrSettings" />
+			</GroupTitle>
+
+			<Spin spinning={appSettingsLoading}>
+				<ProForm
+					form={functionOcrForm}
+					onValuesChange={(_, values) => {
+						updateAppSettings(
+							AppSettingsGroup.FunctionOcr,
+							values,
+							true,
+							true,
+							true,
+							true,
+							false,
+						);
+					}}
+					submitter={false}
+					layout="vertical"
 				>
-					<FormattedMessage id="settings.functionSettings.ocrSettings" />
-				</GroupTitle>
-
-				<Spin spinning={appSettingsLoading}>
-					<ProForm
-						form={functionOcrForm}
-						onValuesChange={(_, values) => {
-							updateAppSettings(
-								AppSettingsGroup.FunctionOcr,
-								values,
-								true,
-								true,
-								true,
-								true,
-								false,
-							);
-						}}
-						submitter={false}
-						layout="vertical"
-					>
-						<Row gutter={token.marginLG}>
-							<Col span={12}>
-								<ProFormSelect
-									label={
-										<IconLabel
-											label={
-												<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel" />
-											}
-										/>
-									}
-									name="ocrModel"
-									options={ocrModelOptions}
-								/>
-							</Col>
-							<Col span={12}>
+					<Row gutter={token.marginLG}>
+						<Col span={12}>
+							<ProFormSelect
+								label={
+									<IconLabel
+										label={
+											<FormattedMessage id="settings.systemSettings.screenshotSettings.ocrModel" />
+										}
+									/>
+								}
+								name="ocrModel"
+								options={ocrModelOptions}
+							/>
+						</Col>
+						<Col span={12}>
 							<ProFormText.Password
 								name="ocrCloudToken"
 								label={
@@ -1302,66 +1283,7 @@ export const FunctionSettingsPage = () => {
 						</Row>
 					)}
 				</ProForm>
-				</Spin>
-			</>
-
-			<>
-				<Divider />
-
-					<GroupTitle
-						id="translationSettings"
-						extra={
-							<ResetSettingsButton
-								title={
-									<FormattedMessage id="settings.functionSettings.translationSettings" />
-								}
-								appSettingsGroup={AppSettingsGroup.FunctionTranslation}
-							/>
-						}
-					>
-						<FormattedMessage id="settings.functionSettings.translationSettings" />
-					</GroupTitle>
-
-					<Spin spinning={appSettingsLoading}>
-						<TranslationConfig />
-
-						<ProForm
-							form={translationForm}
-							onValuesChange={(_, values) => {
-								updateAppSettings(
-									AppSettingsGroup.FunctionTranslation,
-									values,
-									true,
-									true,
-									true,
-									true,
-									false,
-								);
-							}}
-							submitter={false}
-						>
-							<Row gutter={token.marginLG}>
-								<Col span={12}>
-									<ProFormSwitch
-										name="optimizeAiTranslationLayout"
-										label={
-											<IconLabel
-												label={
-													<FormattedMessage id="settings.functionSettings.translationSettings.optimizeAiTranslationLayout" />
-												}
-												tooltipTitle={
-													<FormattedMessage id="settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip" />
-												}
-											/>
-										}
-										layout="vertical"
-									/>
-								</Col>
-							</Row>
-
-						</ProForm>
-				</Spin>
-			</>
+			</Spin>
 
 			<Divider />
 

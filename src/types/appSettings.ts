@@ -76,8 +76,6 @@ export enum AppSettingsGroup {
 	SystemCore = "systemCore",
 	SystemScrollScreenshot = "systemScrollScreenshot_20250628",
 	FunctionOcr = "functionOcr",
-	FunctionTranslation = "functionTranslation",
-	FunctionTranslationCache = "functionTranslationCache",
 	FunctionScreenshot = "functionScreenshot",
 	FunctionFullScreenDraw = "functionFullScreenDraw",
 	FunctionOutput = "functionOutput_20250908",
@@ -353,18 +351,6 @@ export type AppSettingsData = {
 		/** 本地 OCR 模型目录（插件版导入压缩包后的目录，云端失败/选择本地时使用） */
 		ocrModelDir: string;
 	};
-	[AppSettingsGroup.FunctionTranslation]: {
-		/** 优化 AI 翻译的排版 */
-		optimizeAiTranslationLayout: boolean;
-		sourceLanguage: string;
-		targetLanguage: string;
-		/** 翻译引擎优先级（从上到下依次尝试） */
-		translateEngineOrder: string[];
-	};
-	[AppSettingsGroup.FunctionTranslationCache]: {
-		cacheSourceLanguage: string;
-		cacheTargetLanguage: string;
-	};
 	[AppSettingsGroup.FunctionScreenshot]: {
 		/** 选取窗口子元素 */
 		findChildrenElements: boolean;
@@ -542,6 +528,5 @@ export const CanHiddenToolSet: Set<DrawState> = new Set([
 	DrawState.Redo,
 	DrawState.Fixed,
 	DrawState.OcrDetect,
-	DrawState.OcrTranslate,
 	DrawState.ScrollScreenshot,
 ]);

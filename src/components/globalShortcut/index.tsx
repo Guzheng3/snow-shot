@@ -34,18 +34,13 @@ import {
 	FullScreenDrawIcon,
 	FullScreenIcon,
 	OcrDetectIcon,
-	OcrTranslateIcon,
 	ScreenshotIcon,
-	SelectTextIcon,
 	TopWindowIcon,
-	TranslationIcon,
 	VideoRecordIcon,
 } from "@/components/icons";
 import { TrayIconStatePublisher } from "@/components/trayIconLoader";
 import { defaultAppFunctionConfigs } from "@/constants/appFunction";
-import {
-	PLUGIN_ID_FFMPEG,
-} from "@/constants/pluginService";
+import { PLUGIN_ID_FFMPEG } from "@/constants/pluginService";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
 import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
@@ -53,8 +48,6 @@ import {
 	executeScreenshotFocusedWindow,
 } from "@/functions/screenshot";
 import {
-	executeTranslate,
-	executeTranslateSelectedText,
 	openCaptureHistory,
 	openImageSaveFolder,
 	showOrHideMainWindow,
@@ -174,12 +167,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							buttonIcon = <OcrDetectIcon />;
 							buttonOnClick = () => executeScreenshot(ScreenshotType.OcrDetect);
 							break;
-						case AppFunction.ScreenshotOcrTranslate:
-							buttonTitle = <FormattedMessage id="draw.ocrTranslateTool" />;
-							buttonIcon = <OcrTranslateIcon style={{ fontSize: "1.2em" }} />;
-							buttonOnClick = () =>
-								executeScreenshot(ScreenshotType.OcrTranslate);
-							break;
 						case AppFunction.ScreenshotFullScreen:
 							buttonTitle = (
 								<FormattedMessage id="home.screenshotFunction.screenshotFullScreen" />
@@ -207,22 +194,6 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 							);
 							buttonIcon = <ClipboardIcon style={{ fontSize: "1.1em" }} />;
 							buttonOnClick = () => executeScreenshot(ScreenshotType.Copy);
-							break;
-						case AppFunction.TranslationSelectText:
-							buttonTitle = (
-								<FormattedMessage id="home.translationSelectText" />
-							);
-							buttonIcon = <SelectTextIcon style={{ fontSize: "1em" }} />;
-							buttonOnClick = async () => {
-								executeTranslateSelectedText();
-							};
-							break;
-						case AppFunction.Translation:
-							buttonTitle = <FormattedMessage id="home.translation" />;
-							buttonIcon = <TranslationIcon />;
-							buttonOnClick = () => {
-								executeTranslate();
-							};
 							break;
 						case AppFunction.TopWindow:
 							buttonTitle = <FormattedMessage id="home.topWindow" />;
@@ -298,74 +269,71 @@ const GlobalShortcutCore = ({ children }: { children: React.ReactNode }) => {
 						icon: buttonIcon,
 						onClick,
 						onKeyChange: async (value: string, prevValue: string) => {
-						// 支持逗号分隔的多个快捷键（例如 "Alt+A, Ctrl+F1"）
-						const parseKeys = (keys: string) =>
-							keys
-								.split(",")
-								.map((item) => item.trim())
-								.filter(Boolean);
+							// 支持逗号分隔的多个快捷键（例如 "Alt+A, Ctrl+F1"）
+							const parseKeys = (keys: string) =>
+								keys
+									.split(",")
+									.map((item) => item.trim())
+									.filter(Boolean);
 
-						const unregisterKeys = async (keys: string) => {
-							await Promise.all(
-								parseKeys(keys).map(async (key) => {
-									try {
-										if (await isRegistered(key)) {
-											await unregister(key);
+							const unregisterKeys = async (keys: string) => {
+								await Promise.all(
+									parseKeys(keys).map(async (key) => {
+										try {
+											if (await isRegistered(key)) {
+												await unregister(key);
+											}
+										} catch (error) {
+											appError(
+												"[GlobalShortcut] unregister prevValue failed",
+												error,
+											);
 										}
-									} catch (error) {
-										appError(
-											"[GlobalShortcut] unregister prevValue failed",
-											error,
-										);
-									}
-								}),
-							);
-						};
-
-						if (prevValue) {
-							await unregisterKeys(prevValue);
-						}
-
-						const newKeys = parseKeys(value);
-						if (newKeys.length === 0) {
-							return false;
-						}
-
-						await unregisterKeys(value);
-
-						let registerSuccess = true;
-						for (const key of newKeys) {
-							try {
-								await register(key, async (event) => {
-									if (event.state !== "Released") {
-										return;
-									}
-
-									if (
-										getAppSettings()[AppSettingsGroup.FunctionGlobalShortcut]
-											.disableOnFocusedFullScreenWindow &&
-										(await hasFocusedFullScreenWindow())
-									) {
-										return;
-									}
-
-									if (getTrayIconState()?.disableShortcut) {
-										return;
-									}
-
-									onClick();
-								});
-							} catch (error) {
-								appError(
-									"[GlobalShortcut] register failed",
-									error,
+									}),
 								);
-								registerSuccess = false;
-							}
-						}
+							};
 
-						return registerSuccess;
-					},
+							if (prevValue) {
+								await unregisterKeys(prevValue);
+							}
+
+							const newKeys = parseKeys(value);
+							if (newKeys.length === 0) {
+								return false;
+							}
+
+							await unregisterKeys(value);
+
+							let registerSuccess = true;
+							for (const key of newKeys) {
+								try {
+									await register(key, async (event) => {
+										if (event.state !== "Released") {
+											return;
+										}
+
+										if (
+											getAppSettings()[AppSettingsGroup.FunctionGlobalShortcut]
+												.disableOnFocusedFullScreenWindow &&
+											(await hasFocusedFullScreenWindow())
+										) {
+											return;
+										}
+
+										if (getTrayIconState()?.disableShortcut) {
+											return;
+										}
+
+										onClick();
+									});
+								} catch (error) {
+									appError("[GlobalShortcut] register failed", error);
+									registerSuccess = false;
+								}
+							}
+
+							return registerSuccess;
+						},
 					};
 
 					return configs;

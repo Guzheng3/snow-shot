@@ -3,7 +3,6 @@ export enum ScreenshotType {
 	Fixed = "fixed",
 	Delay = "delay",
 	OcrDetect = "ocr-detect",
-	OcrTranslate = "ocr-translate",
 	TopWindow = "top-window",
 	Copy = "copy",
 	VideoRecord = "video-record",

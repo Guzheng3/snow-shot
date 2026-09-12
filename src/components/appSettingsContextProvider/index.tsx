@@ -55,9 +55,9 @@ import type {
 	AppFunction,
 	AppFunctionConfig,
 } from "@/types/components/appFunction";
-import {
+import type {
 	DrawToolbarKeyEventKey,
-	type DrawToolbarKeyEventValue,
+	DrawToolbarKeyEventValue,
 } from "@/types/components/drawToolbar";
 import type {
 	CommonKeyEventKey,
@@ -653,13 +653,13 @@ const AppSettingsContextProviderCore: React.FC<{
 					>;
 
 					let keyEventSettingsKey =
-					typeof keyEventSettings[key]?.shortcutKey === "string" &&
-					keyEventSettings[key].shortcutKey.trim() !== ""
-						? keyEventSettings[key].shortcutKey
-						: (prevSettings?.[key]?.shortcutKey &&
-								prevSettings[key].shortcutKey.trim() !== ""
-							? prevSettings[key].shortcutKey
-							: defaultAppFunctionConfigs[key].shortcutKey);
+						typeof keyEventSettings[key]?.shortcutKey === "string" &&
+						keyEventSettings[key].shortcutKey.trim() !== ""
+							? keyEventSettings[key].shortcutKey
+							: prevSettings?.[key]?.shortcutKey &&
+									prevSettings[key].shortcutKey.trim() !== ""
+								? prevSettings[key].shortcutKey
+								: defaultAppFunctionConfigs[key].shortcutKey;
 
 					// 格式化处理下
 					keyEventSettingsKey = keyEventSettingsKey
@@ -743,10 +743,10 @@ const AppSettingsContextProviderCore: React.FC<{
 				settings = {
 					ocrModel: isValidModel
 						? newSettings.ocrModel
-						: (prevSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
+						: prevSettings?.ocrModel === OcrModel.RapidOcrV5Server ||
 								prevSettings?.ocrModel === OcrModel.PaddleCloudV6
 							? prevSettings.ocrModel
-							: defaultAppSettingsData[group].ocrModel),
+							: defaultAppSettingsData[group].ocrModel,
 					ocrCloudToken:
 						typeof newSettings?.ocrCloudToken === "string"
 							? newSettings.ocrCloudToken
@@ -758,53 +758,6 @@ const AppSettingsContextProviderCore: React.FC<{
 							: (prevSettings?.ocrModelDir ??
 								defaultAppSettingsData[group].ocrModelDir),
 				};
-			} else if (group === AppSettingsGroup.FunctionTranslationCache) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-					cacheSourceLanguage:
-						typeof newSettings?.cacheSourceLanguage === "string"
-							? newSettings.cacheSourceLanguage
-							: (prevSettings?.cacheSourceLanguage ??
-								defaultAppSettingsData[group].cacheSourceLanguage),
-					cacheTargetLanguage:
-						typeof newSettings?.cacheTargetLanguage === "string"
-							? newSettings.cacheTargetLanguage
-							: (prevSettings?.cacheTargetLanguage ??
-								defaultAppSettingsData[group].cacheTargetLanguage),
-				};
-			} else if (group === AppSettingsGroup.FunctionTranslation) {
-				newSettings = newSettings as AppSettingsData[typeof group];
-				const prevSettings = appSettingsRef.current[group] as
-					| AppSettingsData[typeof group]
-					| undefined;
-
-				settings = {
-				optimizeAiTranslationLayout:
-					typeof newSettings?.optimizeAiTranslationLayout === "boolean"
-						? newSettings.optimizeAiTranslationLayout
-						: (prevSettings?.optimizeAiTranslationLayout ??
-							defaultAppSettingsData[group].optimizeAiTranslationLayout),
-				sourceLanguage:
-					typeof newSettings?.sourceLanguage === "string"
-						? newSettings.sourceLanguage
-						: (prevSettings?.sourceLanguage ??
-							defaultAppSettingsData[group].sourceLanguage),
-				targetLanguage:
-					typeof newSettings?.targetLanguage === "string"
-						? newSettings.targetLanguage
-						: (prevSettings?.targetLanguage ??
-							defaultAppSettingsData[group].targetLanguage),
-				translateEngineOrder:
-					Array.isArray(newSettings?.translateEngineOrder) &&
-					newSettings!.translateEngineOrder.length > 0
-						? newSettings!.translateEngineOrder
-						: (prevSettings?.translateEngineOrder ??
-							defaultAppSettingsData[group].translateEngineOrder),
-			};
 			} else if (group === AppSettingsGroup.FunctionScreenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];
 				const prevSettings = appSettingsRef.current[group] as

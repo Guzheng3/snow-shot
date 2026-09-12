@@ -10,14 +10,6 @@ export const defaultCommonKeyEventSettings: Record<
 	CommonKeyEventKey,
 	CommonKeyEventValue
 > = {
-	[CommonKeyEventKey.CopyAndHide]: {
-		hotKey: getPlatformValue("Ctrl+Q", "Meta+Q"),
-		group: CommonKeyEventGroup.Translation,
-	},
-	[CommonKeyEventKey.Copy]: {
-		hotKey: getPlatformValue("Ctrl+C", "Meta+C"),
-		group: CommonKeyEventGroup.Translation,
-	},
 	[CommonKeyEventKey.FixedContentEnableDraw]: {
 		hotKey: getPlatformValue("Ctrl+E", "Meta+E"),
 		group: CommonKeyEventGroup.FixedContent,
@@ -65,11 +57,6 @@ export const defaultCommonKeyEventComponentConfig: Record<
 	(acc, key) => {
 		let baseMessageId = "";
 		if (
-			defaultCommonKeyEventSettings[key as CommonKeyEventKey].group ===
-			CommonKeyEventGroup.Translation
-		) {
-			baseMessageId = "tools.translation";
-		} else if (
 			defaultCommonKeyEventSettings[key as CommonKeyEventKey].group ===
 			CommonKeyEventGroup.FixedContent
 		) {

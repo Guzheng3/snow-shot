@@ -1,12 +1,10 @@
 import type { GlobalToken } from "antd";
-import { OcrResultType } from ".";
 
 export const getOcrResultIframeSrcDoc = (
 	textContent: string,
-	ocrResultType: OcrResultType,
 	enableDrag: boolean | undefined,
 	enableCopy: boolean | undefined,
-	token: GlobalToken | undefined,
+	_token: GlobalToken | undefined,
 ) => {
 	return `<head><meta name="color-scheme" content="light dark"></meta></head>
                                 <body>${textContent}</body>
@@ -155,108 +153,3 @@ export const getOcrResultIframeSrcDoc = (
                         </script>
                     `;
 };
-
-/**
- * 将译文按来源文本的长度占比切分，使两者段数一致且占比尽量接近
- */
-export function alignTranslatedBySourceProportion(
-	sourceTextList: string[],
-	translatedTextList: string[],
-): string[] {
-	const splitGraphemes = (text: string): string[] => {
-		type SegmentData = { segment: string };
-		type SegmenterInstance = {
-			segment: (input: string) => Iterable<SegmentData>;
-		};
-		type SegmenterCtor = new (
-			locales?: string | string[],
-			options?: { granularity?: "grapheme" | "word" | "sentence" },
-		) => SegmenterInstance;
-		const SegCtor =
-			typeof Intl !== "undefined"
-				? (Intl as unknown as { Segmenter?: SegmenterCtor }).Segmenter
-				: undefined;
-		const segmenter: SegmenterInstance | null =
-			typeof SegCtor === "function"
-				? new SegCtor(undefined, { granularity: "grapheme" })
-				: null;
-		if (segmenter) {
-			const seg = segmenter.segment(text);
-			const result: string[] = [];
-			for (const part of seg) result.push(part.segment);
-			return result;
-		}
-		// Fallback: code points
-		return Array.from(text);
-	};
-
-	const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
-
-	// 1) 源文本各段长度与占比
-	const sourceGraphemeLens = sourceTextList.map(
-		(s) => splitGraphemes(s).length,
-	);
-	const sourceTotal = sum(sourceGraphemeLens);
-	const n = sourceTextList.length;
-
-	// 边界：若源总长度为 0，则平均分配
-	const sourceRatios =
-		sourceTotal > 0
-			? sourceGraphemeLens.map((l) => l / sourceTotal)
-			: Array.from({ length: n }, () => 1 / Math.max(1, n));
-
-	// 2) 译文总长度
-	const translatedGraphemesList = translatedTextList.map(splitGraphemes);
-	const translatedTotal = sum(translatedGraphemesList.map((g) => g.length));
-
-	// 边界：译文总长度为 0，直接返回空段
-	if (translatedTotal === 0) return Array.from({ length: n }, () => "");
-
-	// 3) 最大余数法：按占比把总长度分成 n 份的整数目标
-	const quotas = sourceRatios.map((r) => r * translatedTotal);
-	const floorParts = quotas.map((q) => Math.floor(q));
-	const remainder = translatedTotal - sum(floorParts);
-
-	const remainders = quotas.map((q, i) => ({ i, frac: q - Math.floor(q) }));
-	remainders.sort((a, b) => (b.frac === a.frac ? a.i - b.i : b.frac - a.frac));
-	for (let k = 0; k < remainder; k++) {
-		floorParts[remainders[k].i] += 1;
-	}
-	const targetLens = floorParts; // 每段应取的“字素”数，和为 translatedTotal
-
-	// 4) 顺序切分译文，得到与源文本同段数的结果
-	const result: string[] = Array.from({ length: n }, () => "");
-	let translatedIndex = 0; // 指向第几个译文段
-	let graphemeIndex = 0; // 指向该译文段内的字素位置
-
-	for (let i = 0; i < n; i++) {
-		let need = targetLens[i];
-		const parts: string[] = [];
-
-		while (need > 0 && translatedIndex < translatedGraphemesList.length) {
-			const current = translatedGraphemesList[translatedIndex];
-			const remain = current.length - graphemeIndex;
-			if (remain <= 0) {
-				translatedIndex += 1;
-				graphemeIndex = 0;
-				continue;
-			}
-
-			const take = Math.min(need, remain);
-			if (take > 0) {
-				parts.push(current.slice(graphemeIndex, graphemeIndex + take).join(""));
-				graphemeIndex += take;
-				need -= take;
-			}
-
-			if (graphemeIndex >= current.length) {
-				translatedIndex += 1;
-				graphemeIndex = 0;
-			}
-		}
-
-		result[i] = parts.join("");
-	}
-
-	return result;
-}

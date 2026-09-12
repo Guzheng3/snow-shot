@@ -6,7 +6,7 @@ export const en = {
 	"menu.settings.hotKeySettings": "Hotkey Settings",
 	"menu.settings.systemSettings": "System Settings",
 	"menu.tools": "Toolbox",
-		"settings.commonSettings": "Common Settings",
+	"settings.commonSettings": "Common Settings",
 	"settings.language": "Language",
 	"settings.darkMode": "Dark Mode",
 	"settings.controlNode": "Selection Control Style",
@@ -18,7 +18,8 @@ export const en = {
 	"settings.performanceMode.tip1":
 		"Enabling Performance Mode will attempt to reduce rendering quality to improve performance (keep enabled during rapid software iteration)",
 	"settings.drawingHotKey": "Drawing Hotkeys",
-	"settings.hotKeySettings.statusBarTip": "Screenshot shortcut tip items (checked = show when capturing)",
+	"settings.hotKeySettings.statusBarTip":
+		"Screenshot shortcut tip items (checked = show when capturing)",
 	"settings.hotKeySettings.showInToolbar": "Show in toolbar",
 	"settings.hotKeySettings.showInHotKeyTip": "Show hotkey tip when capturing",
 	"settings.addKeyConfig": "Add Key Configuration",
@@ -60,12 +61,9 @@ export const en = {
 	"settings.systemSettings.screenshotSettings.ocrModelImport":
 		"Import OCR Model Archive",
 	"settings.hotKeySettings.keyEventTooltip": "{message} ({key})",
-	"settings.hotKeySettings.translation": "Translation",
-	"home.translation": "Translate",
-	"home.translationSelectText": "Translate selected text",
 	"home.commonFunction": "Common Features",
 	"home.screenshotFunction": "Screenshot Feature",
-			"home.screenshot": "Screenshot",
+	"home.screenshot": "Screenshot",
 	"home.shortcut": "Hotkey",
 	"home.shortcut.registered": "Registered successfully",
 	"home.shortcut.unregistered":
@@ -127,7 +125,6 @@ export const en = {
 	"draw.saveTool": "Save as File",
 	"draw.close": "Close",
 	"draw.ocrDetectTool": "Text Recognition",
-	"draw.ocrTranslateTool": "OCR Translate",
 	"draw.fixedTool": "Pin to Screen",
 	"draw.lockWidthHeightPicker": "Toggle Lock Aspect Ratio",
 	"draw.lockAnglePicker": "Toggle Angle Lock",
@@ -155,7 +152,7 @@ export const en = {
 	"draw.shadowColor": "Shadow Color",
 	"draw.resizeModal": "Resize",
 	"draw.confirm": "Confirm",
-									"settings.systemSettings.networkSettings": "Network Settings",
+	"settings.systemSettings.networkSettings": "Network Settings",
 	"settings.systemSettings.networkSettings.proxy": "System Proxy",
 	"about.title": "Snow Shot",
 	"about.subtitle":
@@ -207,21 +204,6 @@ export const en = {
 		"Horizontal",
 	"settings.functionSettings.videoRecordSettings.keyDisplayDirection.vertical":
 		"Vertical",
-	"settings.functionSettings.translationSettings": "Translation Settings",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
-		"Optimize AI translation layout",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
-		"Optimize the layout based on AI translation results for cleaner text alignment",
-	"settings.functionSettings.translationSettings.engineOrder": "Translation engine priority",
-	"settings.functionSettings.translationSettings.engineOrder.tip":
-		"Engines are tried top-to-bottom in order; earlier means higher priority",
-	"settings.functionSettings.translationSettings.engineOrder.moveUp": "Move up",
-	"settings.functionSettings.translationSettings.engineOrder.moveDown": "Move down",
-	"tools.translation.engine.transmart": "Tencent Translate",
-	"tools.translation.engine.icibaTranslate": "Kingsoft Translate",
-	"tools.translation.engine.microsoft": "Microsoft Translator",
-	"tools.translation.engine.yandex": "Yandex Translator",
-	"tools.translation.language.auto": "Auto",
 	"appearance.ocrResultWindow": "OCR / Translation Result Window",
 	"appearance.ocrResultWindow.borderEnabled": "Show resize border",
 	"appearance.ocrResultWindow.borderEnabled.tip":

@@ -74,7 +74,8 @@ export const settings = {
 	"settings.performanceMode.tip1":
 		"启用性能优先模式后，会尝试降低一定绘图质量提高性能（软件快速迭代中，请保持开启）",
 	"settings.drawingHotKey": "截图",
-	"settings.hotKeySettings.statusBarTip": "截图快捷键提示显示项（勾选 = 截图时显示）",
+	"settings.hotKeySettings.statusBarTip":
+		"截图快捷键提示显示项（勾选 = 截图时显示）",
 	"settings.hotKeySettings.showInToolbar": "显示在工具栏",
 	"settings.hotKeySettings.showInHotKeyTip": "截图时显示快捷键提示",
 	"settings.addKeyConfig": "添加按键配置",
@@ -336,7 +337,6 @@ export const settings = {
 		"自定义图标路径（暗黑）",
 	"settings.commonSettings.trayIconSettings.iconPath.tip":
 		"建议 32x32 或 64x64 的图标",
-	"settings.hotKeySettings.translation": "翻译",
 	"settings.hotKeySettings.fixedContent": "固定到屏幕",
 	"settings.hotKeySettings.fixedContent.fixedContentEnableDraw": "绘制模式",
 	"settings.hotKeySettings.fixedContent.fixedContentSwitchThumbnail":
@@ -383,7 +383,7 @@ export const settings = {
 		"鼠标位置",
 	"settings.printScreen.tip":
 		"Windows 下如无法唤起截图，请禁用系统的截图工具后再次尝试，如无响应可尝试重启",
-									"settings.functionSettings.trayIconSettings": "托盘",
+	"settings.functionSettings.trayIconSettings": "托盘",
 	"settings.functionSettings.trayIconSettings.iconClickAction": "左键点击后",
 	"settings.functionSettings.trayIconSettings.iconClickAction.screenshot":
 		"截图",
@@ -427,8 +427,7 @@ export const settings = {
 		"云端 PaddleOCR V6",
 	"settings.systemSettings.screenshotSettings.ocrModel.cloudToken":
 		"云端 PaddleOCR Token",
-	"settings.systemSettings.screenshotSettings.ocrModelDir":
-		"本地 OCR 模型目录",
+	"settings.systemSettings.screenshotSettings.ocrModelDir": "本地 OCR 模型目录",
 	"settings.systemSettings.screenshotSettings.ocrModelImport":
 		"导入 OCR 模型压缩包",
 	"settings.systemSettings.screenshotSettings.ocrHotStart": "文本识别热启动",
@@ -507,16 +506,6 @@ export const settings = {
 	"settings.systemSettings.coreSettings.hotLoadPageCount": "热加载页面数量",
 	"settings.systemSettings.coreSettings.hotLoadPageCount.tip":
 		"通过热加载页面，实现固定剪贴板内容到屏幕、视频录制、全屏画布等功能的快速加载，但同时提高了内存的占用",
-	"settings.functionSettings.translationSettings": "翻译设置",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout":
-		"优化 AI 翻译排版",
-	"settings.functionSettings.translationSettings.optimizeAiTranslationLayout.tip":
-		"根据 AI 翻译结果优化布局，使文本排版更整齐",
-	"settings.functionSettings.translationSettings.engineOrder": "翻译引擎优先级",
-	"settings.functionSettings.translationSettings.engineOrder.tip":
-		"翻译时按自上而下的顺序依次尝试，靠前优先",
-	"settings.functionSettings.translationSettings.engineOrder.moveUp": "上移",
-	"settings.functionSettings.translationSettings.engineOrder.moveDown": "下移",
 	"settings.functionSettings.ocrSettings": "文本识别",
 	"settings.functionSettings.globalShortcutSettings": "全局快捷键",
 	"settings.functionSettings.globalShortcutSettings.disableOnFocusedFullScreenWindow":

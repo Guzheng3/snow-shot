@@ -5,16 +5,16 @@ import { DrawStatePublisher } from "@/components/drawCore/extra";
 import { defaultDrawToolbarKeyEventComponentConfig } from "@/constants/drawToolbarKeyEvent";
 import { useAppSettingsLoad } from "@/hooks/useAppSettingsLoad";
 import { useStateSubscriber } from "@/hooks/useStateSubscriber";
+import { KeyEventWrap } from "@/pages/draw/components/drawToolbar/components/keyEventWrap";
 import { type AppSettingsData, AppSettingsGroup } from "@/types/appSettings";
 import { DrawToolbarKeyEventKey } from "@/types/components/drawToolbar";
 import type { HotkeysScope } from "@/types/core/appHotKeys";
 import type { DrawState } from "@/types/draw";
 import { getButtonTypeByState } from "../../extra";
-import { KeyEventWrap } from "@/pages/draw/components/drawToolbar/components/keyEventWrap";
 
 /**
  * 工具栏图标下方文字的短名称映射（长名称在设置面板里仍显示完整翻译）
- * 用户指定：锁定绘制工具→锁定、文本识别翻译→翻译、固定到屏幕→贴图、
+ * 用户指定：锁定绘制工具→锁定、固定到屏幕→贴图、
  * 滚动截图→长图、复制到剪贴板→复制
  */
 const TOOLBAR_SHORT_NAMES: Partial<Record<DrawToolbarKeyEventKey, string>> = {
@@ -22,7 +22,6 @@ const TOOLBAR_SHORT_NAMES: Partial<Record<DrawToolbarKeyEventKey, string>> = {
 	[DrawToolbarKeyEventKey.FixedTool]: "贴图",
 	[DrawToolbarKeyEventKey.ScrollScreenshotTool]: "长图",
 	[DrawToolbarKeyEventKey.CopyTool]: "复制",
-	[DrawToolbarKeyEventKey.OcrTranslateTool]: "翻译",
 };
 
 const ToolButtonCore: React.FC<{
@@ -110,7 +109,7 @@ const ToolButtonCore: React.FC<{
 				id: defaultDrawToolbarKeyEventComponentConfig[componentKey].messageId,
 			});
 		const hotKey = keyEventValue?.hotKey;
-		return hotKey ? name + " " + hotKey : name;
+		return hotKey ? `${name} ${hotKey}` : name;
 	}, [componentKey, intl, keyEventValue]);
 
 	const buttonDom = (

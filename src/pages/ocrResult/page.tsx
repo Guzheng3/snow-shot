@@ -1,13 +1,13 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { LogicalSize } from "@tauri-apps/api/dpi";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getCurrentMonitorInfo } from "@/commands/core";
 import { getOcrResultState } from "@/commands/globalSate";
 import { EventListenerContext } from "@/components/eventListener";
 import { TextScaleFactorContextProvider } from "@/components/textScaleFactorContextProvider";
+import OcrResultModal from "@/pages/draw/components/ocrResultModal";
 import type { OcrDetectResult } from "@/types/commands/ocr";
 import { setWindowRect, showWindow } from "@/utils/window";
-import OcrResultModal from "@/pages/draw/components/ocrResultModal";
 
 export const OcrResultPage: React.FC = () => {
 	const { addListener, removeListener } = useContext(EventListenerContext);
@@ -15,7 +15,6 @@ export const OcrResultPage: React.FC = () => {
 	const [ocrResult, setOcrResult] = useState<OcrDetectResult | undefined>(
 		undefined,
 	);
-	const [mode, setMode] = useState<"ocr" | "translate">("ocr");
 	const [open, setOpen] = useState(false);
 
 	const initedRef = useRef(false);
@@ -65,7 +64,6 @@ export const OcrResultPage: React.FC = () => {
 		}
 
 		setOcrResult(result);
-		setMode(state.mode === "translate" ? "translate" : "ocr");
 		setOpen(true);
 		await positionAndShowWindow();
 	}, [positionAndShowWindow]);
@@ -99,12 +97,7 @@ export const OcrResultPage: React.FC = () => {
 
 	return (
 		<TextScaleFactorContextProvider>
-			<OcrResultModal
-				open={open}
-				ocrResult={ocrResult}
-				mode={mode}
-				onClose={handleClose}
-			/>
+			<OcrResultModal open={open} ocrResult={ocrResult} onClose={handleClose} />
 		</TextScaleFactorContextProvider>
 	);
 };
