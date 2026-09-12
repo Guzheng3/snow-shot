@@ -321,6 +321,10 @@ export type AppSettingsData = {
 		delayScreenshotSeconds: number;
 		/** 锁定手动选区时的宽高比 */
 		lockDragAspectRatio: number;
+		/** 内置字体是否已拒绝安装 */
+		fontInstallDeclined: boolean;
+		/** 是否已拒绝导入本地 OCR 模型（选中后不再在在线 OCR 不可达时弹窗提醒） */
+		ocrModelImportDeclined: boolean;
 		/** Tab 键是否启用查找子元素 */
 		enableTabFindChildrenElements: boolean;
 	};

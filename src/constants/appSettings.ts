@@ -109,6 +109,8 @@ export const defaultAppSettingsData: AppSettingsData = {
 		delayScreenshotSeconds: 0,
 		lockDragAspectRatio: 0,
 		enableTabFindChildrenElements: true,
+		fontInstallDeclined: false,
+		ocrModelImportDeclined: false,
 	},
 	[AppSettingsGroup.DrawToolbarKeyEvent]: defaultDrawToolbarKeyEventSettings,
 	[AppSettingsGroup.CommonKeyEvent]: defaultCommonKeyEventSettings,

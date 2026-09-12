@@ -420,6 +420,16 @@ const AppSettingsContextProviderCore: React.FC<{
 							? newSettings.enableTabFindChildrenElements
 							: (prevSettings?.enableTabFindChildrenElements ??
 								defaultAppSettingsData[group].enableTabFindChildrenElements),
+					fontInstallDeclined:
+						typeof newSettings?.fontInstallDeclined === "boolean"
+							? newSettings.fontInstallDeclined
+							: (prevSettings?.fontInstallDeclined ??
+								defaultAppSettingsData[group].fontInstallDeclined),
+					ocrModelImportDeclined:
+						typeof newSettings?.ocrModelImportDeclined === "boolean"
+							? newSettings.ocrModelImportDeclined
+							: (prevSettings?.ocrModelImportDeclined ??
+								defaultAppSettingsData[group].ocrModelImportDeclined),
 				};
 			} else if (group === AppSettingsGroup.Screenshot) {
 				newSettings = newSettings as AppSettingsData[typeof group];
