@@ -17,8 +17,8 @@ use windows::Win32::System::Variant::VARIANT;
 use windows::Win32::UI::Shell::{SEE_MASK_NOCLOSEPROCESS, SHELLEXECUTEINFOW, ShellExecuteExW};
 use windows::Win32::UI::WindowsAndMessaging::GetForegroundWindow;
 use windows::Win32::UI::WindowsAndMessaging::{
-    GWL_EXSTYLE, GetWindowLongPtrW, HWND_NOTOPMOST, HWND_TOPMOST, SWP_NOMOVE, SWP_NOSIZE,
-    SetWindowPos, WS_EX_TOPMOST,
+    GWL_EXSTYLE, GetWindowLongPtrW, HWND_NOTOPMOST, HWND_TOPMOST, SetForegroundWindow,
+    SetWindowPos, SWP_NOMOVE, SWP_NOSIZE, WS_EX_TOPMOST,
 };
 use windows::core::Interface;
 use windows::core::PCWSTR;
@@ -52,16 +52,26 @@ pub fn switch_always_on_top(hwnd: *mut c_void) -> bool {
     result.is_ok()
 }
 
-pub fn set_draw_window_style(#[allow(unused_variables)] window: tauri::Window) {
-    // 暂时不处理，保留下函数占位
+pub fn set_draw_window_style(window: tauri::Window) {
+    use windows::Win32::Foundation::HWND;
 
-    // let window_hwnd = window.hwnd();
-
-    // if let Ok(hwnd) = window_hwnd {
-    //     // 设置窗口样式为0x96000000
-    //     let new_style = -1778384896;
-    //     unsafe { SetWindowLongW(hwnd, GWL_STYLE, new_style) };
-    // }
+    // 强制绘制窗置顶到最上方，并尝试抢占前台焦点，
+    // 这样才能盖住全屏/独占游戏等特殊窗口，让用户能正常绘制截图选区
+    if let Ok(window_hwnd) = window.hwnd() {
+        let hwnd = HWND(window_hwnd.0);
+        unsafe {
+            let _ = SetWindowPos(
+                hwnd,
+                Some(HWND_TOPMOST),
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE,
+            );
+            let _ = SetForegroundWindow(hwnd);
+        }
+    }
 }
 
 pub fn get_focused_window() -> HWND {

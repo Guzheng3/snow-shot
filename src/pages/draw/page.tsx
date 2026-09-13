@@ -25,7 +25,11 @@ import {
 } from "@/commands/core";
 import { setCaptureState } from "@/commands/globalSate";
 import { listenKeyStart, listenKeyStop } from "@/commands/listenKey";
-import { captureAllMonitors, switchAlwaysOnTop } from "@/commands/screenshot";
+import {
+	captureAllMonitors,
+	setDrawWindowStyle,
+	switchAlwaysOnTop,
+} from "@/commands/screenshot";
 import {
 	scrollScreenshotClear,
 	scrollScreenshotGetImageData,
@@ -61,9 +65,9 @@ import { AppSettingsGroup, DoubleClickAction } from "@/types/appSettings";
 import {
 	type ElementRect,
 	type ImageBuffer,
-		ImageBufferType,
-		ImageEncoder,
-	} from "@/types/commands/screenshot";
+	ImageBufferType,
+	ImageEncoder,
+} from "@/types/commands/screenshot";
 import { DrawState } from "@/types/draw";
 import { getCorrectHdrColorAlgorithm } from "@/utils/appSettings";
 import {
@@ -88,9 +92,7 @@ import {
 	type FixedContentActionType,
 	FixedContentCore,
 } from "../fixedContent/components/fixedContentCore";
-import {
-	covertOcrResultToText,
-} from "../fixedContent/components/ocrResult";
+import { covertOcrResultToText } from "../fixedContent/components/ocrResult";
 import {
 	DrawContext as CommonDrawContext,
 	type DrawContextType as CommonDrawContextType,
@@ -168,11 +170,7 @@ const DrawPageCore: React.FC<{
 	getFixedContentAction: () => FixedContentActionType | undefined;
 	onFixedContentLoad: () => void;
 	showFixedContent: () => void;
-}> = ({
-	getFixedContentAction,
-	onFixedContentLoad,
-	showFixedContent,
-}) => {
+}> = ({ getFixedContentAction, onFixedContentLoad, showFixedContent }) => {
 	const { message } = useContext(AntdContext);
 	const intl = useIntl();
 
@@ -408,6 +406,10 @@ const DrawPageCore: React.FC<{
 			}
 
 			await showCurrentWindow();
+			// 强制绘制窗置顶并抢占前台，确保能盖住全屏/独占游戏等窗口正常绘制选区
+			setDrawWindowStyle().catch((error) => {
+				appError("[DrawPageCore] setDrawWindowStyle error", error);
+			});
 			if (
 				process.env.NODE_ENV === "development" &&
 				getScreenshotType()?.type !== ScreenshotType.TopWindow
@@ -1072,7 +1074,7 @@ const DrawPageCore: React.FC<{
 		await finishCapture();
 	}, [finishCapture]);
 
-	const onOcrDetect = useCallback(async (drawState: DrawState) => {
+	const onOcrDetect = useCallback(async () => {
 		if (
 			!selectLayerActionRef.current ||
 			!imageLayerActionRef.current ||
@@ -1080,10 +1082,6 @@ const DrawPageCore: React.FC<{
 		) {
 			return;
 		}
-
-		const screenshotSettings =
-			getAppSettings()[AppSettingsGroup.FunctionScreenshot];
-
 
 		if (!captureBoundingBoxInfoRef.current || !ocrBlocksActionRef.current) {
 			return;
@@ -1097,7 +1095,7 @@ const DrawPageCore: React.FC<{
 			ocrBlocksActionRef.current,
 			true,
 		);
-	}, [finishCapture, getAppSettings, message]);
+	}, []);
 
 	const onCopyToClipboard = useCallback(async () => {
 		const enableAutoSave =
@@ -1507,6 +1505,14 @@ const DrawPageCore: React.FC<{
 				return;
 			}
 
+			// 防误触门槛：仅在选区已确认后才允许触发双击快速操作，
+			// 且本次双击不能紧跟在“刚画完选区”的鼠标松开之后，避免画完选区被误判为双击复制
+			const lastSelectTime =
+				selectLayerActionRef.current?.getLastSelectTime?.() ?? 0;
+			if (lastSelectTime <= 0 || Date.now() - lastSelectTime < 400) {
+				return;
+			}
+
 			if (
 				e.button === 0 &&
 				// 如果存在创建时间大于 300ms 的在编辑中的元素，则认为是对箭头的双击
@@ -1533,7 +1539,7 @@ const DrawPageCore: React.FC<{
 				}
 			}
 		},
-		[getAppSettings, onCopyToClipboard, onSave, onFixed],
+		[getAppSettings, getDrawState, onCopyToClipboard, onSave, onFixed],
 	);
 
 	const onInitCanvasReady = useCallback(async () => {
@@ -1635,19 +1641,19 @@ export const DrawPage: React.FC = () => {
 
 	return (
 		<TextScaleFactorContextProvider>
-				{!isFixed && (
-					<DrawPageContent
-						getFixedContentAction={getFixedContentAction}
-						onFixedContentLoad={onFixedContentLoad}
-						showFixedContent={showFixedContent}
-					/>
-				)}
-				<div>
-					<FixedContentCore
-						actionRef={fixedContentActionRef}
-						disabled={fixedContentDisabled}
-					/>
-				</div>
-			</TextScaleFactorContextProvider>
-		);
-	};
+			{!isFixed && (
+				<DrawPageContent
+					getFixedContentAction={getFixedContentAction}
+					onFixedContentLoad={onFixedContentLoad}
+					showFixedContent={showFixedContent}
+				/>
+			)}
+			<div>
+				<FixedContentCore
+					actionRef={fixedContentActionRef}
+					disabled={fixedContentDisabled}
+				/>
+			</div>
+		</TextScaleFactorContextProvider>
+	);
+};

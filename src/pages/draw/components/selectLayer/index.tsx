@@ -95,6 +95,7 @@ export type SelectLayerActionType = {
 	) => void;
 	getSelectState: () => SelectState;
 	getDragMode: () => DragMode | undefined;
+	getLastSelectTime: () => number;
 	getWindowId: () => number | undefined;
 	setEnable: (enable: boolean) => void;
 	onExecuteScreenshot: () => Promise<void>;
@@ -249,6 +250,8 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 		undefined,
 	);
 	const selectStateRef = useRef(SelectState.Auto); // 当前的选择状态
+	// 记录最近一次选区确认（mouseup 切到 Selected）的时间，用于双击快速操作的误触门槛
+	const lastSelectTimeRef = useRef(0);
 	const [getCaptureEvent] = useStateSubscriber(
 		CaptureEventPublisher,
 		useCallback((event: CaptureEventParams | undefined) => {
@@ -1268,6 +1271,8 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 		}
 
 		mouseDownPositionRef.current = undefined;
+		// 选区确认完成，记录时间用于双击快速操作的误触门槛
+		lastSelectTimeRef.current = Date.now();
 	}, [drawToolbarActionRef, getSelectRect, setSelectRect, setSelectState]);
 
 	// 用上一次的鼠标移动事件触发 onMouseMove 来更新一些状态
@@ -1485,6 +1490,7 @@ const SelectLayerCore: React.FC<SelectLayerProps> = ({ actionRef }) => {
 			},
 			getSelectState: () => selectStateRef.current,
 			getDragMode: () => dragModeRef.current,
+			getLastSelectTime: () => lastSelectTimeRef.current,
 			switchCaptureHistory: (
 				captureHistory: CaptureHistoryItem | undefined,
 			) => {
