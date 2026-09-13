@@ -154,7 +154,13 @@ const DrawCoreComponent: React.FC<{
 
 	const initialData = useMemo<ExcalidrawInitialDataState>(() => {
 		return {
-			appState: { viewBackgroundColor: "#00000000" },
+			appState: {
+				viewBackgroundColor: "#00000000",
+				// 默认绘制颜色改为红色（覆盖 excalidraw 默认 #1e1e1e）
+				currentItemStrokeColor: "#f5222d",
+				// 默认描边宽度改为粗（矩形/椭圆/箭头/直线等）
+				currentItemStrokeWidth: 4,
+			},
 		};
 	}, []);
 

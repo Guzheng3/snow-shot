@@ -58,8 +58,8 @@ export const generatePickerRenders: (
 			>["BorderTypeRadioSelection"],
 		layerButtonRender,
 		elementStrokeColors: [
-			"#1e1e1e",
 			"#f5222d",
+			"#1e1e1e",
 			"#52c41a",
 			"#1677ff",
 			"#faad14",
