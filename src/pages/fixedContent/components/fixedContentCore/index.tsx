@@ -36,7 +36,6 @@ import { showMainWindow } from "@/commands/videoRecord";
 import { INIT_CONTAINER_KEY } from "@/components/imageLayer/actions";
 import { AntdContext } from "@/contexts/antdContext";
 import { AppSettingsPublisher } from "@/contexts/appSettingsActionContext";
-import { usePluginServiceContext } from "@/contexts/pluginServiceContext";
 import {
 	fixedContentFocusModeCloseAllWindow,
 	fixedContentFocusModeCloseOtherWindow,
@@ -195,7 +194,6 @@ const FixedContentCoreInner: React.FC<{
 	onImageLoad,
 	disabled,
 }) => {
-	const { isReadyStatus } = usePluginServiceContext();
 	const intl = useIntl();
 	const { token } = theme.useToken();
 	const { message } = useContext(AntdContext);
@@ -1527,10 +1525,6 @@ const FixedContentCoreInner: React.FC<{
 			closedMenu.setScaleMenu?.close();
 		}
 
-		if (!isReadyStatus) {
-			return;
-		}
-
 		if (disabled) {
 			return;
 		}
@@ -1876,7 +1870,6 @@ const FixedContentCoreInner: React.FC<{
 
 		return result;
 	}, [
-		isReadyStatus,
 		disabled,
 		intl,
 		hotkeys,
