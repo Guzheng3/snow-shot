@@ -23,7 +23,10 @@ import { generateImageFileName, showImageDialog } from "@/utils/file";
 import { appError } from "@/utils/log";
 import { getPlatform } from "@/utils/platform";
 import { randomString } from "@/utils/random";
-import { getWebViewSharedBuffer } from "@/utils/webview";
+import {
+	getWebViewSharedBuffer,
+	writeCanvasPixelsToBuffer,
+} from "@/utils/webview";
 import { setWindowRect } from "@/utils/window";
 import type { FixedContentActionType } from "../fixedContent/components/fixedContentCore";
 import type { AllOcrResult } from "../fixedContent/components/ocrResult";
@@ -374,16 +377,6 @@ const copyBitmapImageToClipboardWithSharedBuffer = async (
 		return false;
 	}
 
-	const imageDataArray = imageCanvas
-		.getContext("2d")
-		?.getImageData(0, 0, imageCanvas.width, imageCanvas.height);
-	if (!imageDataArray) {
-		appError(
-			"[copyBitmapImageToClipboardWithSharedBuffer] imageDataArray is undefined",
-		);
-		return false;
-	}
-
 	const reciveData = (await getWebViewSharedBufferPromise) as unknown as
 		| SharedArrayBuffer
 		| undefined;
@@ -394,12 +387,20 @@ const copyBitmapImageToClipboardWithSharedBuffer = async (
 		return false;
 	}
 
-	// 将 ImageData 写入 SharedArrayBuffer
-	const sharedArray = new Uint8ClampedArray(reciveData);
-	sharedArray.set(imageDataArray.data);
+	// 分块写入像素，避免一次性 getImageData 造成大图卡顿
+	if (!(await writeCanvasPixelsToBuffer(imageCanvas, reciveData))) {
+		appError(
+			"[copyBitmapImageToClipboardWithSharedBuffer] write pixels failed",
+		);
+		return false;
+	}
 
 	// 将宽高以 u32 字节形式写入最后 8 个字节（使用 Uint32Array 更高效）
-	const u32Array = new Uint32Array(reciveData, imageDataArray.data.length, 2);
+	const u32Array = new Uint32Array(
+		reciveData,
+		imageCanvas.width * imageCanvas.height * 4,
+		2,
+	);
 	u32Array[0] = imageCanvas.width;
 	u32Array[1] = imageCanvas.height;
 

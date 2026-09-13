@@ -32,7 +32,10 @@ import { writeTextToClipboard } from "@/utils/clipboard";
 import { appError } from "@/utils/log";
 import { getPlatformValue } from "@/utils/platform";
 import { randomString } from "@/utils/random";
-import { getWebViewSharedBuffer } from "@/utils/webview";
+import {
+	getWebViewSharedBuffer,
+	writeCanvasPixelsToBuffer,
+} from "@/utils/webview";
 import { getOcrResultIframeSrcDoc } from "./extra";
 
 // 定义角度阈值常量（以度为单位）
@@ -392,14 +395,6 @@ export const OcrResult: React.FC<{
 				return undefined;
 			}
 
-			const imageDataArray = canvas
-				.getContext("2d")
-				?.getImageData(0, 0, canvas.width, canvas.height);
-			if (!imageDataArray) {
-				appError("[ocrDetectByCanvas] imageDataArray is undefined");
-				return undefined;
-			}
-
 			const reciveData = (await getWebViewSharedBufferPromise) as unknown as
 				| SharedArrayBuffer
 				| undefined;
@@ -408,14 +403,16 @@ export const OcrResult: React.FC<{
 				return undefined;
 			}
 
-			// 将 ImageData 写入 SharedArrayBuffer
-			const sharedArray = new Uint8ClampedArray(reciveData);
-			sharedArray.set(imageDataArray.data);
+			// 分块写入像素，避免一次性 getImageData 造成大图卡顿
+			if (!(await writeCanvasPixelsToBuffer(canvas, reciveData))) {
+				appError("[ocrDetectByCanvas] write pixels failed");
+				return undefined;
+			}
 
-			// 将宽高以 u32 字节形式写入最后 8 个字节（使用 Uint32Array 更高效）
+			// 将宽高以 u32 字节形式写入最后 8 个字节
 			const u32Array = new Uint32Array(
 				reciveData,
-				imageDataArray.data.length,
+				canvas.width * canvas.height * 4,
 				2,
 			);
 			u32Array[0] = canvas.width;
